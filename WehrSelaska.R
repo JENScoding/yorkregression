@@ -6,27 +6,21 @@
 X <- c(0,0.9, 1.8, 2.6, 3.3, 4.4, 5.2, 6.1, 6.5, 7.4)
 Y <- c(5.9, 5.4, 4.4, 4.6, 3.5, 3.7, 2.8, 2.8, 2.4, 1.5)
 
-w_X <- c(1e+3, 1e+3, 5e+2, 8e+2, 2e+2, 8e+1, 6e+1, 2e+1, 1.8, 1)
-w_Y <- c(1, 1.8, 4,8, 20, 20, 70, 70, 1e+2, 5e+2)
-
 my_w <- data.frame(
-  "Y" = c(1, 1.8, 4,8, 20, 20, 70, 70, 1e+2, 5e+2),
+  "Y" = c(1, 1.8, 4, 8, 20, 20, 70, 70, 1e+2, 5e+2),
   "X" = c(1e+3, 1e+3, 5e+2, 8e+2, 2e+2, 8e+1, 6e+1, 2e+1, 1.8, 1))
 
 ## function for algo
 
-york <- function(y, x, tolerance = 1e-6){
-  #initial value of b and tolerance level
-  b_ols <- function(y, x) { 
-    fit <- lm(y ~ x)
-    return(as.numeric(fit$coefficients[2]))
-  }
-  b <- b_ols(Y, X)
+york <- function(y, x, tolerance = 1e-10, weights){
+  #initial value of b is OLS
+  b <- as.numeric(lm(Y~X)[[1]][2])
   
   b_diff <- 10
   count <- 0
   
   while (b_diff > tolerance) {
+    
     b_old <- b
     X_bar <- 0
     Y_bar <- 0
@@ -35,10 +29,10 @@ york <- function(y, x, tolerance = 1e-6){
     W <- rep(0,length(X))
     for (i in 1:length(X)) {
       # omega, Jonas hat aber gesagt: "Lass es weg"
-      alpha[i] <- sqrt(w_X[i] * w_Y[i])
-      W[i] <- alpha[i]^2 / (b^2 * w_Y[i] + w_X[i])
-      X_bar <- X_bar + W[i] * X[i]
-      Y_bar <- Y_bar + W[i] * Y[i]
+      alpha[i] <- sqrt(weights[i, 1] * weights[i, 2])
+      W[i] <- weights[i, 1] * weights[i, 2] / (b^2 * weights[i, 1] + weights[i, 2])
+      X_bar <- X_bar + W[i] * x[i]
+      Y_bar <- Y_bar + W[i] * y[i]
       W_sum <- W_sum + W[i]
     }
     X_bar <- X_bar / W_sum 
@@ -46,32 +40,32 @@ york <- function(y, x, tolerance = 1e-6){
     
     Q1 <- 0
     Q2 <- 0
-    U <- rep(0,length(X))
-    V <- rep(0,length(X))
-    beta <- rep(0,length(X))
-    for (i in 1:length(X)) {
-      U[i] <- X[i] - X_bar
-      V[i] <- Y[i] - Y_bar
-      beta[i] <- W[i] * ((U[i] / w_Y[i]) + (b * V[i] / w_X[i]) - (b * U[i] + V[i]) * 0 / alpha[i])
+    U <- rep(0,length(x))
+    V <- rep(0,length(x))
+    beta <- rep(0,length(x))
+    for (i in 1:length(x)) {
+      U[i] <- x[i] - X_bar
+      V[i] <- y[i] - Y_bar
+      beta[i] <- W[i] * ((U[i] / weights[i, 1]) + (b * V[i] / weights[i, 2]) - (b * U[i] + V[i]) * 0 / alpha[i])
       Q1 <- Q1 + W[i] * beta[i] * V[i]
       Q2 <- Q2 + W[i] * beta[i] * U[i]
     }
    #Q1 <- sum(W*beta*V)
     #Q2 <- sum(W*beta*U)
-    b <- Q1 / Q2
+    b <- round(Q1 / Q2, 100)
     b_diff <- abs(b - b_old)
     count <- count + 1
-   # print(b)
+   print(b, digits = 10)
     
   }
   
   a <- Y_bar - b * X_bar
-  
+
   x_mean <- 0
-  x <- rep(0,length(X))
+  x_adj <- rep(0,length(X))
   
   for(i in 1:length(X)){
-    x[i] <- X_bar + beta[i]
+    x_adj[i] <- X_bar + beta[i]
     x_mean <- x_mean + W[i] * beta[i]
   }
   
@@ -82,7 +76,7 @@ york <- function(y, x, tolerance = 1e-6){
   u <- rep(0,length(X))
   
   for(i in 1:length(X)){
-    u[i] <- x[i] - x_mean
+    u[i] <- x_adj[i] - x_mean
     sigma_b <- sigma_b + W[i]*u[i]^2
     chisq_w <- chisq_w + W[i]*(Y[i]-b*X[i]-a)^2
   }
@@ -92,13 +86,16 @@ york <- function(y, x, tolerance = 1e-6){
   chisq_w <- chisq_w / (length(X) - 2)
   sigma_x <- sqrt(2 / (length(X) - 2))
   
-  coef <- c(a,b)
-  coefn <- attr(coef, "coefficients")
-  est <- list("coefficients" = coefn, W, X_bar, Y_bar, sigma_a, sigma_b, sigma_x, count, U, V, x, x_mean, u)
+  residuals <- y - (a + b * x)
+  
+  mt <- matrix(c(a, b, sigma_a, sigma_b), nrow = 2)
+  rownames(mt) <- c("intercept", "slope")
+  colnames(mt) <- c("Estimate", "Std.Error")
+  est <- list("coefficients" = mt, "weighting.vector" = W, "residuals" = residuals, "mean.x" = X_bar, "mean.y" = Y_bar ,"Std.Error.chi" = sigma_x, "iterations" = count, U, V, x, y, x_mean, u)
   return(est)
 }
 
-first <- york(Y, g)
+first <- york(Y, X, weight = my_w)
 
 first$coefficients[1]
 
