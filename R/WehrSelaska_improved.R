@@ -5,17 +5,17 @@ rm(list=ls())
 x <- c(0,0.9, 1.8, 2.6, 3.3, 4.4, 5.2, 6.1, 6.5, 7.4)
 y <- c(5.9, 5.4, 4.4, 4.6, 3.5, 3.7, 2.8, 2.8, 2.4, 1.5)
 
-my_w <- data.frame(
-  "y" = c(1, 1.8, 4, 8, 20, 20, 70, 70, 1e+2, 5e+2),
-  "x" = c(1e+3, 1e+3, 5e+2, 8e+2, 2e+2, 8e+1, 6e+1, 2e+1, 1.8, 1))
+weights_y = c(1, 1.8, 4, 8, 20, 20, 70, 70, 1e+2, 5e+2)
+weights_x = c(1e+3, 1e+3, 5e+2, 8e+2, 2e+2, 8e+1, 6e+1, 2e+1, 1.8, 1)
 
 ## function for algo
 
-#initial value of b is OLS
-lm_OLS <- lm(y~x)
-slope <- as.numeric(lm_OLS[[1]][2])
 
-york <- function(y, x, tolerance = 1e-10, weights){
+
+york <- function(y, x, tolerance = 1e-10, weights.y, weights.x){
+  #initial value of b is OLS
+  lm_OLS <- lm(y~x)
+  slope <- as.numeric(lm_OLS[[1]][2])
 
   slope_diff <- 10
   count <- 0
@@ -24,21 +24,21 @@ york <- function(y, x, tolerance = 1e-10, weights){
 
     slope_old <- slope
     # omega, Jonas hat aber gesagt: "Lass es weg"
-    alpha <- sqrt(weights[, 1] * weights[, 2])
-    Weight <- alpha^2 / (slope^2 * weights[, 1] + weights[, 2] - 2 * slope * 0 * alpha)
+    alpha <- sqrt(weights_y * weights_x)
+    Weight <- alpha^2 / (slope^2 * weights_y + weights_x - 2 * slope * 0 * alpha)
     Weight_sum <- sum(Weight)
     x_bar <- sum(Weight * x) / Weight_sum
     y_bar <- sum(Weight * y) / Weight_sum
     x_centered <- x - x_bar
     y_centered <- y - y_bar
 
-    beta <- Weight * ((x_centered / weights[, 1]) + (slope * y_centered / weights[, 2]) - (slope * x_centered + y_centered) * 0 / alpha)
+    beta <- Weight * ((x_centered / weights_y) + (slope * y_centered / weights_x) - (slope * x_centered + y_centered) * 0 / alpha)
     Q1 <- sum(Weight * beta * y_centered)
     Q2 <- sum(Weight * beta * x_centered)
     slope <- Q1 / Q2
     slope_diff <- abs(slope - slope_old)
     count <- count + 1
-    #print(slope, digits = 10)
+    print(slope, digits = 10)
 
   }
 
@@ -74,9 +74,9 @@ york <- function(y, x, tolerance = 1e-10, weights){
 
   c <- 0*alpha
 
-  x_resdiduals = (Weight*(alpha+slope*x-y)*(c-slope*weights[, 2]))/(weights[, 1]*weights[, 2])
+  x_resdiduals <- (Weight * (intercept + slope * x - y) * (c - slope * weights_y)) / (weights_y * weights_x)
 
-  y_resdiduals = (Weight*(alpha+slope*x-y)*(weights[, 1]-slope*c))/(weights[, 1]*weights[, 2])
+  y_resdiduals = (Weight * (intercept + slope * x - y) * (weights_x - slope * c))/ (weights_y * weights_x)
 
 
 
@@ -87,7 +87,7 @@ york <- function(y, x, tolerance = 1e-10, weights){
   return(est)
 }
 
-first <- york(y, x, weight = my_w)
+first <- york(y, x, weights.y = weights_y, weights.x = weights_x)
 first
 
 plot(x,y)
