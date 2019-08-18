@@ -77,7 +77,7 @@ york <- function(y, x, tolerance = 1e-10, weights.y, weights.x){
 
   x_resdiduals <- (Weight * (intercept + slope * x - y) * (c - slope * weights_y)) / (weights_y * weights_x)
 
-  y_resdiduals = (Weight * (intercept + slope * x - y) * (weights_x - slope * c))/ (weights_y * weights_x)
+  y_resdiduals <- (Weight * (intercept + slope * x - y) * (weights_x - slope * c))/ (weights_y * weights_x)
 
 
 
