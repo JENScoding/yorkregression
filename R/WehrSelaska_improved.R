@@ -72,10 +72,18 @@ york <- function(y, x, tolerance = 1e-10, weights){
 
   residuals <- y - fitted_y
 
+  c <- 0*alpha
+
+  x_resdiduals = (Weight*(alpha+slope*x-y)*(c-slope*weights[, 2]))/(weights[, 1]*weights[, 2])
+
+  y_resdiduals = (Weight*(alpha+slope*x-y)*(weights[, 1]-slope*c))/(weights[, 1]*weights[, 2])
+
+
+
   mt <- matrix(c(intercept, slope, sigma_intercept, sigma_slope), nrow = 2)
   rownames(mt) <- c("intercept", "slope")
   colnames(mt) <- c("Estimate", "Std.Error")
-  est <- list("coefficients" = mt, "weighting.vector" = Weight, "residuals" = residuals,"fitted_y"=fitted_y, "mean.x" = x_bar, "mean.y" = y_bar ,"Std.Error.chi" = sigma_x, "iterations" = count, x_centered, y_centered, x, y, x_mean, "show" = x_adj)
+  est <- list("coefficients" = mt, "weighting.vector" = Weight, "x.residuals" = x_resdiduals,"y.residuals"=y_resdiduals,"fitted_y"=fitted_y, "mean.x" = x_bar, "mean.y" = y_bar ,"Std.Error.chi" = sigma_x, "iterations" = count, x_centered, y_centered, x, y, x_mean, "show" = x_adj)
   return(est)
 }
 
@@ -89,6 +97,8 @@ legend("topright",legend = c("OLS","York"), fill = c("blue","red"))
 #the York regression line and the OLS regression line both go to the "center of gravity"
 abline(v= first$mean.x,h= first$mean.y ,lty = "dashed", col = "red")
 abline(v= mean(x),h= mean(y) ,lty = "dashed", col = "blue")
+
+plot(first$x.residuals,first$y.residuals)
 
 ## end of (relevant) script
 
