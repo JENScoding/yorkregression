@@ -10,7 +10,8 @@ weights_x = c(1e+3, 1e+3, 5e+2, 8e+2, 2e+2, 8e+1, 6e+1, 2e+1, 1.8, 1)
 
 ## function for algo
 
-
+lm_OLS <- lm(y~x)
+slope <- as.numeric(lm_OLS[[1]][2])
 
 york <- function(y, x, tolerance = 1e-10, weights.y, weights.x){
   #initial value of b is OLS
@@ -90,13 +91,15 @@ york <- function(y, x, tolerance = 1e-10, weights.y, weights.x){
 first <- york(y, x, weights.y = weights_y, weights.x = weights_x)
 first
 
-plot(x,y)
+plot(x,y, pch = 16)
 lines(x,first$fitted_y , col = "red",lwd = 2)
 lines(x, lm_OLS$fitted.values, col = "blue", lty = "dashed",lwd = 2)
 legend("topright",legend = c("OLS","York"), fill = c("blue","red"))
 #the York regression line and the OLS regression line both go to the "center of gravity"
 abline(v= first$mean.x,h= first$mean.y ,lty = "dashed", col = "red")
+points(x= first$mean.x,y= first$mean.y,col="red", pch = 16)
 abline(v= mean(x),h= mean(y) ,lty = "dashed", col = "blue")
+points(x= mean(x),y= mean(y),col="blue", pch = 16)
 
 plot(first$x.residuals,first$y.residuals)
 
