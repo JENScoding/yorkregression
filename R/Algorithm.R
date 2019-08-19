@@ -38,6 +38,7 @@ york <- function(y, x, tolerance = 1e-10, weights.y, weights.x){
     count <- count + 1
     print(slope, digits = 10)
 
+    if (count > tolerance^-1) stop(cat("The slope coefficient does not converge after", count, "iterations"))
   }
 
   intercept <- y_bar - slope * x_bar
