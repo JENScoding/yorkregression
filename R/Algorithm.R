@@ -10,7 +10,7 @@ weights_x = c(1e+3, 1e+3, 5e+2, 8e+2, 2e+2, 8e+1, 6e+1, 2e+1, 1.8, 1)
 
 ## function for algo
 
-york <- function(y, x, tolerance = 1e-10, weights.y, weights.x){
+york <- function(x, y, tolerance = 1e-10, weights.x, weights.y){
   #initial value of b is OLS
   lm_OLS <- lm(y~x)
   slope <- as.numeric(lm_OLS[[1]][2])
@@ -39,7 +39,15 @@ york <- function(y, x, tolerance = 1e-10, weights.y, weights.x){
     count <- count + 1
     slope_per_iteration <- append(slope_per_iteration, slope)
 
-    if (count > tolerance^-1) stop(cat("The slope coefficient does not converge after", count, "iterations"))
+    if (count > 5)  stop("\nThe slope coefficient does not converge after ",
+                         count,
+                         " iterations. \nHint: You may reduce the tolerance level.",
+                         cat("Slope coefficient for last 5 iterations:"),
+                         for (i in 4:0){
+                           cat("\n\t", count - i, "\t", slope_per_iteration[count - i])
+                         },
+                         cat("\n")
+                         )
   }
   slope_per_iteration <- data.frame("slope_per_iteration" = slope_per_iteration)
 
@@ -99,10 +107,13 @@ york <- function(y, x, tolerance = 1e-10, weights.y, weights.x){
   return(est)
 }
 
-york.output <- york(y, x, weights.y = weights_y, weights.x = weights_x)
+york.output <- york(x, y, weights.x = weights_x, weights.y = weights_y)
 
 york.output$slope.after.each.iteration
 
 
 ## end of (relevant) script
+
+
+#### Testing
 
