@@ -3,6 +3,7 @@
 ## Input from Table I and Table II in york 1966
 #setwd()
 load("original_data.RData")
+# here you can also load other data and weights
 
 ## function for algo
 
