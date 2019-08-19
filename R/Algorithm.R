@@ -2,107 +2,104 @@
 
 ## Input from Table I and Table II in york 1966
 rm(list=ls())
-x <- c(0,0.9, 1.8, 2.6, 3.3, 4.4, 5.2, 6.1, 6.5, 7.4)
+x <- c(0, NA, 1.8, 2.6, 3.3, 4.4, 5.2, 6.1, 6.5, 7.4)
 y <- c(5.9, 5.4, 4.4, 4.6, 3.5, 3.7, 2.8, 2.8, 2.4, 1.5)
 
-weights_y = c(1, 1.8, 4, 8, 20, 20, 70, 70, 1e+2, 5e+2)
-weights_x = c(1e+3, 1e+3, 5e+2, 8e+2, 2e+2, 8e+1, 6e+1, 2e+1, 1.8, 1)
+weights.y = c(1, 1.8, 4, 8, 20, 20, 70, 70, 1e+2, 5e+2)
+weights.x = c(1e+3, 1e+3, 5e+2, 8e+2, 2e+2, 8e+1, 6e+1, 2e+1, 1.8, 1)
 
 ## function for algo
 
-york <- function(y, x, tolerance = 1e-10, weights.y, weights.x){
+york <- function(x, y, tolerance = 1e-10, weights.x, weights.y){
   #initial value of b is OLS
-  lm_OLS <- lm(y~x)
-  slope <- as.numeric(lm_OLS[[1]][2])
+  lm.OLS <- lm(y~x)
+  slope <- as.numeric(lm.OLS[[1]][2])
 
-  slope_diff <- 10
+  slope.diff <- 10
   count <- 0
-  slope_per_iteration <- NULL
+  slope.per.iteration <- NULL
 
-  while (slope_diff > tolerance) {
+  while (slope.diff > tolerance) {
 
-    slope_old <- slope
+    slope.old <- slope
     # omega, Jonas hat aber gesagt: "Lass es weg"
-    alpha <- sqrt(weights_y * weights_x)
-    Weight <- alpha^2 / (slope^2 * weights_y + weights_x - 2 * slope * 0 * alpha)
-    Weight_sum <- sum(Weight)
-    x_bar <- sum(Weight * x) / Weight_sum
-    y_bar <- sum(Weight * y) / Weight_sum
-    x_centered <- x - x_bar
-    y_centered <- y - y_bar
+    alpha <- sqrt(weights.x * weights.y)
+    Weight <- alpha^2 / (slope^2 * weights.y + weights.x - 2 * slope * 0 * alpha)
+    Weight.sum <- sum(Weight)
+    x.bar <- sum(Weight * x, na.rm = T) / Weight.sum
+    y.bar <- sum(Weight * y, na.rm = T) / Weight.sum
+    x.centered <- x - x.bar
+    y.centered <- y - y.bar
 
-    beta <- Weight * ((x_centered / weights_y) + (slope * y_centered / weights_x) - (slope * x_centered + y_centered) * 0 / alpha)
-    Q1 <- sum(Weight * beta * y_centered)
-    Q2 <- sum(Weight * beta * x_centered)
+    beta <- Weight * ((x.centered / weights.y) + (slope * y.centered / weights.x) - (slope * x.centered + y.centered) * 0 / alpha)
+    Q1 <- sum(Weight * beta * y.centered, na.rm = T)
+    Q2 <- sum(Weight * beta * x.centered, na.rm = T)
     slope <- Q1 / Q2
-    slope_diff <- abs(slope - slope_old)
+    slope.diff <- abs(slope - slope.old)
     count <- count + 1
-    slope_per_iteration <- append(slope_per_iteration, slope)
+    slope.per.iteration <- append(slope.per.iteration, slope)
 
-    if (count > tolerance^-1) stop(cat("The slope coefficient does not converge after", count, "iterations"))
+    if (count > tolerance^-1)  stop("\nThe slope coefficient does not converge after ",
+                         count,
+                         " iterations. \nHint: You may reduce the tolerance level.",
+                         cat("Slope coefficient for last 5 iterations:"),
+                         for (i in 4:0){
+                           cat("\n\t", count - i, "\t", slope.per.iteration[count - i])
+                         },
+                         cat("\n")
+                         )
   }
-  slope_per_iteration <- data.frame("slope_per_iteration" = slope_per_iteration)
+  slope.per.iteration <- data.frame("slope.per.iteration" = slope.per.iteration)
 
-  intercept <- y_bar - slope * x_bar
+  intercept <- y.bar - slope * x.bar
 
-  x_mean <- 0
-  x_adj <- rep(0,length(x))
+  x.adj <- x.bar + beta
 
-  x_adj <- x_bar + beta
-  x_mean <- sum(Weight * beta)
+  x.mean <- sum(Weight * beta, na.rm = T) / (Weight.sum * (length(x) - 2))
+  u <- x.adj - x.mean
 
+  sigma.slope <- sqrt(1 / sum(Weight * u^2, na.rm = T))
+  sigma.intercept <- sqrt(x.mean^2 * sigma.slope^2 + 1 / Weight.sum)
 
-  x_mean <- x_mean / (Weight_sum * (length(x) - 2))
+  chisq.weight <- sum(Weight * (y - slope * x - intercept)^2, na.rm = T) / (length(x) - 2)
+  sigma.x <- sqrt(2 / (length(x) - 2))
 
-  sigma_slope <- 0
-  chisq_weight <- 0
-  u <- rep(0,length(x))
+  fitted.y <- intercept + slope * x
 
-  for(i in 1:length(x)){
-    u[i] <- x_adj[i] - x_mean
-    sigma_slope <- sigma_slope + Weight[i]*u[i]^2
-    chisq_weight <- chisq_weight + Weight[i]*(y[i]-slope*x[i]-intercept)^2
-  }
-
-  sigma_slope <- sqrt(1 / sigma_slope)
-  sigma_intercept <- sqrt(x_mean^2 * sigma_slope^2 + 1 / Weight_sum)
-  chisq_weight <- chisq_weight / (length(x) - 2)
-  sigma_x <- sqrt(2 / (length(x) - 2))
-
-  fitted_y <- intercept + slope * x
-
-  residuals <- y - fitted_y
+  residuals <- y - fitted.y
 
   c <- 0*alpha
+  x.residuals <- (Weight * (intercept + slope * x - y) * (c - slope * weights.y)) / (weights.y * weights.x)
+  y.residuals <- (Weight * (intercept + slope * x - y) * (weights.x - slope * c))/ (weights.y * weights.x)
 
-  x_residuals <- (Weight * (intercept + slope * x - y) * (c - slope * weights_y)) / (weights_y * weights_x)
-
-  y_residuals <- (Weight * (intercept + slope * x - y) * (weights_x - slope * c))/ (weights_y * weights_x)
-
-  mt <- matrix(c(intercept, slope, sigma_intercept, sigma_slope), nrow = 2)
+  mt <- matrix(c(intercept, slope, sigma.intercept, sigma.slope), nrow = 2)
   rownames(mt) <- c("intercept", "slope")
   colnames(mt) <- c("Estimate", "Std.Error")
   est <- list("coefficients" = mt,
               "weighting.vector" = Weight,
-              "x.residuals" = x_residuals,
-              "y.residuals"=y_residuals,
-              "fitted_y"=fitted_y,
-              "mean.x" = x_bar,
-              "mean.y" = y_bar ,
-              "Std.Error.chi" = sigma_x,
+              "x.residuals" = x.residuals,
+              "y.residuals"=y.residuals,
+              "fitted.y"=fitted.y,
+              "mean.x" = x.bar,
+              "mean.y" = y.bar ,
+              "Std.Error.chi" = sigma.x,
+              "Weighted_chi^2" = chisq.weight,
               "number.of.iterations" = count,
-              "slope.after.each.iteration" = slope_per_iteration,
-              x_centered, y_centered, x, y, x_mean, "show" = x_adj,
+              "slope.after.each.iteration" = slope.per.iteration,
+              x.centered, y.centered, x, y, x.mean, "show" = x.adj,
               "original.x.values" = x,
               "original.y.values" = y,
-              "fitted_ols" = lm_OLS$fitted.values)
+              "fitted.ols" = lm.OLS$fitted.values)
   return(est)
 }
 
-york.output <- york(y, x, weights.y = weights_y, weights.x = weights_x)
+york.output <- york(x, y, weights.x = weights.x, weights.y = weights.y)
 
 york.output$slope.after.each.iteration
 
 
 ## end of (relevant) script
+
+
+#### Testing
 

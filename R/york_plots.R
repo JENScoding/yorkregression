@@ -1,5 +1,13 @@
 york.plots <- function(york.output){
-  plot(york.output$original.x.values, york.output$original.y.values, pch = 16)
+  plot(york.output$original.x.values, york.output$original.y.values,
+       xlab = "x data",
+       ylab = "y data",
+       main = "York regression vs. OLS regression",
+       col = "black",
+       pch = 16,
+       las = 1,
+       ylim = c(1.5,6))
+
   lines(york.output$original.x.values, york.output$fitted_y , col = "red",lwd = 2)
   lines(york.output$original.x.values, york.output$fitted_ols, col = "blue", lty = "dashed",lwd = 2)
   legend("topright",legend = c("OLS","York"), fill = c("blue","red"))
@@ -11,11 +19,39 @@ york.plots <- function(york.output){
   compare_OLS_York <- recordPlot()
   dev.off()
 
-  plot(york.output$x.residuals, york.output$y.residuals)
+  plot(york.output$x.residuals, york.output$y.residuals,
+       xlab = "x residuals",
+       ylab = "y residuals",
+       main = "x residuals vs. y residuals",
+       col = "black",
+       pch = 16,
+       las = 1)
   residuals <- recordPlot()
   dev.off()
 
-  return(list("compare_OLS_York_with_center_of_gravity" = compare_OLS_York, "residuals" = residuals))
+  plot(york.output$fitted_y, york.output$x.residuals,
+       xlab = "fitted y",
+       ylab = "x residuals",
+       main = "x residuals vs. fitted plot",
+       col = "black",
+       pch = 16,
+       las = 1)
+
+  xresiduals_vs_fitted <- recordPlot()
+  dev.off()
+
+  plot(york.output$fitted_y, york.output$y.residuals,
+       xlab = "fitted y",
+       ylab = "y residuals",
+       main = "y residuals vs. fitted plot",
+       col = "black",
+       pch = 16,
+       las = 1)
+
+  yresiduals_vs_fitted <- recordPlot()
+  dev.off()
+
+  return(list("compare_OLS_York_with_center_of_gravity" = compare_OLS_York, "residuals" = residuals, "yresiduals_vs_fitted" = yresiduals_vs_fitted.))
 }
 
 my_plots <- york.plots(york.output)
