@@ -8,23 +8,61 @@ load("multiple_samples.RData")
 york <- function(x, y, tolerance = 1e-10, weights.x, weights.y){
   #initial value of b is OLS
   lm.OLS <- list()
-  slope <- list()
+  slope <- NULL
   for (i in 1:5){
-    lm.OLS <- lm(y[, i]~x[, i])
-    x[[i]] <- c(0, 0.9, 1.8, 2.6, 3.3, 4.4, 5.2, 6.1, 6.5, 7.4) * vary[[i]]
-    y[[i]] <- c(5.9, 5.4, 4.4, 4.6, 3.5, 3.7, 2.8, 2.8, 2.4, 1.5) * vary[[i]]
+    lm.OLS[[i]] <- lm(y[, i]~x[, i])
+    slope[i] <- as.numeric(lm.OLS[[i]][[1]][2])
   }
-  lm.OLS <- lm(y~x)
-  slope <- as.numeric(lm.OLS[[1]][2])
+  slope <- mean(slope)
   
   slope.diff <- 10
   count <- 0
   slope.per.iteration <- NULL
   
   while (slope.diff > tolerance) {
+    slope.old <- slope
+    x.bar <- 0
+    y.bar <- 0
+    W.sum <- 0
+    alpha <- rep(0,length(x))
+    Weight <- rep(0,length(x))
+    omega.x <- rep(0,length(x))
+    omega.y <- rep(0,length(x))
+    error.correlation <- rep(0,length(x))
+    for (i in 1:length(x)) {
+      omega.x[i] <- 1 / var(x[i, ])
+      omega.y[i] <- 1 / var(y[i, ])
+      alpha[i] <- sqrt(omega.x[i] * omega.y[i])
+      Weight[i] <- alpha[i]^2 / (slope^2 * omega.y[i] + omega.x[i] - 2 * slope * error.correlation[i] * alpha[i])
+      x.bar <- x.bar + Weight[i] * x[i, ]
+      y.bar <- y.bar + Weight[i] * y[i, ]
+      W.sum <- W.sum + Weight[i]
+    }
+    X_bar <- X_bar / W_sum
+    Y_bar <- Y_bar / W_sum
+    
+    Q1 <- 0
+    Q2 <- 0
+    U <- rep(0,length(x))
+    V <- rep(0,length(x))
+    beta <- rep(0,length(x))
+    for (i in 1:length(x)) {
+      U[i] <- x[i] - X_bar
+      V[i] <- y[i] - Y_bar
+      beta[i] <- W[i] * ((U[i] / weights[i, 1]) + (b * V[i] / weights[i, 2]) - (b * U[i] + V[i]) * 0 / alpha[i])
+      Q1 <- Q1 + W[i] * beta[i] * V[i]
+      Q2 <- Q2 + W[i] * beta[i] * U[i]
+    }
+    #Q1 <- sum(W*beta*V)
+    #Q2 <- sum(W*beta*U)
+    b <- round(Q1 / Q2, 100)
+    b_diff <- abs(b - b_old)
+    count <- count + 1
+    
+  }
     
     slope.old <- slope
-    # omega, Jonas hat aber gesagt: "Lass es weg"
+    omega, Jonas hat aber gesagt: "Lass es weg"
     alpha <- sqrt(weights.x * weights.y)
     Weight <- alpha^2 / (slope^2 * weights.y + weights.x - 2 * slope * 0 * alpha)
     Weight.sum <- sum(Weight)
