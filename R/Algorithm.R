@@ -17,6 +17,7 @@ york <- function(y, x, tolerance = 1e-10, weights.y, weights.x){
 
   slope_diff <- 10
   count <- 0
+  slope_per_iteration <- NULL
 
   while (slope_diff > tolerance) {
 
@@ -36,9 +37,11 @@ york <- function(y, x, tolerance = 1e-10, weights.y, weights.x){
     slope <- Q1 / Q2
     slope_diff <- abs(slope - slope_old)
     count <- count + 1
-    print(slope, digits = 10)
+    slope_per_iteration <- append(slope_per_iteration, slope)
 
+    if (count > tolerance^-1) stop(cat("The slope coefficient does not converge after", count, "iterations"))
   }
+  slope_per_iteration <- data.frame("slope_per_iteration" = slope_per_iteration)
 
   intercept <- y_bar - slope * x_bar
 
@@ -76,28 +79,6 @@ york <- function(y, x, tolerance = 1e-10, weights.y, weights.x){
 
   y_residuals <- (Weight * (intercept + slope * x - y) * (weights_x - slope * c))/ (weights_y * weights_x)
 
-  create.plots <- function(x, y){
-    plot(x, y, pch = 16)
-    lines(x, fitted_y , col = "red",lwd = 2)
-    lines(x, lm_OLS$fitted.values, col = "blue", lty = "dashed",lwd = 2)
-    legend("topright",legend = c("OLS","York"), fill = c("blue","red"))
-    #the York regression line and the OLS regression line both go to the "center of gravity"
-    abline(v = x_bar, h = y_bar ,lty = "dashed", col = "red")
-    points(x = x_bar, y = y_bar, col = "red", pch = 16)
-    abline(v = mean(x), h = mean(y) ,lty = "dashed", col = "blue")
-    points(x = mean(x), y = mean(y), col = "blue", pch = 16)
-    compare_OLS_York <- recordPlot()
-    dev.off()
-
-    plot(x_residuals, y_residuals)
-    residuals <- recordPlot()
-    dev.off()
-
-    return(list("compare_OLS_York" = compare_OLS_York, "residuals" = residuals))
-  }
-  all.plots <- create.plots(x, y)
-
-
   mt <- matrix(c(intercept, slope, sigma_intercept, sigma_slope), nrow = 2)
   rownames(mt) <- c("intercept", "slope")
   colnames(mt) <- c("Estimate", "Std.Error")
@@ -109,37 +90,19 @@ york <- function(y, x, tolerance = 1e-10, weights.y, weights.x){
               "mean.x" = x_bar,
               "mean.y" = y_bar ,
               "Std.Error.chi" = sigma_x,
-              "iterations" = count,
+              "number.of.iterations" = count,
+              "slope.after.each.iteration" = slope_per_iteration,
               x_centered, y_centered, x, y, x_mean, "show" = x_adj,
-              "plots" = list("compare_OLS_York" = all.plots$compare_OLS_York, "residuals" = all.plots$residuals))
+              "original.x.values" = x,
+              "original.y.values" = y,
+              "fitted_ols" = lm_OLS$fitted.values)
   return(est)
 }
 
-first <- york(y, x, weights.y = weights_y, weights.x = weights_x)
+york.output <- york(y, x, weights.y = weights_y, weights.x = weights_x)
 
-first$plots[2]
+york.output$slope.after.each.iteration
 
-# all.plots <- function(y, x){
-#   plot(x,y, pch = 16)
-#   lines(x,first$fitted_y , col = "red",lwd = 2)
-#   lines(x, lm_OLS$fitted.values, col = "blue", lty = "dashed",lwd = 2)
-#   legend("topright",legend = c("OLS","York"), fill = c("blue","red"))
-#   #the York regression line and the OLS regression line both go to the "center of gravity"
-#   abline(v= first$mean.x,h= first$mean.y ,lty = "dashed", col = "red")
-#   points(x= first$mean.x,y= first$mean.y,col="red", pch = 16)
-#   abline(v= mean(x),h= mean(y) ,lty = "dashed", col = "blue")
-#   points(x= mean(x),y= mean(y),col="blue", pch = 16)
-#   compare_OLS_York <- recordPlot()
-#   dev.off()
-#
-#   plot(first$x.residuals,first$y.residuals)
-#   residuals <- recordPlot()
-#   dev.off()
-#   return(list("compare_OLS_York" = compare_OLS_York, "residuals" = residuals))
-# }
-#
-# second <- all.plots(y,x)
-# second$compare_OLS_York
 
 ## end of (relevant) script
 
