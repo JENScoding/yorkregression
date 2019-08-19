@@ -14,22 +14,22 @@ york <- function(x, y, tolerance = 1e-10, weights.x, weights.y){
     slope[i] <- as.numeric(lm.OLS[[i]][[1]][2])
   }
   slope <- mean(slope)
-  
+
   slope.diff <- 10
   count <- 0
   slope.per.iteration <- NULL
-  
+
   while (slope.diff > tolerance) {
     slope.old <- slope
     x.bar <- 0
     y.bar <- 0
     W.sum <- 0
-    alpha <- rep(0,length(x))
-    Weight <- rep(0,length(x))
-    omega.x <- rep(0,length(x))
-    omega.y <- rep(0,length(x))
-    error.correlation <- rep(0,length(x))
-    for (i in 1:length(x)) {
+    alpha <- rep(0,nrow(x))
+    Weight <- rep(0,nrow(x))
+    omega.x <- rep(0,nrow(x))
+    omega.y <- rep(0,nrow(x))
+    error.correlation <- rep(0,nrow(x))
+    for (i in 1:nrow(x)) {
       omega.x[i] <- 1 / var(x[i, ])
       omega.y[i] <- 1 / var(y[i, ])
       alpha[i] <- sqrt(omega.x[i] * omega.y[i])
@@ -38,9 +38,10 @@ york <- function(x, y, tolerance = 1e-10, weights.x, weights.y){
       y.bar <- y.bar + Weight[i] * y[i, ]
       W.sum <- W.sum + Weight[i]
     }
-    X_bar <- X_bar / W_sum
+    x.bar <- x.bar / W_sum
     Y_bar <- Y_bar / W_sum
-    
+    omega.x[1] <- 1 / var(x[1, ])
+
     Q1 <- 0
     Q2 <- 0
     U <- rep(0,length(x))
@@ -58,9 +59,9 @@ york <- function(x, y, tolerance = 1e-10, weights.x, weights.y){
     b <- round(Q1 / Q2, 100)
     b_diff <- abs(b - b_old)
     count <- count + 1
-    
+
   }
-    
+
     slope.old <- slope
     omega, Jonas hat aber gesagt: "Lass es weg"
     alpha <- sqrt(weights.x * weights.y)
@@ -70,7 +71,7 @@ york <- function(x, y, tolerance = 1e-10, weights.x, weights.y){
     y.bar <- sum(Weight * y, na.rm = T) / Weight.sum
     x.centered <- x - x.bar
     y.centered <- y - y.bar
-    
+
     beta <- Weight * ((x.centered / weights.y) + (slope * y.centered / weights.x) - (slope * x.centered + y.centered) * 0 / alpha)
     Q1 <- sum(Weight * beta * y.centered, na.rm = T)
     Q2 <- sum(Weight * beta * x.centered, na.rm = T)
@@ -78,7 +79,7 @@ york <- function(x, y, tolerance = 1e-10, weights.x, weights.y){
     slope.diff <- abs(slope - slope.old)
     count <- count + 1
     slope.per.iteration <- append(slope.per.iteration, slope)
-    
+
     if (count > tolerance^-1)  stop("\nThe slope coefficient does not converge after ",
                                     count,
                                     " iterations. \nHint: You may reduce the tolerance level.",
@@ -90,28 +91,28 @@ york <- function(x, y, tolerance = 1e-10, weights.x, weights.y){
     )
   }
   slope.per.iteration <- data.frame("slope.per.iteration" = slope.per.iteration)
-  
+
   intercept <- y.bar - slope * x.bar
-  
+
   x.adj <- x.bar + beta
-  
+
   x.mean <- sum(Weight * beta, na.rm = T) / (Weight.sum * (length(x) - 2))
   u <- x.adj - x.mean
-  
+
   sigma.slope <- sqrt(1 / sum(Weight * u^2, na.rm = T))
   sigma.intercept <- sqrt(x.mean^2 * sigma.slope^2 + 1 / Weight.sum)
-  
+
   chisq.weight <- sum(Weight * (y - slope * x - intercept)^2, na.rm = T) / (length(x) - 2)
   sigma.x <- sqrt(2 / (length(x) - 2))
-  
+
   fitted.y <- intercept + slope * x
-  
+
   residuals <- y - fitted.y
-  
+
   c <- 0*alpha
   x.residuals <- (Weight * (intercept + slope * x - y) * (c - slope * weights.y)) / (weights.y * weights.x)
   y.residuals <- (Weight * (intercept + slope * x - y) * (weights.x - slope * c))/ (weights.y * weights.x)
-  
+
   mt <- matrix(c(intercept, slope, sigma.intercept, sigma.slope), nrow = 2)
   rownames(mt) <- c("intercept", "slope")
   colnames(mt) <- c("Estimate", "Std.Error")
