@@ -2,7 +2,7 @@ york.plots <- function(york.output){
   plot(york.output$original.x.values, york.output$original.y.values,
        xlab = "x data",
        ylab = "y data",
-       main = "York regression vs. OLS regression",
+       main = "Pearson's data with York's weights: Best fit straight line",
        col = "black",
        pch = 16,
        las = 1,
@@ -26,7 +26,8 @@ york.plots <- function(york.output){
        col = "black",
        pch = 16,
        las = 1)
-  residuals <- recordPlot()
+  abline(h = 0, lty = "dashed", col = "red")
+  x.residuals.vs.y.residuals <- recordPlot()
   dev.off()
 
   plot(york.output$fitted.y, york.output$x.residuals,
@@ -36,8 +37,9 @@ york.plots <- function(york.output){
        col = "black",
        pch = 16,
        las = 1)
+  abline(h = 0, lty = "dashed", col = "red")
 
-  xresiduals.vs.fitted <- recordPlot()
+  x.residuals.vs.fitted.y <- recordPlot()
   dev.off()
 
   plot(york.output$fitted.y, york.output$y.residuals,
@@ -48,7 +50,7 @@ york.plots <- function(york.output){
        pch = 16,
        las = 1)
 
-  yresiduals.vs.fitted <- recordPlot()
+  y.residuals.vs.fitted.y <- recordPlot()
   dev.off()
 
   return(list("compare.OLS.York.with.center.of.gravity" = compare.OLS.York, "residuals" = residuals, "yresiduals.vs.fitted" = yresiduals.vs.fitted.))
@@ -58,3 +60,19 @@ my.plots <- york.plots(york.output)
 
 my.plots$compare.OLS.York.with.center.of.gravity
 my.plots$residuals
+
+##end of relevant script
+
+load("original_data.RData")
+
+x <- matrix(x,ncol=1)
+x
+(P <- x%*%solve((t(x)%*%x))%*%t(x))
+
+diag(P)
+
+
+
+
+
+
