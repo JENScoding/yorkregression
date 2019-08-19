@@ -1,24 +1,19 @@
 ### york in Least Squares Fitting Of A Straight Line With Correlated Errors ###
+#setwd()
+load("multiple_samples.RData")
 
-## slightly vary x and y
-vary <- list()
-x <- list()
-y <- list()
-for (i in 1:5){
-vary[[i]] <- sample(seq(0.1,2,0.01), 10, replace = T)
-x[[i]] <- c(0, 0.9, 1.8, 2.6, 3.3, 4.4, 5.2, 6.1, 6.5, 7.4) * vary[[i]]
-y[[i]] <- c(5.9, 5.4, 4.4, 4.6, 3.5, 3.7, 2.8, 2.8, 2.4, 1.5) * vary[[i]]
-}
-
-
-
-weights.y = c(1, 1.8, 4, 8, 20, 20, 70, 70, 1e+2, 5e+2)
-weights.x = c(1e+3, 1e+3, 5e+2, 8e+2, 2e+2, 8e+1, 6e+1, 2e+1, 1.8, 1)
 
 ## function for algo
 
 york <- function(x, y, tolerance = 1e-10, weights.x, weights.y){
   #initial value of b is OLS
+  lm.OLS <- list()
+  slope <- list()
+  for (i in 1:5){
+    lm.OLS <- lm(y[, i]~x[, i])
+    x[[i]] <- c(0, 0.9, 1.8, 2.6, 3.3, 4.4, 5.2, 6.1, 6.5, 7.4) * vary[[i]]
+    y[[i]] <- c(5.9, 5.4, 4.4, 4.6, 3.5, 3.7, 2.8, 2.8, 2.4, 1.5) * vary[[i]]
+  }
   lm.OLS <- lm(y~x)
   slope <- as.numeric(lm.OLS[[1]][2])
   
