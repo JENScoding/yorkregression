@@ -10,14 +10,15 @@ york.plots <- function(york.output){
   points(x = mean(york.output$original.x.values), y = mean(york.output$original.y.values), col = "blue", pch = 16)
   compare_OLS_York <- recordPlot()
   dev.off()
-  
+
   plot(york.output$x.residuals, york.output$y.residuals)
   residuals <- recordPlot()
   dev.off()
-  
+
   return(list("compare_OLS_York_with_center_of_gravity" = compare_OLS_York, "residuals" = residuals))
 }
 
 my_plots <- york.plots(york.output)
 
 my_plots$compare_OLS_York_with_center_of_gravity
+my_plots$residuals

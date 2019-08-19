@@ -17,6 +17,7 @@ york <- function(y, x, tolerance = 1e-10, weights.y, weights.x){
 
   slope_diff <- 10
   count <- 0
+  slope_per_iteration <- NULL
 
   while (slope_diff > tolerance) {
 
@@ -36,10 +37,11 @@ york <- function(y, x, tolerance = 1e-10, weights.y, weights.x){
     slope <- Q1 / Q2
     slope_diff <- abs(slope - slope_old)
     count <- count + 1
-    print(slope, digits = 10)
+    slope_per_iteration <- append(slope_per_iteration, slope)
 
     if (count > tolerance^-1) stop(cat("The slope coefficient does not converge after", count, "iterations"))
   }
+  slope_per_iteration <- data.frame("slope_per_iteration" = slope_per_iteration)
 
   intercept <- y_bar - slope * x_bar
 
@@ -88,7 +90,8 @@ york <- function(y, x, tolerance = 1e-10, weights.y, weights.x){
               "mean.x" = x_bar,
               "mean.y" = y_bar ,
               "Std.Error.chi" = sigma_x,
-              "iterations" = count,
+              "number.of.iterations" = count,
+              "slope.after.each.iteration" = slope_per_iteration,
               x_centered, y_centered, x, y, x_mean, "show" = x_adj,
               "original.x.values" = x,
               "original.y.values" = y,
@@ -98,7 +101,7 @@ york <- function(y, x, tolerance = 1e-10, weights.y, weights.x){
 
 york.output <- york(y, x, weights.y = weights_y, weights.x = weights_x)
 
-
+york.output$slope.after.each.iteration
 
 
 ## end of (relevant) script
