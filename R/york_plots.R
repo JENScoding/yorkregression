@@ -1,75 +1,62 @@
-york.plots <- function(york.output){
-  plot(york.output$original.x.values, york.output$original.y.values,
-       xlab = "x data",
-       ylab = "y data",
-       main = "Pearson's data with York's weights: Best fit straight line",
-       col = "black",
-       pch = 16,
-       las = 1,
-       ylim = c(1.5,6))
+library(ggplot2)
+york.plots <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
+                       rxy = NULL, sd.x = NULL, sd.y = NULL) {
+  york.output <- york(x, y, tolerance, weights.x, weights.y,
+                      rxy, sd.x, sd.y)
+  ddf <- data.frame(x=x,y=y)
+  plot.1 <- ggplot(data=ddf, aes(x=york.output$original.x.values,
+                                y=york.output$original.y.values))+
+    geom_abline(aes(slope = york.output$coefficients.york[2,1],
+                    intercept = york.output$coefficients.york[1,1],colour="York"),
+                key_glyph = draw_key_rect) +
+    geom_abline(aes(slope = york.output$coefficients.ols[2,1],
+                    intercept = york.output$coefficients.ols[1,1],colour="OLS")) +
+    geom_abline(aes(slope = york.output$coefficients.mayor[2,1], intercept =
+                      york.output$coefficients.mayor[1,1],colour="Orthogonal")) +
+    labs(colour="") + scale_colour_manual(values=c("blue","green","red")) +
+    geom_point()+
+    labs(title="Pearson's data with York's weights: Best fit straight line",
+         x ="x data", y = "y data") +
+    geom_vline(xintercept = york.output$mean.x, linetype="dashed",
+               color = "red", size=0.4) +
+    geom_hline(yintercept = york.output$mean.y, linetype="dashed",
+               color = "red", size=0.4) +
+    geom_vline(xintercept = mean(york.output$original.x.values),
+               linetype="dashed",color = "blue", size=0.4) +
+    geom_hline(yintercept = mean(york.output$original.y.values),
+               linetype="dashed",color = "blue", size=0.4) +
+    geom_smooth(method ="lm") +
+    geom_point(aes(x = mean(york.output$original.x.values),
+                   y= mean(york.output$original.y.values)), col ="blue")+
+    geom_point(aes(x = york.output$mean.x,
+                   y= york.output$mean.y), col ="red")+
+    theme(plot.title =element_text(hjust = 0.5))
+  ddf2 <- data.frame( x= york.output$x.residuals,  y= york.output$y.residuals)
+  plot.2 <- ggplot(aes(x= x, y = y), data =ddf2)+
+           geom_point()+
+          labs( title = "y residuals vs. x residuals",
+                x = "x residuals", y= "y residuals") +
+    geom_hline(yintercept = 0, linetype = "dashed", col = "red") +
+    theme(plot.title =element_text(hjust =0.5))
 
-  lines(york.output$original.x.values, york.output$fitted.y , col = "red",lwd = 2)
-  lines(york.output$original.x.values, york.output$fitted.ols, col = "blue", lty = "dashed",lwd = 2)
-  legend("topright",legend = c("OLS","York"), fill = c("blue","red"))
-  #the York regression line and the OLS regression line both go to the "center of gravity"
-  abline(v = york.output$mean.x, h = york.output$mean.y, lty = "dashed", col = "red")
-  points(x = york.output$mean.x, y = york.output$mean.y, col = "red", pch = 16)
-  abline(v = mean(york.output$original.x.values), h = mean(york.output$original.y.values) ,lty = "dashed", col = "blue")
-  points(x = mean(york.output$original.x.values), y = mean(york.output$original.y.values), col = "blue", pch = 16)
-  compare.OLS.York <- recordPlot()
-  dev.off()
-
-  plot(york.output$x.residuals, york.output$y.residuals,
-       xlab = "x residuals",
-       ylab = "y residuals",
-       main = "x residuals vs. y residuals",
-       col = "black",
-       pch = 16,
-       las = 1)
-  abline(h = 0, lty = "dashed", col = "red")
-  x.residuals.vs.y.residuals <- recordPlot()
-  dev.off()
-
-  plot(york.output$fitted.y, york.output$x.residuals,
-       xlab = "fitted y",
-       ylab = "x residuals",
-       main = "x residuals vs. fitted plot",
-       col = "black",
-       pch = 16,
-       las = 1)
-  abline(h = 0, lty = "dashed", col = "red")
-
-  x.residuals.vs.fitted.y <- recordPlot()
-  dev.off()
-
-  plot(york.output$fitted.y, york.output$y.residuals,
-       xlab = "fitted y",
-       ylab = "y residuals",
-       main = "y residuals vs. fitted plot",
-       col = "black",
-       pch = 16,
-       las = 1)
-
-  y.residuals.vs.fitted.y <- recordPlot()
-  dev.off()
-
-  return(list("compare.OLS.York.with.center.of.gravity" = compare.OLS.York, "residuals" = residuals, "yresiduals.vs.fitted" = yresiduals.vs.fitted.))
+  ddf3 <- data.frame( x= york.output$fitted.y, y=york.output$x.residuals)
+plot.3 <- ggplot(aes(x= x, y = y), data = ddf3)+
+  geom_point()+
+  labs( title = "x residuals vs. fitted y",
+        x = "fitted y", y= "x residuals") +
+  geom_hline(yintercept = 0, linetype = "dashed", col = "red") +
+  theme(plot.title =element_text(hjust =0.5))
+ddf4 <- data.frame(x = york.output$fitted.y, y= york.output$y.residuals)
+plot.4 <- ggplot(aes(x=x, y=y), data = ddf4)+
+         geom_point()+
+         labs(title = "y residuals vs. fitted y",
+              x = "fitted y", y= "y residuals")+
+        geom_hline(yintercept = 0, linetype = "dashed", col = "red") +
+        theme(plot.title =element_text(hjust =0.5))
+return(list(plot.1, plot.2, plot.3, plot.4))
 }
+york.plots(x=x,y=y, weights.x =weights.x, weights.y=weights.y,rxy=0.1)
 
-my.plots <- york.plots(york.output)
-
-my.plots$compare.OLS.York.with.center.of.gravity
-my.plots$residuals
-
-##end of relevant script
-
-load("original_data.RData")
-
-x <- matrix(x,ncol=1)
-x
-(P <- x%*%solve((t(x)%*%x))%*%t(x))
-
-diag(P)
 
 
 
