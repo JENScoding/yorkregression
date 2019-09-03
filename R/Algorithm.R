@@ -1,21 +1,18 @@
 ### york in Least Squares Fitting Of A Straight Line With Correlated Errors ###
 ## Input from Table I and Table II in york 1966
-setwd("/Users/jonascedrodelgado/Desktop/York-Regression/York/R")
+#setwd("/Users/jonascedrodelgado/Desktop/York-Regression/York/R")
 load("original_data.RData")
 # here you can also load other data and weights
 
 ## function for algo
 york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
                  rxy = NULL, sd.x = NULL, sd.y = NULL) {
-  if (all(sapply(list(sd.x, sd.y, weights.x, weights.y), is.null))) {
+  if (is.null(c(sd.x, sd.y, weights.x, weights.y))) {
     stop("Specify either standard errors or weights")
   }
   if (all(sapply(list(sd.x, sd.y, weights.x, weights.y),
                  function(x) !is.null(x)))) {
     stop("You can't specify weights and standard errors at the same time!")
-  }
-  if (any(is.na(x))) {
-    stop("There is at least one NA value. Please specify this value(s)!")
   }
   if (length(sd.x) == 1) {
     sd.x = rep(sd.x, length(x))
@@ -26,7 +23,27 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
   if(length(x) != length(y)) {
     stop("x and y must have same length!")
   }
-
+  if (length(rxy) == 1) {
+    rxy = rep(rxy, length(x))
+  }
+  if (length(rxy) != length(x)) {
+    stop("Length of correlation vector must equal length of x")
+  }
+  #delete rows with NA values
+  to.delete  <- c(which(is.na(x)), which(is.na(y)))
+  rm.share <- length(to.delete) / length(x)
+  if (rm.share > 0.1) {
+    warning(rm.share * 100, "% of the data were removed due to missing values!")
+  }
+  if (length(to.delete) > 0){
+    y <- y[-to.delete]
+    x <- x[-to.delete]
+    weights.x <- weights.x[-to.delete]
+    weights.y <- weights.y[-to.delete]
+    sd.x <- sd.x[-to.delete]
+    sd.y <- sd.y[-to.delete]
+    rxy <- rxy[-to.delete]
+  }
   if (is.null(weights.x) & is.null(weights.y)) {
     weights.x <- 1/sd.x^2
     weights.y <- 1/sd.y^2
@@ -37,12 +54,6 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
   }
   if(length(sd.x) != length(x) | length(sd.y) != length(y)) {
     stop("Sd.x and sd.y must have the same length of x resp. y")
-  }
-  if (length(rxy) == 1) {
-    rxy = rep(rxy, length(x))
-  }
-  if (length(rxy) != length(x)) {
-    stop("Length of correlation vector must equal length of x")
   }
   #initial value of b is OLS
   x.input <- matrix(c(rep(1, length(x)), x), ncol =2)
@@ -160,15 +171,12 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
   return(est)
 }
 
-(york.output <- york(x, y, sd.x = c(0.4,0.5, rep(0.9,8)), sd.y = 0.6, rxy = 0))
+(york.output <- york(x, y, weights.x = weights.x, weights.y = weights.y, rxy = 0))
 #york.output$slope.after.each.iteration
 
 #york.plots(x = x, y = y, rxy = 0.3)
 
 ## end of (relevant) script
-
-
-
 
 #### Testing
 
