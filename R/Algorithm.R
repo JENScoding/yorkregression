@@ -5,7 +5,6 @@ load("original_data.RData")
 # here you can also load other data and weights
 
 ## function for algo
-
 york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
                  rxy = NULL, sd.x = NULL, sd.y = NULL) {
   if (all(sapply(list(sd.x, sd.y, weights.x, weights.y), is.null))) {
@@ -13,7 +12,10 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
   }
   if (all(sapply(list(sd.x, sd.y, weights.x, weights.y),
                  function(x) !is.null(x)))) {
-    stop("You can't specify weights and standard deviations at the same time!")
+    stop("You can't specify weights and standard errors at the same time!")
+  }
+  if (any(is.na(x))) {
+    stop("There is at least one NA value. Please specify this value(s)!")
   }
   if (length(sd.x) == 1) {
     sd.x = rep(sd.x, length(x))
@@ -49,8 +51,8 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
   residuals <- y - fitted.y.ols
   slope <- as.numeric(lm.ols[2])
   intercept.ols <- as.numeric(lm.ols[1])
-  sigma.hat <- (1 / (length(x) - 2)) * sum((residuals)^2)
-  se.of.reg.ols <- sqrt(sigma.hat)
+  sigma.squared.hat <- (1 / (length(x) - 2)) * sum((residuals)^2)
+  se.of.reg.ols <- sqrt(sigma.squared.hat)
   mean.x <- mean(x)
   mean.y <- mean(y)
   centered.x <- x - mean.x
@@ -58,9 +60,9 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
   SS.x <- sum(centered.x^2)
   SS.y <- sum(centered.y^2)
   S.x <- sum(x^2)
-  SS.xy <-sum((centered.x) * (centered.y))
-  se.intercept.ols <- sqrt(sigma.hat * (S.x / (length(x) * SS.x)))
-  se.slope.ols <- sqrt(sigma.hat / SS.x)
+  SS.xy <- sum((centered.x) * (centered.y))
+  se.intercept.ols <- sqrt(sigma.squared.hat * (S.x / (length(x) * SS.x)))
+  se.slope.ols <- sqrt(sigma.squared.hat / SS.x)
 
   slope.diff <- 10
   count <- 0
@@ -158,7 +160,7 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
   return(est)
 }
 
-(york.output <- york(x, y, weights.y = weights.y , weights.x = weights.x, rxy = 0))
+(york.output <- york(x, y, sd.x = c(0.4,0.5, rep(0.9,8)), sd.y = 0.6, rxy = 0))
 #york.output$slope.after.each.iteration
 
 #york.plots(x = x, y = y, rxy = 0.3)
