@@ -1,7 +1,7 @@
 ### york in Least Squares Fitting Of A Straight Line With Correlated Errors ###
 ## Input from Table I and Table II in york 1966
 #setwd("/Users/jonascedrodelgado/Desktop/York-Regression/York/R")
-load("original_data.RData")
+load("R/original_data.RData")
 # here you can also load other data and weights
 
 ## function for algo

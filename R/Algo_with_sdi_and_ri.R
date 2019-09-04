@@ -1,6 +1,6 @@
 ### york in Least Squares Fitting Of A Straight Line With Correlated Errors ###
 #setwd()
-load("multiple_samples.RData")
+load("R/multiple_samples.RData")
 
 
 ## function for algo
