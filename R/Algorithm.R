@@ -23,7 +23,7 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
   if (length(sd.y) == 1) {
     sd.y = rep(sd.y, length(y))
   }
-  if(length(x) != length(y)) {
+  if(length(x) != length(y)) {a
     stop("x and y must have same length!")
   }
 
@@ -160,7 +160,7 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
   return(est)
 }
 
-(york.output <- york(x, y, sd.x = c(0.4,0.5, rep(0.9,8)), sd.y = 0.6, rxy = 0))
+(york.output <- york(x, y, weights.x = weights.x, weights.y = weights.y, rxy = 0))
 #york.output$slope.after.each.iteration
 
 #york.plots(x = x, y = y, rxy = 0.3)
