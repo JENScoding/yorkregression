@@ -5,11 +5,11 @@ load("multiple_samples.RData")
 
 ## function for algo
 
-york <- function(x, y, tolerance = 1e-10, weights.x, weights.y){
+york.multiple.sample <- function(x, y, tolerance = 1e-10){
   #initial value of b is OLS
   lm.OLS <- list()
   slope <- NULL
-  for (i in 1:5){
+  for (i in 1:5) {
     lm.OLS[[i]] <- lm(y[, i]~x[, i])
     slope[i] <- as.numeric(lm.OLS[[i]][[1]][2])
   }
@@ -18,18 +18,22 @@ york <- function(x, y, tolerance = 1e-10, weights.x, weights.y){
   slope.diff <- 10
   count <- 0
   slope.per.iteration <- NULL
+  mean.xi <- apply(x, 1, mean)
+  mean.yi <- apply(y, 1, mean)
+  x.errors <- x - mean.xi
+  y.errors <- y - mean.yi
+  error.correlation <- diag(cor(x.errors, y.errors))
 
   while (slope.diff > tolerance) {
     slope.old <- slope
     x.bar <- 0
     y.bar <- 0
     W.sum <- 0
-    alpha <- rep(0,nrow(x))
-    Weight <- rep(0,nrow(x))
-    omega.x <- rep(0,nrow(x))
-    omega.y <- rep(0,nrow(x))
-    error.correlation <- rep(0,nrow(x))
-    for (i in 1:nrow(x)) {
+    alpha <- rep(0,ncol(x))
+    Weight <- rep(0,ncol(x))
+    omega.x <- rep(0,ncol(x))
+    omega.y <- rep(0,ncol(x))
+    for (i in 1:ncol(x)) {
       omega.x[i] <- 1 / var(x[i, ])
       omega.y[i] <- 1 / var(y[i, ])
       alpha[i] <- sqrt(omega.x[i] * omega.y[i])
@@ -63,7 +67,6 @@ york <- function(x, y, tolerance = 1e-10, weights.x, weights.y){
   }
 
     slope.old <- slope
-    omega, Jonas hat aber gesagt: "Lass es weg"
     alpha <- sqrt(weights.x * weights.y)
     Weight <- alpha^2 / (slope^2 * weights.y + weights.x - 2 * slope * 0 * alpha)
     Weight.sum <- sum(Weight)

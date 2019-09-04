@@ -6,74 +6,81 @@ load("original_data.RData")
 
 ## function for algo
 york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
-                 rxy = NULL, sd.x = NULL, sd.y = NULL) {
-  if (is.null(c(sd.x, sd.y, weights.x, weights.y))) {
-    stop("Specify either standard errors or weights")
+                 rxy = NULL, sd.x = NULL, sd.y = NULL, mult.samples = FALSE) {
+  if (mult.samples == FALSE) {
+    if (is.null(c(sd.x, sd.y, weights.x, weights.y))) {
+      stop("Specify either standard errors or weights")
+    }
+    if (all(sapply(list(sd.x, sd.y, weights.x, weights.y),
+                   function(x) !is.null(x)))) {
+      stop("You can't specify weights and standard errors at the same time!")
+    }
+    if (length(sd.x) == 1) {
+      sd.x = rep(sd.x, length(x))
+    }
+    if (length(sd.y) == 1) {
+      sd.y = rep(sd.y, length(y))
+    }
+    if(length(x) != length(y)) {
+      stop("x and y must have same length!")
+    }
+    if (length(rxy) == 1) {
+      rxy = rep(rxy, length(x))
+    }
+    if (length(rxy) != length(x)) {
+      stop("Length of correlation vector must equal length of x")
+    }
+    #delete rows with NA values
+    to.delete  <- c(which(is.na(x)), which(is.na(y)),
+                    which(is.na(weights.x)), which(is.na(weights.y)),
+                    which(is.na(sd.x)), which(is.na(sd.y)))
+    rm.share <- length(to.delete) / length(x)
+    if (rm.share > 0.1) {
+      warning(rm.share * 100, "% of the data were removed due to missing values!")
+    }
+    if (length(to.delete) > 0){
+      y <- y[-to.delete]
+      x <- x[-to.delete]
+      weights.x <- weights.x[-to.delete]
+      weights.y <- weights.y[-to.delete]
+      sd.x <- sd.x[-to.delete]
+      sd.y <- sd.y[-to.delete]
+      rxy <- rxy[-to.delete]
+    }
+    if (is.null(weights.x) & is.null(weights.y)) {
+      weights.x <- 1/sd.x^2
+      weights.y <- 1/sd.y^2
+    }
+    if (is.null(sd.x) & is.null(sd.y)) {
+      sd.x <- 1/ sqrt(weights.x)
+      sd.y <- 1/sqrt(weights.y)
+    }
+    if(length(sd.x) != length(x) | length(sd.y) != length(y)) {
+      stop("Sd.x and sd.y must have the same length of x resp. y")
+    }
+    #initial value of b is OLS
+    x.input <- matrix(c(rep(1, length(x)), x), ncol =2)
+    lm.ols <- solve(t(x.input) %*% x.input) %*% t(x.input) %*% y
+    fitted.y.ols <- x.input %*% lm.ols
+    residuals <- y - fitted.y.ols
+    slope <- as.numeric(lm.ols[2])
+    intercept.ols <- as.numeric(lm.ols[1])
+    sigma.squared.hat <- (1 / (length(x) - 2)) * sum((residuals)^2)
+    se.of.reg.ols <- sqrt(sigma.squared.hat)
+    mean.x <- mean(x)
+    mean.y <- mean(y)
+    centered.x <- x - mean.x
+    centered.y <- y - mean.y
+    SS.x <- sum(centered.x^2)
+    SS.y <- sum(centered.y^2)
+    S.x <- sum(x^2)
+    SS.xy <- sum((centered.x) * (centered.y))
+    se.intercept.ols <- sqrt(sigma.squared.hat * (S.x / (length(x) * SS.x)))
+    se.slope.ols <- sqrt(sigma.squared.hat / SS.x)
+  } else {
+    stop("Not ready yet")
   }
-  if (all(sapply(list(sd.x, sd.y, weights.x, weights.y),
-                 function(x) !is.null(x)))) {
-    stop("You can't specify weights and standard errors at the same time!")
-  }
-  if (length(sd.x) == 1) {
-    sd.x = rep(sd.x, length(x))
-  }
-  if (length(sd.y) == 1) {
-    sd.y = rep(sd.y, length(y))
-  }
-  if(length(x) != length(y)) {
-    stop("x and y must have same length!")
-  }
-  if (length(rxy) == 1) {
-    rxy = rep(rxy, length(x))
-  }
-  if (length(rxy) != length(x)) {
-    stop("Length of correlation vector must equal length of x")
-  }
-  #delete rows with NA values
-  to.delete  <- c(which(is.na(x)), which(is.na(y)))
-  rm.share <- length(to.delete) / length(x)
-  if (rm.share > 0.1) {
-    warning(rm.share * 100, "% of the data were removed due to missing values!")
-  }
-  if (length(to.delete) > 0){
-    y <- y[-to.delete]
-    x <- x[-to.delete]
-    weights.x <- weights.x[-to.delete]
-    weights.y <- weights.y[-to.delete]
-    sd.x <- sd.x[-to.delete]
-    sd.y <- sd.y[-to.delete]
-    rxy <- rxy[-to.delete]
-  }
-  if (is.null(weights.x) & is.null(weights.y)) {
-    weights.x <- 1/sd.x^2
-    weights.y <- 1/sd.y^2
-  }
-  if (is.null(sd.x) & is.null(sd.y)) {
-    sd.x <- 1/ sqrt(weights.x)
-    sd.y <- 1/sqrt(weights.y)
-  }
-  if(length(sd.x) != length(x) | length(sd.y) != length(y)) {
-    stop("Sd.x and sd.y must have the same length of x resp. y")
-  }
-  #initial value of b is OLS
-  x.input <- matrix(c(rep(1, length(x)), x), ncol =2)
-  lm.ols <- solve(t(x.input) %*% x.input) %*% t(x.input) %*% y
-  fitted.y.ols <- x.input %*% lm.ols
-  residuals <- y - fitted.y.ols
-  slope <- as.numeric(lm.ols[2])
-  intercept.ols <- as.numeric(lm.ols[1])
-  sigma.squared.hat <- (1 / (length(x) - 2)) * sum((residuals)^2)
-  se.of.reg.ols <- sqrt(sigma.squared.hat)
-  mean.x <- mean(x)
-  mean.y <- mean(y)
-  centered.x <- x - mean.x
-  centered.y <- y - mean.y
-  SS.x <- sum(centered.x^2)
-  SS.y <- sum(centered.y^2)
-  S.x <- sum(x^2)
-  SS.xy <- sum((centered.x) * (centered.y))
-  se.intercept.ols <- sqrt(sigma.squared.hat * (S.x / (length(x) * SS.x)))
-  se.slope.ols <- sqrt(sigma.squared.hat / SS.x)
+
 
   slope.diff <- 10
   count <- 0
@@ -171,7 +178,7 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
   return(est)
 }
 
-(york.output <- york(x, y, weights.x = weights.x, weights.y = weights.y, rxy = 0))
+(york.output <- york(x, y, weights.x = weights.x, weights.y = weights.y, rxy = 0, mult.samples = T))
 #york.output$slope.after.each.iteration
 
 #york.plots(x = x, y = y, rxy = 0.3)
