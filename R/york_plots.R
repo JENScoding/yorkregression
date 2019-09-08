@@ -2,9 +2,9 @@ load("R/original_data.RData")
 
 library(ggplot2)
 york.plots <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
-                       xy.error.correlation = NULL, x.errors = NULL, y.errors = NULL, mult.samples = F) {
+                       r.xy = NULL, sd.x = NULL, sd.y = NULL, mult.samples = F) {
   york.output <- york(x, y, tolerance, weights.x, weights.y,
-                      xy.error.correlation, x.errors, y.errors)
+                      r.xy, sd.x, sd.y)
   ddf <- data.frame(x=x,y=y)
   plot.1 <- ggplot(data=ddf, aes(x=york.output$original.x.values,
                                  y=york.output$original.y.values)) +
@@ -65,4 +65,4 @@ york.plots <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NU
     theme(plot.title = element_text(hjust = 0.5))
   return(list(plot.1, plot.2, plot.3, plot.4, plot.5))
 }
-york.plots(x=x,y=y, weights.x =weights.x, weights.y=weights.y,xy.error.correlation=0.1)
+york.plots(x=x,y=y, weights.x =weights.x, weights.y=weights.y,r.xy=0.1)
