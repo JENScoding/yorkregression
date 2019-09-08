@@ -17,7 +17,7 @@ york.plots <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NU
                       york.output$coefficients.mayor[1,1],colour="Orthogonal")) +
     labs(colour="") + scale_colour_manual(values=c("blue","green","red")) +
     geom_point() +
-    labs(title="Pearson's data with York's weights: Best fit straight line",
+    labs(title="York' best fit straight line compared to OLS and orthogonal ",
          x ="x data", y = "y data") +
     geom_vline(xintercept = york.output$mean.x, linetype="dashed",
                color = "red", size=0.4) +
