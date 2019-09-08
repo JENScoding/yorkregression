@@ -141,11 +141,11 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
   if(length(sd.x) != length(x) | length(sd.y) != length(y)) {
     stop("Sd.x and sd.y must have the same length of x resp. y!")
   }
-  #initial value of b is OLS
   x.input <- matrix(c(rep(1, length(x)), x), ncol =2)
   lm.ols <- solve(t(x.input) %*% x.input) %*% t(x.input) %*% y
   fitted.y.ols <- x.input %*% lm.ols
   residuals <- y - fitted.y.ols
+  #initial value of the slope is the OLSE
   slope <- as.numeric(lm.ols[2])
   intercept.ols <- as.numeric(lm.ols[1])
   if (any(is.na(c(slope,intercept.ols)))){
@@ -163,6 +163,7 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
   SS.xy <- sum((centered.x) * (centered.y))
   se.intercept.ols <- sqrt(sigma.squared.hat * (S.x / (length(x) * SS.x)))
   se.slope.ols <- sqrt(sigma.squared.hat / SS.x)
+  r.squared.ols <- 1 - sum((residuals)^2) / SS.y
   slope.diff <- 10
   count <- 0
   slope.per.iteration <- NULL
@@ -254,6 +255,7 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
               "original.y.values" = y,
               "fitted.y.ols" = fitted.y.ols,
               "se.of.reg.ols" = se.of.reg.ols,
+              "r.squared.ols" = r.squared.ols,
               "fitted.y.orthogonal" = fitted.y.orthogonal,
               "data" = data)
   return(est)
