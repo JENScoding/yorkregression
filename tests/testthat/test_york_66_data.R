@@ -5,9 +5,9 @@ test_that("Test that our york implementation is correct", {
   weights.y = c(1, 1.8, 4, 8, 20, 20, 70, 70, 1e+2, 5e+2)
   weights.x = c(1e+3, 1e+3, 5e+2, 8e+2, 2e+2, 8e+1, 6e+1, 2e+1, 1.8, 1)
 
-  expect_error(york(x, y, weights.x = weights.x, weights.y = weights.y, rxy = 0, mult.samples = F), NA)
+  expect_error(york(x, y, weights.x = weights.x, weights.y = weights.y, xy.error.correlation = 0, mult.samples = F), NA)
 
-  first <- york(x, y, weights.x = weights.x, weights.y = weights.y, rxy = 0, mult.samples = F)
+  first <- york(x, y, weights.x = weights.x, weights.y = weights.y, xy.error.correlation = 0, mult.samples = F)
   expect_type(first$coefficients.york[2, 1], "double")
   expect_true(first$coefficients.york[2, 1] < -0.47 && first$coefficients.york[2, 1] > -0.55)
 })
