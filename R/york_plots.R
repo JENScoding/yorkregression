@@ -7,7 +7,7 @@ york.plots <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NU
                       xy.error.correlation, x.errors, y.errors)
   ddf <- data.frame(x=x,y=y)
   plot.1 <- ggplot(data=ddf, aes(x=york.output$original.x.values,
-                                y=york.output$original.y.values)) +
+                                 y=york.output$original.y.values)) +
     geom_abline(aes(slope = york.output$coefficients.york[2,1],
                     intercept = york.output$coefficients.york[1,1],colour="York"),
                 key_glyph = draw_key_rect) +
@@ -35,41 +35,34 @@ york.plots <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NU
     theme(plot.title =element_text(hjust = 0.5))
   ddf2 <- data.frame( x = york.output$x.residuals,  y = york.output$y.residuals)
   plot.2 <- ggplot(aes(x = x, y = y), data = ddf2) +
-           geom_point() +
-          labs( title = "y residuals vs. x residuals",
-                x = "x residuals", y = "y residuals") +
+    geom_point() +
+    labs( title = "y residuals vs. x residuals",
+          x = "x residuals", y = "y residuals") +
     geom_hline(yintercept = 0, linetype = "dashed", col = "red") +
     theme(plot.title =element_text(hjust = 0.5))
 
   ddf3 <- data.frame( x = york.output$fitted.y, y = york.output$x.residuals)
-plot.3 <- ggplot(aes(x = x, y = y), data = ddf3) +
-  geom_point() +
-  labs( title = "x residuals vs. fitted y",
-        x = "fitted y", y = "x residuals") +
-  geom_hline(yintercept = 0, linetype = "dashed", col = "red") +
-  theme(plot.title = element_text(hjust = 0.5))
-ddf4 <- data.frame(x = york.output$fitted.y, y = york.output$y.residuals)
-plot.4 <- ggplot(aes(x=x, y=y), data = ddf4) +
-         geom_point() +
-         labs(title = "y residuals vs. fitted y",
-              x = "fitted y", y= "y residuals") +
-        geom_hline(yintercept = 0, linetype = "dashed", col = "red") +
-        theme(plot.title =element_text(hjust = 0.5))
-ddf5 <- data.frame(x = 1:york.output$number.of.iterations, y = york.output$slope.after.each.iteration[,1])
-plot.5 <- ggplot(aes(x=x, y=y), data = ddf5)+
-  geom_line() +
-  geom_point() +
-  labs(title = "Trace plot",
-       x = "Number of iterations", y = "slope coefficient") +
-  geom_hline(yintercept = york.output$coefficients.york[2,1], col = "darkblue") +
-  theme(plot.title = element_text(hjust = 0.5))
-return(list(plot.1, plot.2, plot.3, plot.4, plot.5))
+  plot.3 <- ggplot(aes(x = x, y = y), data = ddf3) +
+    geom_point() +
+    labs( title = "x residuals vs. fitted y",
+          x = "fitted y", y = "x residuals") +
+    geom_hline(yintercept = 0, linetype = "dashed", col = "red") +
+    theme(plot.title = element_text(hjust = 0.5))
+  ddf4 <- data.frame(x = york.output$fitted.y, y = york.output$y.residuals)
+  plot.4 <- ggplot(aes(x=x, y=y), data = ddf4) +
+    geom_point() +
+    labs(title = "y residuals vs. fitted y",
+         x = "fitted y", y= "y residuals") +
+    geom_hline(yintercept = 0, linetype = "dashed", col = "red") +
+    theme(plot.title =element_text(hjust = 0.5))
+  ddf5 <- data.frame(x = 1:york.output$number.of.iterations, y = york.output$slope.after.each.iteration[,1])
+  plot.5 <- ggplot(aes(x=x, y=y), data = ddf5)+
+    geom_line() +
+    geom_point() +
+    labs(title = "Trace plot",
+         x = "Number of iterations", y = "slope coefficient") +
+    geom_hline(yintercept = york.output$coefficients.york[2,1], col = "darkblue") +
+    theme(plot.title = element_text(hjust = 0.5))
+  return(list(plot.1, plot.2, plot.3, plot.4, plot.5))
 }
 york.plots(x=x,y=y, weights.x =weights.x, weights.y=weights.y,xy.error.correlation=0.1)
-
-
-
-
-
-
-
