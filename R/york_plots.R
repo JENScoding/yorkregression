@@ -4,7 +4,7 @@ library(ggplot2)
 york.plots <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
                        r.xy = NULL, sd.x = NULL, sd.y = NULL, mult.samples = F) {
   york.output <- york(x, y, tolerance, weights.x, weights.y,
-                      r.xy, sd.x, sd.y)
+                      sd.x, sd.y, r.xy)
   ddf <- data.frame(x=x,y=y)
   plot.1 <- ggplot(data=ddf, aes(x=york.output$original.x.values,
                                  y=york.output$original.y.values)) +
