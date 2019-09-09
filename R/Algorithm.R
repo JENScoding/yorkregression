@@ -243,7 +243,7 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
     while (slope.diff > tolerance) {
       slope.old <- slope
       Weight <- alpha^2 / (slope^2 * weights.y + weights.x -
-                             2 * slope * xy.error.correlation * alpha)
+                             2 * slope * r.xy * alpha)
       Weight.sum <- sum(Weight)
       x.bar <- sum(Weight * x, na.rm = T) / Weight.sum
       y.bar <- sum(Weight * y, na.rm = T) / Weight.sum
@@ -251,7 +251,7 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
       y.centered <- y - y.bar
       beta <- Weight * ((x.centered / weights.y) + (slope * y.centered /
                                                       weights.x) -
-                          (slope * x.centered + y.centered) * xy.error.correlation / alpha)
+                          (slope * x.centered + y.centered) * r.xy / alpha)
       Q1 <- sum(Weight * beta * y.centered, na.rm = T)
       Q2 <- sum(Weight * beta * x.centered, na.rm = T)
       slope <- Q1 / Q2
@@ -353,32 +353,74 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
     data <- matrix(c(x, y, sd.x, sd.y, r.xy), ncol = 5)
     colnames(data) <- c("x", "y", "sd.x", "sd.y", "r.xy")
   }
-  est <- list("coefficients.york" = york.reg,
-              "coefficients.orthogonal" = orthogonal.reg,
-              "coefficients.ols" = ols.reg,
-              "weighting.vector" = Weight,
-              "x.residuals" = x.residuals,
-              "y.residuals"= y.residuals,
-              "fitted.y"=fitted.y,
-              "df.regression" = df.regression,
-              "mean.x" = x.bar,
-              "mean.y" = y.bar ,
-              "reduced.chisq" = reduced.chisq,
-              "std.Error.chisq" = sigma.chisq,
-              "number.of.iterations" = count,
-              "slope.after.each.iteration" = slope.per.iteration,
-              "original.x.values" = x,
-              "original.y.values" = y,
-              "fitted.y.ols" = fitted.y.ols,
-              "se.of.reg.ols" = se.of.reg.ols,
-              "r.squared.ols" = r.squared.ols,
-              "fitted.y.orthogonal" = fitted.y.orthogonal,
-              "data" = data)
-  return(est)
+  define.class.york <- setClass("york", slots =  c(coefficients.york = "matrix",
+                                              coefficients.orthogonal = "matrix",
+                                              coefficients.ols = "matrix",
+                                              weighting.vector = "numeric",
+                                              x.residuals = "numeric",
+                                              y.residuals = "numeric",
+                                              fitted.y = "numeric",
+                                              df.regression = "numeric",
+                                              mean.x = "numeric",
+                                              mean.y = "numeric",
+                                              reduced.chisq = "numeric",
+                                              std.Error.chisq = "numeric",
+                                              number.of.iterations = "numeric",
+                                              slope.after.each.iteration = "data.frame",
+                                              original.x.values = "numeric",
+                                              original.y.values = "numeric",
+                                              fitted.y.ols = "matrix",
+                                              se.of.reg.ols = "numeric",
+                                              fitted.y.orthogonal = "numeric",
+                                              data = "matrix"))
+
+  output <- define.class.york("coefficients.york" = york.reg,
+                             "coefficients.orthogonal" = orthogonal.reg,
+                             "coefficients.ols" = ols.reg,
+                             "weighting.vector" = Weight,
+                             "x.residuals" = x.residuals,
+                             "y.residuals"= y.residuals,
+                             "fitted.y"=fitted.y,
+                             "df.regression" = df.regression,
+                             "mean.x" = x.bar,
+                             "mean.y" = y.bar ,
+                             "reduced.chisq" = reduced.chisq,
+                             "std.Error.chisq" = sigma.chisq,
+                             "number.of.iterations" = count,
+                             "slope.after.each.iteration" = slope.per.iteration,
+                             "original.x.values" = x,
+                             "original.y.values" = y,
+                             "fitted.y.ols" = fitted.y.ols,
+                             "se.of.reg.ols" = se.of.reg.ols,
+                             "fitted.y.orthogonal" = fitted.y.orthogonal,
+                             "data" = data)
+  # est <- list("coefficients.york" = york.reg,
+  #             "coefficients.orthogonal" = orthogonal.reg,
+  #             "coefficients.ols" = ols.reg,
+  #             "weighting.vector" = Weight,
+  #             "x.residuals" = x.residuals,
+  #             "y.residuals"= y.residuals,
+  #             "fitted.y"=fitted.y,
+  #             "df.regression" = df.regression,
+  #             "mean.x" = x.bar,
+  #             "mean.y" = y.bar ,
+  #             "reduced.chisq" = reduced.chisq,
+  #             "std.Error.chisq" = sigma.chisq,
+  #             "number.of.iterations" = count,
+  #             "slope.after.each.iteration" = slope.per.iteration,
+  #             "original.x.values" = x,
+  #             "original.y.values" = y,
+  #             "fitted.y.ols" = fitted.y.ols,
+  #             "se.of.reg.ols" = se.of.reg.ols,
+  #             "r.squared.ols" = r.squared.ols,
+  #             "fitted.y.orthogonal" = fitted.y.orthogonal,
+  #             "data" = data)
+  return(output)
 }
 
 (york.output <- york(x, y, weights.x = weights.x, weights.y = weights.y, r.xy = 0, mult.samples = F))
 
+class(york.output)
 
 (york.output <- york(x, y, weights.x = weights.x, weights.y = weights.y, r.xy = 0, mult.samples = F, exact.solution = T))
 
