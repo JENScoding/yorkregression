@@ -96,7 +96,8 @@
 #' @name york
 #' @export
 york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
-                  sd.x = NULL, sd.y = NULL, r.xy = NULL, mult.samples = FALSE) {
+                  sd.x = NULL, sd.y = NULL, r.xy = NULL, mult.samples = FALSE,
+                 exact.solution = FALSE) {
 
   if (mult.samples == FALSE) {
     if (all(sapply(list(sd.x, sd.y, weights.x, weights.y), is.null))) {
@@ -193,6 +194,9 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
     se.slope.ols <- sqrt(sigma.squared.hat / SS.x)
     r.squared.ols <- 1 - sum((residuals)^2) / SS.y
   } else {
+    if(exact.solution == T) {
+      stop("There is no exact solution in case of multiple samples!")
+    }
     # For Jonas
     x.input <- 1
     lm.ols <- 1
@@ -231,40 +235,73 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
     x <- mean.xi
     y <- mean.yi
   }
+  if (exact.solution == F) {
+    slope.diff <- 10
+    count <- 0
+    slope.per.iteration <- NULL
+    alpha <- sqrt(weights.x * weights.y)
+    while (slope.diff > tolerance) {
+      slope.old <- slope
+      Weight <- alpha^2 / (slope^2 * weights.y + weights.x -
+                             2 * slope * xy.error.correlation * alpha)
+      Weight.sum <- sum(Weight)
+      x.bar <- sum(Weight * x, na.rm = T) / Weight.sum
+      y.bar <- sum(Weight * y, na.rm = T) / Weight.sum
+      x.centered <- x - x.bar
+      y.centered <- y - y.bar
+      beta <- Weight * ((x.centered / weights.y) + (slope * y.centered /
+                                                      weights.x) -
+                          (slope * x.centered + y.centered) * xy.error.correlation / alpha)
+      Q1 <- sum(Weight * beta * y.centered, na.rm = T)
+      Q2 <- sum(Weight * beta * x.centered, na.rm = T)
+      slope <- Q1 / Q2
+      slope.diff <- abs(slope - slope.old)
+      count <- count + 1
+      slope.per.iteration <- append(slope.per.iteration, slope)
+      if (count > tolerance^-1) {
+        stop("\nThe slope coefficient does not converge after ",
+             count," iterations. \nHint: You may reduce the tolerance level.",
+             cat("Slope coefficient for last 5 iterations:"),
+             for (i in 4:0){
+               cat("\n\t", count - i, "\t", slope.per.iteration[count - i])},
+             cat("\n"))
+      }
+    }
+    slope.per.iteration <- data.frame("slope.per.iteration" =
+                                        slope.per.iteration)
 
-  slope.diff <- 10
-  count <- 0
-  slope.per.iteration <- NULL
-  alpha <- sqrt(weights.x * weights.y)
-  while (slope.diff > tolerance) {
-    slope.old <- slope
-    Weight <- alpha^2 / (slope^2 * weights.y + weights.x -
-                           2 * slope * r.xy * alpha)
+  } else {
+    if (any(r.xy != 0)) {
+      stop("There is no exact solution in case of correlation between x and y errors!")
+    }
+    ## Apply formula and use lm estimate as intitial value for b
+    alpha <- sqrt(weights.x * weights.y)
+    Weight <- alpha^2 / (slope^2 * weights.y + weights.x)
+
+    # see formula 19 and 20 for the following:
     Weight.sum <- sum(Weight)
     x.bar <- sum(Weight * x, na.rm = T) / Weight.sum
     y.bar <- sum(Weight * y, na.rm = T) / Weight.sum
     x.centered <- x - x.bar
     y.centered <- y - y.bar
-    beta <- Weight * ((x.centered / weights.y) + (slope * y.centered /
-                                                    weights.x) -
-                        (slope * x.centered + y.centered) * r.xy / alpha)
-    Q1 <- sum(Weight * beta * y.centered, na.rm = T)
-    Q2 <- sum(Weight * beta * x.centered, na.rm = T)
-    slope <- Q1 / Q2
-    slope.diff <- abs(slope - slope.old)
-    count <- count + 1
-    slope.per.iteration <- append(slope.per.iteration, slope)
-    if (count > tolerance^-1) {
-      stop("\nThe slope coefficient does not converge after ",
-           count," iterations. \nHint: You may reduce the tolerance level.",
-           cat("Slope coefficient for last 5 iterations:"),
-           for (i in 4:0){
-             cat("\n\t", count - i, "\t", slope.per.iteration[count - i])},
-           cat("\n"))
-    }
+    # calculate alpha.exact, beta.exact and gamma.exact. See York 66 page 1084
+    alpha.exact <- 2 * sum(x.centered * y.centered * Weight^2 / weights.x) / (3 * sum(x.centered^2 * Weight^2 / weights.x))
+    beta.exact <- (sum(y.centered^2 * Weight^2 / weights.x) - sum(Weight * x.centered^2)) / (3 * sum(x.centered^2 * Weight^2 / weights.x))
+    gamma.exact <- - sum(x.centered * y.centered * Weight) / (sum(x.centered^2 * Weight^2 / weights.x))
+
+    # use formula of York 66 to find slope, given on page 1084
+    phi <- acos((alpha.exact^3 - 3 /2 * alpha.exact * beta.exact + 0.5 * gamma.exact) / (alpha.exact^2 - beta.exact)^(3 / 2))
+
+    sol.cubic2 <- alpha.exact + 2 * (alpha.exact^2 - beta.exact)^0.5 * cos( 1 / 3 *(phi + 2 * pi * c(0:2)))
+    sol.cubic2
+    slope <- sol.cubic2[3]
+
+    beta <- Weight * (x.centered / weights.y) + (slope * y.centered / weights.x)
+    count <- 0
+    slope.per.iteration <- data.frame("slope.per.iteration" =
+                                        slope)
   }
-  slope.per.iteration <- data.frame("slope.per.iteration" =
-                                      slope.per.iteration)
+
   intercept <- y.bar - slope * x.bar
   x.adj <- x.bar + beta
   x.mean <- sum(Weight * beta, na.rm = T) / (Weight.sum * (length(x) - 2))
@@ -330,7 +367,6 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
               "std.Error.chisq" = sigma.chisq,
               "number.of.iterations" = count,
               "slope.after.each.iteration" = slope.per.iteration,
-              x.centered, y.centered, x, y, x.mean, "show" = x.adj,
               "original.x.values" = x,
               "original.y.values" = y,
               "fitted.y.ols" = fitted.y.ols,
@@ -343,6 +379,8 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
 
 (york.output <- york(x, y, weights.x = weights.x, weights.y = weights.y, r.xy = 0, mult.samples = F))
 
+
+(york.output <- york(x, y, weights.x = weights.x, weights.y = weights.y, r.xy = 0, mult.samples = F, exact.solution = T))
 
 
 
