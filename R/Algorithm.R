@@ -1,7 +1,7 @@
 ### york in Least Squares Fitting Of A Straight Line With Correlated Errors ###
 ## Input from Table I and Table II in york 1966
 #setwd("/Users/jonascedrodelgado/Desktop/York-Regression/York/R")
-#load("original_data.RData")
+'load("original_data.RData")
 # here you can also load other data and weights
 
 #' @title
@@ -169,7 +169,7 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
     if(length(sd.x) != length(x) | length(sd.y) != length(y)) {
       stop("sd.x and sd.y must have the same length of x resp. y!")
     }
-    #initial value of b is OLS
+    #initial value of the slope is the OLSE
     x.input <- matrix(c(rep(1, length(x)), x), ncol =2)
     lm.ols <- solve(t(x.input) %*% x.input) %*% t(x.input) %*% y
     fitted.y.ols <- x.input %*% lm.ols
@@ -191,6 +191,7 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
     SS.xy <- sum((centered.x) * (centered.y))
     se.intercept.ols <- sqrt(sigma.squared.hat * (S.x / (length(x) * SS.x)))
     se.slope.ols <- sqrt(sigma.squared.hat / SS.x)
+    r.squared.ols <- 1 - sum((residuals)^2) / SS.y
   } else {
     # For Jonas
     x.input <- 1
@@ -334,10 +335,14 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
               "original.y.values" = y,
               "fitted.y.ols" = fitted.y.ols,
               "se.of.reg.ols" = se.of.reg.ols,
+              "r.squared.ols" = r.squared.ols,
               "fitted.y.orthogonal" = fitted.y.orthogonal,
               "data" = data)
   return(est)
 }
 
-
 (york.output <- york(x, y, weights.x = weights.x, weights.y = weights.y, r.xy = 0, mult.samples = F))
+
+
+
+
