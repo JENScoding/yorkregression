@@ -107,9 +107,9 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
                    function(x) !is.null(x)))) {
       stop("You can't specify weights and standard errors at the same time!")
     }
-    if (any(is.na(x))) {
-      stop("There is at least one NA value. Please specify this value(s)!")
-    }
+  #  if (any(is.na(x))) {
+   #   stop("There is at least one NA value. Please specify this value(s)!")
+  #  }
     if (length(sd.x) == 1) {
       sd.x = rep(sd.x, length(x))
     }
@@ -198,20 +198,20 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
       stop("There is no exact solution in case of multiple samples!")
     }
     # For Jonas
-    x.input <- 1
-    lm.ols <- 1
-    fitted.y.ols <- 1
-    residuals <- 1
-    slope <- 1
-    intercept.ols <- 1
-    sigma.squared.hat <- 1
+    x.input <- matrix(1)
+    lm.ols <- matrix(1)
+    fitted.y.ols <- matrix(1)
+    residuals <- matrix(1)
+    slope <- matrix(1)
+    intercept.ols <- matrix(1)
+    sigma.squared.hat <- matrix(1)
     se.of.reg.ols <- 1
     mean.x <- 1
     mean.y <- 1
-    SS.x <- 1
-    SS.y <- 1
-    S.x <- 1
-    SS.xy <- 1
+    SS.x <- matrix(1)
+    SS.y <- matrix(1)
+    S.x <- matrix(1)
+    SS.xy <- matrix(1)
     se.intercept.ols <- 1
     se.slope.ols <- 1
 
