@@ -1,11 +1,11 @@
 load("R/original_data.RData")
 
 library(ggplot2)
-york.plots <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
-                       r.xy = NULL, sd.x = NULL, sd.y = NULL, mult.samples = F) {
-  york.output <- york(x, y, tolerance, weights.x, weights.y,
-                      sd.x, sd.y, r.xy)
-  ddf <- data.frame(x=x,y=y)
+york.plots <- function(york.output) {
+  if (class(york.output) != "york") {
+    stop("Input must be of class york (Output of york function)")
+  }
+  ddf <- data.frame(x = york.output$data[,1], y = york.output$data[,2])
   plot.1 <- ggplot(data=ddf, aes(x=york.output$original.x.values,
                                  y=york.output$original.y.values)) +
     geom_abline(aes(slope = york.output$coefficients.york[2,1],
@@ -66,4 +66,4 @@ york.plots <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NU
     theme(plot.title = element_text(hjust = 0.5))
   return(list(plot.1, plot.2, plot.3, plot.4, plot.5))
 }
-york.plots(x=x,y=y, weights.x =weights.x, weights.y=weights.y,r.xy=0.1)
+york.plots(york.output = york.output)
