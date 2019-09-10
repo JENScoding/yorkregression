@@ -54,14 +54,18 @@ york.plots <- function(york.output) {
          x = "fitted y", y= "y residuals") +
     geom_hline(yintercept = 0, linetype = "dashed", col = "red") +
     theme(plot.title =element_text(hjust = 0.5))
-  ddf5 <- data.frame(x = 1:york.output$number.of.iterations, y = york.output$slope.after.each.iteration[,1])
-  plot.5 <- ggplot(aes(x=x, y=y), data = ddf5)+
-    geom_line() +
-    geom_point() +
-    labs(title = "Trace plot",
-         x = "Number of iterations", y = "slope coefficient") +
-    geom_hline(yintercept = york.output$coefficients.york[2,1], col = "darkblue") +
-    theme(plot.title = element_text(hjust = 0.5))
+  if (york.output$york.arguments$exact.solution == F) {
+    ddf5 <- data.frame(x = 1:york.output$number.of.iterations, y = york.output$slope.after.each.iteration[,1])
+    plot.5 <- ggplot(aes(x=x, y=y), data = ddf5)+
+      geom_line() +
+      geom_point() +
+      labs(title = "Trace plot",
+           x = "Number of iterations", y = "slope coefficient") +
+      geom_hline(yintercept = york.output$coefficients.york[2,1], col = "darkblue") +
+      theme(plot.title = element_text(hjust = 0.5))
+  } else {
+    plot.5 <- NULL
+  }
   return(list(plot.1, plot.2, plot.3, plot.4, plot.5))
 }
 york.plots(york.output = york.output)

@@ -353,6 +353,7 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
     data <- list("x" = x.original, "y" = y.original, "x.errors" = x.errors,
                  "y.errors" = y.errors, "r.xy" = r.xy)
   }
+  york.arguments <- list("mult.samples" = mult.samples, "exact.solution" = exact.solution)
 
   output <- list("coefficients.york" = york.reg,
                   "coefficients.orthogonal" = orthogonal.reg,
@@ -372,6 +373,7 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
                   "se.of.reg.ols" = se.of.reg.ols,
                   "r.squared.ols" = r.squared.ols,
                   "fitted.y.orthogonal" = fitted.y.orthogonal,
+                  "york.arguments" = york.arguments,
                   "data" = data)
   attr(output, "class") <- "york"
 
