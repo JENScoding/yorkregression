@@ -166,60 +166,10 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
     if(length(sd.x) != length(x) | length(sd.y) != length(y)) {
       stop("sd.x and sd.y must have the same length of x resp. y!")
     }
-    #initial value of the slope is the OLSE
-    x.input <- matrix(c(rep(1, length(x)), x), ncol =2)
-    lm.ols <- solve(t(x.input) %*% x.input) %*% t(x.input) %*% y
-    fitted.y.ols <- x.input %*% lm.ols
-    residuals <- y - fitted.y.ols
-    slope <- as.numeric(lm.ols[2])
-    intercept.ols <- as.numeric(lm.ols[1])
-    if (any(is.na(c(slope,intercept.ols)))){
-      stop("Cannot fit a line through these data!")
-    }
-    sigma.squared.hat <- (1 / (length(x) - 2)) * sum((residuals)^2)
-    se.of.reg.ols <- sqrt(sigma.squared.hat)
-    mean.x <- mean(x)
-    mean.y <- mean(y)
-    centered.x <- x - mean.x
-    centered.y <- y - mean.y
-    SS.x <- sum(centered.x^2)
-    SS.y <- sum(centered.y^2)
-    S.x <- sum(x^2)
-    SS.xy <- sum((centered.x) * (centered.y))
-    se.intercept.ols <- sqrt(sigma.squared.hat * (S.x / (length(x) * SS.x)))
-    se.slope.ols <- sqrt(sigma.squared.hat / SS.x)
-    r.squared.ols <- 1 - sum((residuals)^2) / SS.y
   } else {
     if(exact.solution == T) {
       stop("There is no exact solution in case of multiple samples!")
     }
-    # For Jonas
-    x.input <- matrix(1)
-    lm.ols <- matrix(1)
-    fitted.y.ols <- matrix(1)
-    residuals <- matrix(1)
-    slope <- matrix(1)
-    intercept.ols <- matrix(1)
-    sigma.squared.hat <- matrix(1)
-    se.of.reg.ols <- 1
-    mean.x <- 1
-    mean.y <- 1
-    SS.x <- matrix(1)
-    SS.y <- matrix(1)
-    S.x <- matrix(1)
-    SS.xy <- matrix(1)
-    se.intercept.ols <- 1
-    se.slope.ols <- 1
-    r.squared.ols <- 1 - sum((residuals)^2) / SS.y
-
-    lm.OLS <- list()
-    slope <- NULL
-    for (i in 1:5) {
-      lm.OLS[[i]] <- lm(y[, i]~x[, i])
-      slope[i] <- as.numeric(lm.OLS[[i]][[1]][2])
-    }
-    slope <- mean(slope)
-
     mean.xi <- apply(x, 1, mean)
     mean.yi <- apply(y, 1, mean)
     x.errors<- x - mean.xi
@@ -232,6 +182,31 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
     x <- mean.xi
     y <- mean.yi
   }
+
+  #initial value of the slope is the OLSE
+  x.input <- matrix(c(rep(1, length(x)), x), ncol =2)
+  lm.ols <- solve(t(x.input) %*% x.input) %*% t(x.input) %*% y
+  fitted.y.ols <- x.input %*% lm.ols
+  residuals <- y - fitted.y.ols
+  slope <- as.numeric(lm.ols[2])
+  intercept.ols <- as.numeric(lm.ols[1])
+  if (any(is.na(c(slope,intercept.ols)))){
+    stop("Cannot fit a line through these data!")
+  }
+  sigma.squared.hat <- (1 / (length(x) - 2)) * sum((residuals)^2)
+  se.of.reg.ols <- sqrt(sigma.squared.hat)
+  mean.x <- mean(x)
+  mean.y <- mean(y)
+  centered.x <- x - mean.x
+  centered.y <- y - mean.y
+  SS.x <- sum(centered.x^2)
+  SS.y <- sum(centered.y^2)
+  S.x <- sum(x^2)
+  SS.xy <- sum((centered.x) * (centered.y))
+  se.intercept.ols <- sqrt(sigma.squared.hat * (S.x / (length(x) * SS.x)))
+  se.slope.ols <- sqrt(sigma.squared.hat / SS.x)
+  r.squared.ols <- 1 - sum((residuals)^2) / SS.y
+
   if (exact.solution == F) {
     slope.diff <- 10
     count <- 0
@@ -351,7 +326,7 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
     colnames(data) <- c("x", "y", "sd.x", "sd.y", "r.xy")
   } else {
     data <- list("x" = x.original, "y" = y.original, "x.errors" = x.errors,
-                 "y.errors" = y.errors, "r.xy" = r.xy)
+                 "y.errors" = y.errors, "r.xy" = r.xy, "mean.x.i" = x, "mean.y.i" = y)
   }
   york.arguments <- list("mult.samples" = mult.samples, "exact.solution" = exact.solution)
 
@@ -385,3 +360,5 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
 class(york.output)
 
 (york.output <- york(x, y, weights.x = weights.x, weights.y = weights.y, r.xy = 0, mult.samples = F, exact.solution = T))
+
+(york.output <- york(x, y, mult.samples = T))
