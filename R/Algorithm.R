@@ -210,6 +210,7 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
     SS.xy <- matrix(1)
     se.intercept.ols <- 1
     se.slope.ols <- 1
+    r.squared.ols <- 1 - sum((residuals)^2) / SS.y
 
     lm.OLS <- list()
     slope <- NULL
@@ -281,12 +282,15 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
     x.centered <- x - x.bar
     y.centered <- y - y.bar
     # calculate alpha.exact, beta.exact and gamma.exact. See York 66 page 1084
-    alpha.exact <- 2 * sum(x.centered * y.centered * Weight^2 / weights.x) / (3 * sum(x.centered^2 * Weight^2 / weights.x))
-    beta.exact <- (sum(y.centered^2 * Weight^2 / weights.x) - sum(Weight * x.centered^2)) / (3 * sum(x.centered^2 * Weight^2 / weights.x))
+    alpha.exact <- 2 * sum(x.centered * y.centered * Weight^2 / weights.x) /
+                  (3 * sum(x.centered^2 * Weight^2 / weights.x))
+    beta.exact <- (sum(y.centered^2 * Weight^2 / weights.x) - sum(Weight * x.centered^2)) /
+                  (3 * sum(x.centered^2 * Weight^2 / weights.x))
     gamma.exact <- - sum(x.centered * y.centered * Weight) / (sum(x.centered^2 * Weight^2 / weights.x))
 
     # use formula of York 66 to find slope, given on page 1084
-    phi <- acos((alpha.exact^3 - 3 /2 * alpha.exact * beta.exact + 0.5 * gamma.exact) / (alpha.exact^2 - beta.exact)^(3 / 2))
+    phi <- acos((alpha.exact^3 - 3 /2 * alpha.exact * beta.exact + 0.5 * gamma.exact) /
+           (alpha.exact^2 - beta.exact)^(3 / 2))
 
     sol.cubic2 <- alpha.exact + 2 * (alpha.exact^2 - beta.exact)^0.5 * cos( 1 / 3 *(phi + 2 * pi * c(0:2)))
     sol.cubic2
@@ -349,91 +353,28 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
     data <- list("x" = x.original, "y" = y.original, "x.errors" = x.errors,
                  "y.errors" = y.errors, "r.xy" = r.xy)
   }
-  if (mult.samples == F) {
-    define.class.york <- setClass("york", slots =  c(coefficients.york = "matrix",
-                                                     coefficients.orthogonal = "matrix",
-                                                     coefficients.ols = "matrix",
-                                                     weighting.vector = "numeric",
-                                                     x.residuals = "numeric",
-                                                     y.residuals = "numeric",
-                                                     fitted.y = "numeric",
-                                                     df.regression = "numeric",
-                                                     mean.x = "numeric",
-                                                     mean.y = "numeric",
-                                                     reduced.chisq = "numeric",
-                                                     std.Error.chisq = "numeric",
-                                                     number.of.iterations = "numeric",
-                                                     slope.after.each.iteration = "data.frame",
-                                                     original.x.values = "numeric",
-                                                     original.y.values = "numeric",
-                                                     fitted.y.ols = "matrix",
-                                                     se.of.reg.ols = "numeric",
-                                                     fitted.y.orthogonal = "numeric",
-                                                     data = "matrix"))
-  } else {
-    define.class.york <- setClass("york", slots =  c(coefficients.york = "matrix",
-                                                     coefficients.orthogonal = "matrix",
-                                                     coefficients.ols = "matrix",
-                                                     weighting.vector = "numeric",
-                                                     x.residuals = "numeric",
-                                                     y.residuals = "numeric",
-                                                     fitted.y = "numeric",
-                                                     df.regression = "numeric",
-                                                     mean.x = "numeric",
-                                                     mean.y = "numeric",
-                                                     reduced.chisq = "numeric",
-                                                     std.Error.chisq = "numeric",
-                                                     number.of.iterations = "numeric",
-                                                     slope.after.each.iteration = "data.frame",
-                                                     original.x.values = "numeric",
-                                                     original.y.values = "numeric",
-                                                     fitted.y.ols = "matrix",
-                                                     se.of.reg.ols = "numeric",
-                                                     fitted.y.orthogonal = "numeric",
-                                                     data = "list"))
-  }
 
-  output <- define.class.york("coefficients.york" = york.reg,
-                              "coefficients.orthogonal" = orthogonal.reg,
-                              "coefficients.ols" = ols.reg,
-                              "weighting.vector" = Weight,
-                              "x.residuals" = x.residuals,
-                              "y.residuals"= y.residuals,
-                              "fitted.y"=fitted.y,
-                              "df.regression" = df.regression,
-                              "mean.x" = x.bar,
-                              "mean.y" = y.bar ,
-                              "reduced.chisq" = reduced.chisq,
-                              "std.Error.chisq" = sigma.chisq,
-                              "number.of.iterations" = count,
-                              "slope.after.each.iteration" = slope.per.iteration,
-                              "original.x.values" = x,
-                              "original.y.values" = y,
-                              "fitted.y.ols" = fitted.y.ols,
-                              "se.of.reg.ols" = se.of.reg.ols,
-                              "fitted.y.orthogonal" = fitted.y.orthogonal,
-                              "data" = data)
-  # est <- list("coefficients.york" = york.reg,
-  #             "coefficients.orthogonal" = orthogonal.reg,
-  #             "coefficients.ols" = ols.reg,
-  #             "weighting.vector" = Weight,
-  #             "x.residuals" = x.residuals,
-  #             "y.residuals"= y.residuals,
-  #             "fitted.y"=fitted.y,
-  #             "df.regression" = df.regression,
-  #             "mean.x" = x.bar,
-  #             "mean.y" = y.bar ,
-  #             "reduced.chisq" = reduced.chisq,
-  #             "std.Error.chisq" = sigma.chisq,
-  #             "number.of.iterations" = count,
-  #             "slope.after.each.iteration" = slope.per.iteration,
-  #             "original.x.values" = x,
-  #             "original.y.values" = y,
-  #             "fitted.y.ols" = fitted.y.ols,
-  #             "se.of.reg.ols" = se.of.reg.ols,
-  #             "r.squared.ols" = r.squared.ols,
-  #             "fitted.y.orthogonal" = fitted.y.orthogonal,
-  #             "data" = data)
+  output <- list("coefficients.york" = york.reg,
+                  "coefficients.orthogonal" = orthogonal.reg,
+                  "coefficients.ols" = ols.reg,
+                  "weighting.vector" = Weight,
+                  "x.residuals" = x.residuals,
+                  "y.residuals"= y.residuals,
+                  "fitted.y"=fitted.y,
+                  "df.regression" = df.regression,
+                  "mean.x" = x.bar,
+                  "mean.y" = y.bar ,
+                  "reduced.chisq" = reduced.chisq,
+                  "std.Error.chisq" = sigma.chisq,
+                  "number.of.iterations" = count,
+                  "slope.after.each.iteration" = slope.per.iteration,
+                  "fitted.y.ols" = fitted.y.ols,
+                  "se.of.reg.ols" = se.of.reg.ols,
+                  "r.squared.ols" = r.squared.ols,
+                  "fitted.y.orthogonal" = fitted.y.orthogonal,
+                  "data" = data)
+  attr(output, "class") <- "york"
+
   return(output)
 }
 
