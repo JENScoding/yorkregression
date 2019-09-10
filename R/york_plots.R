@@ -1,13 +1,11 @@
-load("R/original_data.RData")
-
 library(ggplot2)
 york.plots <- function(york.output) {
   if (class(york.output) != "york") {
     stop("Input must be of class york (Output of york function)")
   }
   ddf <- data.frame(x = york.output$data[,1], y = york.output$data[,2])
-  plot.1 <- ggplot(data=ddf, aes(x=york.output$original.x.values,
-                                 y=york.output$original.y.values)) +
+  plot.1 <- ggplot(data=ddf, aes(x=york.output$data[,1],
+                                 y=york.output$data[,2])) +
     geom_abline(aes(slope = york.output$coefficients.york[2,1],
                     intercept = york.output$coefficients.york[1,1],colour="York"),
                 key_glyph = draw_key_rect) +
@@ -23,13 +21,13 @@ york.plots <- function(york.output) {
                color = "red", size=0.4) +
     geom_hline(yintercept = york.output$mean.y, linetype="dashed",
                color = "red", size=0.4) +
-    geom_vline(xintercept = mean(york.output$original.x.values),
+    geom_vline(xintercept = mean(york.output$data[,1]),
                linetype="dashed",color = "blue", size = 0.4) +
-    geom_hline(yintercept = mean(york.output$original.y.values),
+    geom_hline(yintercept = mean(york.output$data[,2]),
                linetype="dashed",color = "blue", size = 0.4) +
     geom_smooth(method ="lm") +
-    geom_point(aes(x = mean(york.output$original.x.values),
-                   y= mean(york.output$original.y.values)), col = "blue") +
+    geom_point(aes(x = mean(york.output$data[,1]),
+                   y= mean(york.output$data[,2])), col = "blue") +
     geom_point(aes(x = york.output$mean.x,
                    y= york.output$mean.y), col = "red") +
     theme(plot.title =element_text(hjust = 0.5))
