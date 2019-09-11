@@ -1,8 +1,11 @@
 Package: York
-Title: Simple linear regression of X and Y-variables with correlated errors
+Title: York's regression of X and Y-variables with correlated errors
 Version: 0.0.0.9000
-Authors@R: person("First", "Last", email = "first.last@example.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
+Authors@R: c(
+	person("Jonas", "Cedro Delgado", email = 		"j.cedrodelgado01@stud.uni-goettingen.de", 		    	role = c("aut", "cre")),
+   	person("Jens", "Lichter", email = 		"jens.lichter@stud.uni-	goettingen.de", 
+		role = c("aut", "cre")))
+Description: Fit the best straight line through X and Y-variarbles with York's method, when both X and Y-variables are subject to measurement errors . The York's method includes potential correlation between those errors. 
 Depends: R (>= 3.6.0)
 License: What license is it under?
 Encoding: UTF-8
