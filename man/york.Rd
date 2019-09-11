@@ -16,48 +16,53 @@ york(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
 \item{tolerance}{The tolerance for convergence which is set a priori to
 \code{1e-10}}
 
-\item{weights.x}{The prespecified 1 times n weights vector for X-values}
+\item{weights.x}{The prespecified 1 times n weights vector for
+\code{X}-values}
 
-\item{weights.y}{The prespecified 1 times n weights vector for Y-values}
+\item{weights.y}{The prespecified 1 times n weights vector for
+\code{Y}-values}
 
-\item{sd.x}{The standard error of the X-values}
+\item{sd.x}{The standard error of the \code{X}-values}
 
-\item{sd.y}{The standard error of the Y-values}
+\item{sd.y}{The standard error of the \code{Y}-values}
 
-\item{r.xy}{The prespecified correlation coefficient between X and Y}
+\item{r.xy}{The prespecified correlation coefficient between the errors in
+\code{X} and \code{Y}}
 }
 \value{
-York Returns an object of class "York" the York regression for the
+York Returns an object of class "\linkS4class{york}" the York regression for the
 \code{x} and \code{y} data for either specified weights \code{weights.x}
 and \code{weights.y} or specified standard errors \code{sd.x} and \code{sd.y}
-An object of class "York" containing the following components:
+An object of class "york" containing the following components:
 
 \describe{
 
 \item{coefficients.york}{a matrix which contains the York estimates for
+intercept and slope of the best-fit straight line with the respective
+standard errors}
+\item{coefficients.orthogonal}{a matrix which contains the orthogonal
+estimates for intercept and slope with the respective standard errors}
+\item{coefficients.ols}{a matrix which contains the OLS estimates for the
 intercept and slope with the respective standard errors}
-\item{coefficients.orthogonal}{a matrix which contains the Deming estimates
-for intercept and slope with the respective standard errors}
-\item{coefficients.ols}{a matrix which contains the OLS estimates for
-intercept and slope with the respective standard errors}
-\item{weighting.vector}{the prespecified or calculated weights}
-\item{x.residuals}{the York X-residuals}
-\item{y.residuals}{the York Y-residuals}
-\item{fitted.y}{the fitted York Y-values}
-\item{df.regression}{the number of degrees of freedom of the York regression}
-\item{mean.x}{the ordinary mean of X}
-\item{mean.y}{the ordinary mean of Y}
+\item{weights}{a matrix representation of the prespecified or calculated
+weights for the X- and Y-observations}
+\item{x.residuals}{a vector of the York X-residuals}
+\item{y.residuals}{a vector of the York Y-residuals}
+\item{fitted.y}{a vector of the fitted York Y-values}
+\item{df.regression}{the number of degrees of freedom of York's regression}
+\item{weighted.mean.x}{the weighted.mean of X}
+\item{weighted.mean.y}{the weighted.mean of Y}
 \item{reduced.chisq}{the reduced chi-squared statistic, i.e. the goodness
 of fit measure of York's regression}
-\item{std.Error.chisq}{the standard error of the chi-squared statistic}
+\item{std.error.chisq}{the standard error of the chi-squared statistic}
 \item{number.of.iterations}{the total number of iterations}
 \item{slope.after.each.iteration}{the York slope after each iteration}
-\item{original.x.values}{the original X-values}
-\item{original.y.values}{the original Y-values}
 \item{fitted.y.ols}{the fitted values for OLS}
 \item{se.of.reg.ols}{the standard error of the regression for OLS}
-\item{fitted.y.orthogonal}{the fitted values for Deming regression}
-\item{data}{a data matrix which contains as columns the X-, Y-, sd.X- and
+\item{r.squared.ols}{the R squared of the OLS regression}
+\item{fitted.y.orthogonal}{the fitted values for orthogonal regression}
+\item{data}{a data matrix which contains as columns the observed points X-,
+Y-, sd.X- and
 sd.Y-values}
 }
 }
@@ -73,8 +78,8 @@ Given \eqn{n} pairs of \eqn{(X_i, Y_i), i = 1, \ldots, n}, their weights
 straight line using the algorithm of York et al. (1966)/ York et al. (1969)
 as presented in Wehr & Saleska (2017). In addition, the function provides
 numerous statistics, parameters and goodness of fit criteria. If the data
-contains NA values then the share of NA values in the total values is
-calculated and the rows with NA values will be deleted.
+contains NA values then the share of \code{NA} values in the total values is
+calculated and the rows with \code{NA} values will be deleted.
 }
 \examples{
 x <- c(0.0, 0.9, 1.8, 2.6, 3.3, 4.4, 5.2, 6.1, 6.5, 7.4)
