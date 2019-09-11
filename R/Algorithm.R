@@ -255,14 +255,14 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
     y.centered <- y - y.bar
     # calculate alpha.exact, beta.exact and gamma.exact. See York 66 page 1084
     alpha.exact <- 2 * sum(x.centered * y.centered * Weight^2 / weights.x) /
-                  (3 * sum(x.centered^2 * Weight^2 / weights.x))
+      (3 * sum(x.centered^2 * Weight^2 / weights.x))
     beta.exact <- (sum(y.centered^2 * Weight^2 / weights.x) - sum(Weight * x.centered^2)) /
-                  (3 * sum(x.centered^2 * Weight^2 / weights.x))
+      (3 * sum(x.centered^2 * Weight^2 / weights.x))
     gamma.exact <- - sum(x.centered * y.centered * Weight) / (sum(x.centered^2 * Weight^2 / weights.x))
 
     # use formula of York 66 to find slope, given on page 1084
     phi <- acos((alpha.exact^3 - 3 /2 * alpha.exact * beta.exact + 0.5 * gamma.exact) /
-           (alpha.exact^2 - beta.exact)^(3 / 2))
+                  (alpha.exact^2 - beta.exact)^(3 / 2))
 
     sol.cubic2 <- alpha.exact + 2 * (alpha.exact^2 - beta.exact)^0.5 * cos( 1 / 3 *(phi + 2 * pi * c(0:2)))
     sol.cubic2
@@ -328,6 +328,27 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
   york.arguments <- list("mult.samples" = mult.samples, "exact.solution" = exact.solution)
 
   output <- list("coefficients.york" = york.reg,
+<<<<<<< HEAD
+                 "coefficients.orthogonal" = orthogonal.reg,
+                 "coefficients.ols" = ols.reg,
+                 "weighting.vector" = Weight,
+                 "x.residuals" = x.residuals,
+                 "y.residuals"= y.residuals,
+                 "fitted.y"=fitted.y,
+                 "df.regression" = df.regression,
+                 "mean.x" = x.bar,
+                 "mean.y" = y.bar ,
+                 "reduced.chisq" = reduced.chisq,
+                 "std.Error.chisq" = sigma.chisq,
+                 "number.of.iterations" = count,
+                 "slope.after.each.iteration" = slope.per.iteration,
+                 "fitted.y.ols" = fitted.y.ols,
+                 "se.of.reg.ols" = se.of.reg.ols,
+                 "r.squared.ols" = r.squared.ols,
+                 "fitted.y.orthogonal" = fitted.y.orthogonal,
+                 "york.arguments" = york.arguments,
+                 "data" = data)
+=======
                   "coefficients.orthogonal" = orthogonal.reg,
                   "coefficients.ols" = ols.reg,
                   "weighting.vector" = Weight,
@@ -347,6 +368,7 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
                   "fitted.y.orthogonal" = fitted.y.orthogonal,
                   "york.arguments" = york.arguments,
                   "data" = data)
+>>>>>>> 116655d5a3a7e0a381bf6ff61fa0a433ee987282
   attr(output, "class") <- "york"
 
   return(output)
