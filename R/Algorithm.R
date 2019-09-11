@@ -391,8 +391,3 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
 
   return(output)
 }
-#Testing
-#load("original_data.RData")
-(york.output <- york(x, y,sd.x = 0.1,sd.y = 0.6, r.xy = 0.2))
-#(york.output <- york(x, y, weights.x = weights.x, weights.y = weights.y, r.xy = 0, mult.samples = T))
-(york.output <- york(x, y, weights.x = weights.x, weights.y = weights.y, r.xy = 0, exact.solution = T))
