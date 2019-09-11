@@ -169,9 +169,21 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
       stop("sd.x and sd.y must have the same length of x resp. y!")
     }
   } else {
-    if(exact.solution == T) {
+    if (exact.solution == T) {
       stop("There is no exact solution in case of multiple samples!")
     }
+    if (is.data.frame(x) == F|| is.data.frame(y) == F) {
+      stop("Inputs x and y must be of class data.frame!")
+    }
+    if (ncol(x) != ncol(y) || nrow(x) != nrow(y)) {
+      stop("x and y must have the same number of columns/ rows")
+    }
+    if (ncol(x) == 1 || ncol(y) == 1) {
+      stop("You need more than one sample of x and y, if you specify mult.samples = T")
+    }
+
+  #  stop.mult.sample(exact.solution = exact.solution, x = x, y = y)
+
     mean.xi <- apply(x, 1, mean)
     mean.yi <- apply(y, 1, mean)
     x.errors<- x - mean.xi
