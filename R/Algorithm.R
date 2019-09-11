@@ -14,17 +14,17 @@
 #' straight line using the algorithm of York et al. (1966)/ York et al. (1969)
 #' as presented in Wehr & Saleska (2017). In addition, the function provides
 #' numerous statistics, parameters and goodness of fit criteria. If the data
-#' contains NA values then the share of NA values in the total values is
-#' calculated and the rows with NA values will be deleted.
+#' contains NA values then the share of \code{NA} values in the total values is
+#' calculated and the rows with \code{NA} values will be deleted.
 #' @param x A 1 times n numeric row vector of the \code{X}-variable
 #' @param y A 1 times n numeric row vector of the \code{Y}-variable
 #' @param tolerance The tolerance for convergence which is set a priori to
 #' \code{1e-10}
-#' @param weights.x The prespecified 1 times n weights vector for X-values
-#' @param weights.y The prespecified 1 times n weights vector for Y-values
-#' @param r.xy The prespecified correlation coefficient between X and Y
-#' @param sd.x The standard error of the X-values
-#' @param sd.y The standard error of the Y-values
+#' @param weights.x The prespecified 1 times n weights vector for \code{X}-values
+#' @param weights.y The prespecified 1 times n weights vector for \code{Y}-values
+#' @param r.xy The prespecified correlation coefficient between the errors in \code{X} and \code{Y}
+#' @param sd.x The standard error of the \code{X}-values
+#' @param sd.y The standard error of the \code{Y}-values
 #' @return York Returns an object of class "York" the York regression for the
 #' \code{x} and \code{y} data for either specified weights \code{weights.x}
 #' and \code{weights.y} or specified standard errors \code{sd.x} and \code{sd.y}
@@ -33,7 +33,7 @@
 #' \describe{
 #'
 #' \item{coefficients.york}{a matrix which contains the York estimates for
-#' intercept and slope with the respective standard errors}
+#' intercept and slope of the best-fit straight line with the respective standard errors}
 #' \item{coefficients.orthogonal}{a matrix which contains the Deming estimates
 #' for intercept and slope with the respective standard errors}
 #' \item{coefficients.ols}{a matrix which contains the OLS estimates for
@@ -55,7 +55,7 @@
 #' \item{fitted.y.ols}{the fitted values for OLS}
 #' \item{se.of.reg.ols}{the standard error of the regression for OLS}
 #' \item{fitted.y.orthogonal}{the fitted values for Deming regression}
-#' \item{data}{a data matrix which contains as columns the X-, Y-, sd.X- and
+#' \item{data}{a data matrix which contains as columns the observed points X-, Y-, sd.X- and
 #' sd.Y-values}
 #' }
 #'
@@ -328,7 +328,6 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
   york.arguments <- list("mult.samples" = mult.samples, "exact.solution" = exact.solution)
 
   output <- list("coefficients.york" = york.reg,
-<<<<<<< HEAD
                  "coefficients.orthogonal" = orthogonal.reg,
                  "coefficients.ols" = ols.reg,
                  "weighting.vector" = Weight,
@@ -348,27 +347,6 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
                  "fitted.y.orthogonal" = fitted.y.orthogonal,
                  "york.arguments" = york.arguments,
                  "data" = data)
-=======
-                  "coefficients.orthogonal" = orthogonal.reg,
-                  "coefficients.ols" = ols.reg,
-                  "weighting.vector" = Weight,
-                  "x.residuals" = x.residuals,
-                  "y.residuals"= y.residuals,
-                  "fitted.y"=fitted.y,
-                  "df.regression" = df.regression,
-                  "mean.x" = x.bar,
-                  "mean.y" = y.bar ,
-                  "reduced.chisq" = reduced.chisq,
-                  "std.Error.chisq" = sigma.chisq,
-                  "number.of.iterations" = count,
-                  "slope.after.each.iteration" = slope.per.iteration,
-                  "fitted.y.ols" = fitted.y.ols,
-                  "se.of.reg.ols" = se.of.reg.ols,
-                  "r.squared.ols" = r.squared.ols,
-                  "fitted.y.orthogonal" = fitted.y.orthogonal,
-                  "york.arguments" = york.arguments,
-                  "data" = data)
->>>>>>> 116655d5a3a7e0a381bf6ff61fa0a433ee987282
   attr(output, "class") <- "york"
 
   return(output)
