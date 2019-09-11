@@ -34,26 +34,36 @@
 #'
 #'   \item{coefficients.york}{a matrix which contains the York estimates for
 #'   intercept and slope of the best-fit straight line with the respective
-#'   standard errors} \item{coefficients.orthogonal}{a matrix which contains the
+#'   standard errors}
+#'   \item{coefficients.orthogonal}{a matrix which contains the
 #'   orthogonal estimates for intercept and slope with the respective standard
-#'   errors} \item{coefficients.ols}{a matrix which contains the OLS estimates
+#'   errors}
+#'   \item{coefficients.ols}{a matrix which contains the OLS estimates
 #'   for the intercept and slope with the respective standard errors}
 #'   \item{weights}{a matrix representation of the prespecified or calculated
-#'   weights for the X- and Y-observations} \item{x.residuals}{a vector of the
-#'   York X-residuals} \item{y.residuals}{a vector of the York Y-residuals}
+#'   weights for the X- and Y-observations}
+#'   \item{x.residuals}{a vector of the
+#'   York X-residuals}
+#'   \item{y.residuals}{a vector of the York Y-residuals}
 #'   \item{fitted.y}{a vector of the fitted York Y-values}
-#'   \item{df.regression}{the number of degrees of freedom of York's regression}
-#'   \item{weighted.mean.x}{the weighted.mean of X} \item{weighted.mean.y}{the
-#'   weighted.mean of Y} \item{reduced.chisq}{the reduced chi-squared statistic,
+#'   \item{df.regression}{the number of degrees of freedom
+#'   (See \url{https://en.wikipedia.org/wiki/Degrees_of_freedom_(statistics)})
+#'   of York's regression}
+#'   \item{weighted.mean.x}{the weighted.mean of X}
+#'   \item{weighted.mean.y}{the weighted.mean of Y}
+#'   \item{reduced.chisq}{the reduced chi-squared statistic
+#'   (See \url{https://en.wikipedia.org/wiki/Reduced_chi-squared_statistic}),
 #'   i.e. the goodness of fit measure of York's regression}
 #'   \item{std.error.chisq}{the standard error of the chi-squared statistic}
 #'   \item{number.of.iterations}{the total number of iterations}
 #'   \item{slope.after.each.iteration}{the York slope after each iteration}
-#'   \item{fitted.y.ols}{the fitted values for OLS} \item{se.of.reg.ols}{the
-#'   standard error of the regression for OLS} \item{r.squared.ols}{the R
-#'   squared of the OLS regression} \item{fitted.y.orthogonal}{the fitted values
-#'   for orthogonal regression} \item{data}{a data matrix which contains as
-#'   columns the observed points X-, Y-, sd.X- and sd.Y-values} }
+#'   \item{fitted.y.ols}{the fitted values for OLS}
+#'   \item{se.of.reg.ols}{the standard error of the regression (SER) for OLS}
+#'   \item{r.squared.ols}{the R squared of the OLS regression}
+#'   \item{fitted.y.orthogonal}{the fitted values for orthogonal regression (See
+#'   \url{https://en.wikipedia.org/wiki/Deming_regression})}
+#'   \item{data}{a data matrix which contains as columns the observed points
+#'   X-, Y-, sd.X- and sd.Y-values}}
 #'
 #' @references Wehr, Richard, and Scott R. Saleska. "The long-solved problem of
 #' the best-fit straight line: Application to isotopic mixing lines."
@@ -66,13 +76,23 @@
 #' Physics 44.5 (1966), pp. 1079-1086.
 #'
 #' @examples
+#' # Example: York's regression with weight data taken from Pearson (1901):
 #' x <- c(0.0, 0.9, 1.8, 2.6, 3.3, 4.4, 5.2, 6.1, 6.5, 7.4)
 #' y <- c(5.9, 5.4, 4.4, 4.6, 3.5, 3.7, 2.8, 2.8, 2.4, 1.5)
 #' weights.x <- c(1e+3, 1e+3, 5e+2, 8e+2, 2e+2, 8e+1, 6e+1, 2e+1, 1.8, 1)
 #' weights.y <- c(1, 1.8, 4, 8, 20, 20, 70, 70, 1e+2, 5e+2)
 #' r.xy <- 0
 #' york(x = x, y = y, tolerance = 1e-10, weights.x = weights.x,
-#' weights.y = weights.y, r.xy = r.xy, mult.samples = F)
+#' weights.y = weights.y, r.xy = r.xy, mult.samples = FALSE)
+#'
+#' # Example: York's regression arbitrary values for sd.x and sd.y:
+#' x <- c(0.0, 0.9, 1.8, 2.6, 3.3, 4.4, 5.2, 6.1, 6.5, 7.4)
+#' y <- c(5.9, 5.4, 4.4, 4.6, 3.5, 3.7, 2.8, 2.8, 2.4, 1.5)
+#' sd.y
+#' sd.y <- 0.4
+#' r.xy <- 0.3
+#' york(x = x, y = y, tolerance = 1e-10, weights.x = weights.x,
+#' weights.y = weights.y, r.xy = r.xy, mult.samples = FALSE)
 #'
 #' \dontrun{
 #' # Example: No standard errors or weights specified
