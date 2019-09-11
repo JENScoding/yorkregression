@@ -1,3 +1,29 @@
+#' @title Plots for York's regression
+#'
+#' @description Gives several diagnostic plots for York's regression.
+#' @details Given an object of class "york" this function gives several
+#' dianostic plots. The first plot shows York's best-fit straight line only. The
+#' second plot shows ork' best fit straight line compared to OLS and orthogonal
+#' regression. Additionally, the different "center of gravity" are shown. The
+#' third plot is a "y-residuals vs. x-residuals plot". The fourth is a
+#' "x-residuals vs. fitted-y plot". The fith plot is a "y-residuals vs.
+#' fitted y" plot and the last plot is a "trace plot" which shows the slope after
+#' each interation, i.e. how the slope coefficient converges.
+#' @param york.output An object of class "york"
+#' @return york.plots returns 6 different diagnostic plots.
+#'
+#' @examples
+#' # Example: York's regression with weight data taken from Pearson (1901):
+#' x <- c(0.0, 0.9, 1.8, 2.6, 3.3, 4.4, 5.2, 6.1, 6.5, 7.4)
+#' y <- c(5.9, 5.4, 4.4, 4.6, 3.5, 3.7, 2.8, 2.8, 2.4, 1.5)
+#' weights.x <- c(1e+3, 1e+3, 5e+2, 8e+2, 2e+2, 8e+1, 6e+1, 2e+1, 1.8, 1)
+#' weights.y <- c(1, 1.8, 4, 8, 20, 20, 70, 70, 1e+2, 5e+2)
+#' r.xy <- 0
+#' york.output <- york(x, y, weights.x = weights.x, weights.y = weights.y,
+#'                     r.xy = 0, mult.samples = T, exact.solution = FALSE)))
+#' york.plots(york.output)
+#' @name york.plots
+#' @export
 #' @importFrom ggplot2 ggplot aes geom_abline geom_point labs theme element_text
 #' draw_key_rect scale_colour_manual geom_vline geom_hline geom_smooth geom_line
 #' @importFrom utils stack
@@ -16,7 +42,7 @@ york.plots <- function(york.output) {
       geom_abline(aes(slope = york.output$coefficients.york[2, 1],
                       intercept = york.output$coefficients.york[1, 1]), col = "red") +
       geom_point() +
-      labs(title="York's best fit straight line",
+      labs(title="York's best-fit straight line with correlated errors",
            x ="x data", y = "y data") +
       theme(plot.title =element_text(hjust = 0.5))
   } else {
@@ -33,7 +59,7 @@ york.plots <- function(york.output) {
       geom_abline(aes(slope = york.output$coefficients.york[2, 1],
                       intercept = york.output$coefficients.york[1, 1]), col = "red") +
       geom_point() +
-      labs(title="York's least squares fitting of a straight line with correlated errors",
+      labs(title="York's best-fit straight line with correlated errors",
            x ="x data", y = "y data") +
       theme(plot.title =element_text(hjust = 0.5))
   }
@@ -53,9 +79,9 @@ york.plots <- function(york.output) {
     geom_point() +
     labs(title="York' best fit straight line compared to OLS and orthogonal ",
          x ="x data", y = "y data") +
-    geom_vline(xintercept = york.output$mean.x, linetype = "dashed",
+    geom_vline(xintercept = york.output$weighted.mean.x, linetype = "dashed",
                color = "red", size = 0.4) +
-    geom_hline(yintercept = york.output$mean.y, linetype = "dashed",
+    geom_hline(yintercept = york.output$weighted.mean.y, linetype = "dashed",
                color = "red", size = 0.4) +
     geom_vline(xintercept = mean(x.data),
                linetype = "dashed", color = "blue", size = 0.4) +
@@ -64,8 +90,8 @@ york.plots <- function(york.output) {
     geom_smooth(method = "lm") +
     geom_point(aes(x = mean(x.data),
                    y = mean(y.data)), col = "blue") +
-    geom_point(aes(x = york.output$mean.x,
-                   y = york.output$mean.y), col = "red") +
+    geom_point(aes(x = york.output$weighted.mean.x,
+                   y = york.output$weighted.mean.y), col = "red") +
     theme(plot.title = element_text(hjust = 0.5))
 
   ddf3 <- data.frame(x = york.output$x.residuals,  y = york.output$y.residuals)
