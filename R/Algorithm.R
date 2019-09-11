@@ -331,6 +331,7 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
   york.arguments <- list("mult.samples" = mult.samples, "exact.solution" = exact.solution)
 
   output <- list("coefficients.york" = york.reg,
+<<<<<<< HEAD
                  "coefficients.orthogonal" = orthogonal.reg,
                  "coefficients.ols" = ols.reg,
                  "weighting.vector" = Weight,
@@ -350,6 +351,27 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
                  "fitted.y.orthogonal" = fitted.y.orthogonal,
                  "york.arguments" = york.arguments,
                  "data" = data)
+=======
+                  "coefficients.orthogonal" = orthogonal.reg,
+                  "coefficients.ols" = ols.reg,
+                  "weighting.vector" = Weight,
+                  "x.residuals" = x.residuals,
+                  "y.residuals"= y.residuals,
+                  "fitted.y"=fitted.y,
+                  "df.regression" = df.regression,
+                  "mean.x" = x.bar,
+                  "mean.y" = y.bar ,
+                  "reduced.chisq" = reduced.chisq,
+                  "std.Error.chisq" = sigma.chisq,
+                  "number.of.iterations" = count,
+                  "slope.after.each.iteration" = slope.per.iteration,
+                  "fitted.y.ols" = fitted.y.ols,
+                  "se.of.reg.ols" = se.of.reg.ols,
+                  "r.squared.ols" = r.squared.ols,
+                  "fitted.y.orthogonal" = fitted.y.orthogonal,
+                  "york.arguments" = york.arguments,
+                  "data" = data)
+>>>>>>> 116655d5a3a7e0a381bf6ff61fa0a433ee987282
   attr(output, "class") <- "york"
 
   return(output)
