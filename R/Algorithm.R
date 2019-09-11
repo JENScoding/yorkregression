@@ -75,6 +75,10 @@
 #' York, Derek. "Least-squares fitting of a straight line.", Canadian Journal of
 #' Physics 44.5 (1966), pp. 1079-1086.
 #'
+#' York, Derek, et al. "Unified equations for the slope, intercept, and standard
+#' errors of the best straight line." American Journal of Physics 72.3 (2004),
+#' pp. 367-375.
+#'
 #' @examples
 #' # Example: York's regression with weight data taken from Pearson (1901):
 #' x <- c(0.0, 0.9, 1.8, 2.6, 3.3, 4.4, 5.2, 6.1, 6.5, 7.4)
@@ -88,11 +92,11 @@
 #' # Example: York's regression arbitrary values for sd.x and sd.y:
 #' x <- c(0.0, 0.9, 1.8, 2.6, 3.3, 4.4, 5.2, 6.1, 6.5, 7.4)
 #' y <- c(5.9, 5.4, 4.4, 4.6, 3.5, 3.7, 2.8, 2.8, 2.4, 1.5)
-#' sd.y
+#' sd.x <- 0.2
 #' sd.y <- 0.4
 #' r.xy <- 0.3
-#' york(x = x, y = y, tolerance = 1e-10, weights.x = weights.x,
-#' weights.y = weights.y, r.xy = r.xy, mult.samples = FALSE)
+#' york(x = x, y = y, tolerance = 1e-10, sd.x = sd.x,
+#' sd.y = sd.y, r.xy = r.xy, mult.samples = FALSE)
 #'
 #' \dontrun{
 #' # Example: No standard errors or weights specified
