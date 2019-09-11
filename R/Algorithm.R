@@ -21,10 +21,14 @@
 #'   \code{X}-values
 #' @param weights.y The prespecified 1 times n weights vector for
 #'   \code{Y}-values
-#' @param r.xy The prespecified correlation coefficient between the errors in
-#'   \code{X} and \code{Y}
 #' @param sd.x The standard error of the \code{X}-values
 #' @param sd.y The standard error of the \code{Y}-values
+#' @param r.xy The prespecified correlation coefficient between the errors in
+#'   \code{X} and \code{Y}
+#' @param mult.samples An indicator if the multiple samples option is turned on
+#' or not. The standard value is \code{FALSE}
+#' @param exact.solution An indicator if the exact solution option is turned on
+#' or not. The standard value is \code{FALSE}
 #' @return York Returns an object of class "york" the York regression for the
 #'   \code{x} and \code{y} data for either specified weights \code{weights.x}
 #'   and \code{weights.y} or specified standard errors \code{sd.x} and
@@ -58,8 +62,13 @@
 #'   \item{number.of.iterations}{the total number of iterations}
 #'   \item{slope.after.each.iteration}{the York slope after each iteration}
 #'   \item{fitted.y.ols}{the fitted values for OLS}
+#'   \item{residuals.ols}{the OLS residuals}
+#'   \item{residual.sum.of.squares}{the residual sum of squares (RSS) of OLS}
+#'   \item{total.sum.of.squares}{the total sum of squares of OLS}
 #'   \item{se.of.reg.ols}{the standard error of the regression (SER) for OLS}
 #'   \item{r.squared.ols}{the R squared of the OLS regression}
+#'   \item{r.squared.adjusted.ols}{the adjusted R squared of OLS}
+#'   \item{f.statistic.ols}{the F statistic of OLS}
 #'   \item{fitted.y.orthogonal}{the fitted values for orthogonal regression (See
 #'   \url{https://en.wikipedia.org/wiki/Deming_regression})}
 #'   \item{data}{a data matrix which contains as columns the observed points
@@ -193,7 +202,8 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
       stop("x and y must have the same number of columns/ rows")
     }
     if (ncol(x) == 1 || ncol(y) == 1) {
-      stop("You need more than one sample of x and y, if you specify mult.samples = T")
+      stop("You need more than one sample of x and y,
+           if you specify mult.samples = T")
     }
 
   #  stop.mult.sample(exact.solution = exact.solution, x = x, y = y)
@@ -215,13 +225,14 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
   x.input <- matrix(c(rep(1, length(x)), x), ncol =2)
   lm.ols <- solve(t(x.input) %*% x.input) %*% t(x.input) %*% y
   fitted.y.ols <- x.input %*% lm.ols
-  residuals <- y - fitted.y.ols
+  residuals.ols <- y - fitted.y.ols
   slope <- as.numeric(lm.ols[2])
   intercept.ols <- as.numeric(lm.ols[1])
   if (any(is.na(c(slope,intercept.ols)))){
     stop("Cannot fit a line through these data!")
   }
-  sigma.squared.hat <- (1 / (length(x) - 2)) * sum((residuals)^2)
+  RSS <- sum(residuals.ols^2)
+  sigma.squared.hat <- (1 / (length(x) - 2)) * RSS
   se.of.reg.ols <- sqrt(sigma.squared.hat)
   mean.x <- mean(x)
   mean.y <- mean(y)
@@ -233,7 +244,10 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
   SS.xy <- sum((centered.x) * (centered.y))
   se.intercept.ols <- sqrt(sigma.squared.hat * (S.x / (length(x) * SS.x)))
   se.slope.ols <- sqrt(sigma.squared.hat / SS.x)
-  r.squared.ols <- 1 - sum((residuals)^2) / SS.y
+  r.squared.ols <- 1 - RSS / SS.y
+  r.squared.adjusted.ols <- r.squared.ols - (1 - r.squared.ols)*
+    (1 / (length(x)-2))
+  f.statistic.ols <- (r.squared.ols / (1- r.squared.ols)) * ((length(x)-2))
 
   if (exact.solution == F) {
     slope.diff <- 10
@@ -323,7 +337,6 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
     (length(x) - 2)
   sigma.chisq <- sqrt(2 / (length(x) - 2))
   fitted.y <- intercept + slope * x
-  residuals <- y - fitted.y
   df.regression <- 2*(length(x)-1)
   c <- r.xy*alpha
   x.residuals <- (Weight * (intercept + slope * x - y)
@@ -386,8 +399,13 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
                  "number.of.iterations" = count,
                  "slope.after.each.iteration" = slope.per.iteration,
                  "fitted.y.ols" = fitted.y.ols,
+                 "residuals.ols" = residuals.ols,
+                 "residual.sum.of.squares" = RSS,
+                 "total.sum.of.squares" = SS.y,
                  "se.of.reg.ols" = se.of.reg.ols,
                  "r.squared.ols" = r.squared.ols,
+                 "r.squared.adjusted.ols" = r.squared.adjusted.ols,
+                 "f.statistic.ols" = f.statistic.ols,
                  "fitted.y.orthogonal" = fitted.y.orthogonal,
                  "york.arguments" = york.arguments,
                  "data" = data)
