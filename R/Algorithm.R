@@ -96,7 +96,8 @@
 #' weights.y <- c(1, 1.8, 4, 8, 20, 20, 70, 70, 1e+2, 5e+2)
 #' r.xy <- 0
 #' york(x = x, y = y, tolerance = 1e-10, weights.x = weights.x,
-#' weights.y = weights.y, r.xy = r.xy, mult.samples = FALSE)
+#' weights.y = weights.y, r.xy = r.xy, mult.samples = FALSE,
+#' exact.solution = FALSE)
 #'
 #' # Example: York's regression arbitrary values for sd.x and sd.y:
 #' x <- c(0.0, 0.9, 1.8, 2.6, 3.3, 4.4, 5.2, 6.1, 6.5, 7.4)
@@ -105,17 +106,20 @@
 #' sd.y <- 0.4
 #' r.xy <- 0.3
 #' york(x = x, y = y, tolerance = 1e-10, sd.x = sd.x,
-#' sd.y = sd.y, r.xy = r.xy, mult.samples = FALSE)
+#' sd.y = sd.y, r.xy = r.xy, mult.samples = FALSE,
+#' exact.solution = FALSE))
 #'
 #' \dontrun{
 #' # Example: No standard errors or weights specified
 #' york(x, y, r.xy = 0)
 #' # Example: You can't specify weights and standard errors at the same time
-#' york(x , y, sd.x, sd.y, weights.x, weights.y, r.xy = 0)
+#' york(x , y, sd.x, sd.y, weights.x, weights.y, r.xy = 0 ,
+#' mult.samples = FALSE, exact.solution = FALSE))
 #' # Example: x and y must have same length
 #' york(x = c(0.0, 0.9, 1.8, 2.6, 3.3, 4.4, 5.2, 6.1, 6.5),
 #' y = c(5.9, 5.4, 4.4, 4.6, 3.5, 3.7, 2.8, 2.8, 2.4, 1.5),
-#' weights.x = weights.x, weights.y = weights.y, r.xy = 0)
+#' weights.x = weights.x, weights.y = weights.y,  r.xy = 0 ,
+#' mult.samples = FALSE, exact.solution = FALSE))
 #' }
 #' @name york
 #' @export
@@ -414,3 +418,4 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
 
   return(output)
 }
+
