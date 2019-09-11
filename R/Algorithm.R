@@ -271,21 +271,23 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
     y.bar <- sum(Weight * y, na.rm = T) / Weight.sum
     x.centered <- x - x.bar
     y.centered <- y - y.bar
-    # calculate alpha.exact, beta.exact and gamma.exact. See York 66 page 1084
-    alpha.exact <- 2 * sum(x.centered * y.centered * Weight^2 / weights.x) /
-      (3 * sum(x.centered^2 * Weight^2 / weights.x))
-    beta.exact <- (sum(y.centered^2 * Weight^2 / weights.x) - sum(Weight *
-                                                            x.centered^2)) /
-      (3 * sum(x.centered^2 * Weight^2 / weights.x))
-    gamma.exact <- - sum(x.centered * y.centered * Weight) / (sum(x.centered^2 *
-                                                         Weight^2 / weights.x))
+    # calculate alpha.cubic, beta.cubic and gamma.cubic. See York 66 page 1084
+    xy <- x.centered * y.centered
+    xW.w <- x.centered^2 * Weight^2 / weights.x
+    yW.w <- y.centered^2 * Weight^2 / weights.x
+    alpha.cubic <- 2 * sum(xy * Weight^2 / weights.x) /
+                    (3 * sum(xW.w))
+    beta.cubic <- (sum(yW.w) - sum(Weight * x.centered^2)) /
+                    (3 * sum(xW.w))
+    gamma.cubic <- - sum(xy * Weight) / (sum(x.centered^2 *
+                    Weight^2 / weights.x))
 
     # use formula of York 66 to find slope, given on page 1084
-    phi <- acos((alpha.exact^3 - 3 /2 * alpha.exact * beta.exact + 0.5 *
-                   gamma.exact) /
-                  (alpha.exact^2 - beta.exact)^(3 / 2))
+    phi <- acos((alpha.cubic^3 - 3 /2 * alpha.cubic * beta.cubic + 0.5 *
+                   gamma.cubic) /
+                  (alpha.cubic^2 - beta.cubic)^(3 / 2))
 
-    sol.cubic2 <- alpha.exact + 2 * (alpha.exact^2 - beta.exact)^0.5 *
+    sol.cubic2 <- alpha.cubic + 2 * (alpha.cubic^2 - beta.cubic)^0.5 *
       cos( 1 / 3 *(phi + 2 * pi * c(0:2)))
     sol.cubic2
     slope <- sol.cubic2[3]
