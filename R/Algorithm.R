@@ -1,8 +1,5 @@
 ### york in Least Squares Fitting Of A Straight Line With Correlated Errors ###
-## Input from Table I and Table II in york 1966
-#setwd("/Users/jonascedrodelgado/Desktop/York-Regression/York/R")
-'load("original_data.RData")
-# here you can also load other data and weights
+
 #' @title
 #' Simple linear regression of X- and Y-variables with correlated errors.
 #'
@@ -354,11 +351,3 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
 
   return(output)
 }
-
-(york.output <- york(x, y, weights.x = weights.x, weights.y = weights.y, r.xy = 0, mult.samples = F))
-
-class(york.output)
-
-(york.output <- york(x, y, weights.x = weights.x, weights.y = weights.y, r.xy = 0, mult.samples = F, exact.solution = T))
-
-(york.output <- york(x, y, mult.samples = T))

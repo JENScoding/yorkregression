@@ -5,7 +5,8 @@
 \title{Simple linear regression of X- and Y-variables with correlated errors.}
 \usage{
 york(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
-  sd.x = NULL, sd.y = NULL, r.xy = NULL, mult.samples = FALSE)
+  sd.x = NULL, sd.y = NULL, r.xy = NULL, mult.samples = FALSE,
+  exact.solution = FALSE)
 }
 \arguments{
 \item{x}{A 1 times n numeric row vector of the \code{X}-variable}

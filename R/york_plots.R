@@ -105,4 +105,4 @@ york.plots <- function(york.output) {
   }
   return(list(plot.1, plot.2, plot.3, plot.4, plot.5, plot.6))
 }
-york.plots(york.output = york.output)
+
