@@ -27,11 +27,7 @@ york.plots <- function(york.output) {
 
     ddf <- data.frame(x = x.data.1, y = y.data.1)
     plot.1 <- ggplot(data = ddf, aes(x = x,
-<<<<<<< HEAD
                                      y = y)) +
-=======
-                                   y = y)) +
->>>>>>> 116655d5a3a7e0a381bf6ff61fa0a433ee987282
       geom_abline(aes(slope = york.output$coefficients.york[2, 1],
                       intercept = york.output$coefficients.york[1, 1]), col = "red") +
       geom_point() +
@@ -42,11 +38,7 @@ york.plots <- function(york.output) {
 
   ddf2 <- data.frame(x = x.data, y = y.data)
   plot.2 <- ggplot(data = ddf2, aes(x = x,
-<<<<<<< HEAD
                                     y = y)) +
-=======
-                                 y = y)) +
->>>>>>> 116655d5a3a7e0a381bf6ff61fa0a433ee987282
     geom_abline(aes(slope = york.output$coefficients.york[2, 1],
                     intercept = york.output$coefficients.york[1, 1], colour="York"),
                 key_glyph = draw_key_rect) +
