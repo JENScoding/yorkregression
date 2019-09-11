@@ -89,6 +89,37 @@
 #' y = c(5.9, 5.4, 4.4, 4.6, 3.5, 3.7, 2.8, 2.8, 2.4, 1.5),
 #' weights.x = weights.x, weights.y = weights.y, r.xy = 0)
 #' }
+#'
+#' @references
+#' Wehr, Richard, and Scott R. Saleska.
+#' "The long-solved problem of the best-fit straight line: Application to
+#'  isotopic mixing lines." Biogeosciences 14.1 (2017). pp. 17-29.
+#'
+#' York, Derek. "Least squares fitting of a straight line with correlated
+#' errors." Earth and planetary science letters 5 (1968), pp. 320-324.
+#'
+#' York, Derek. "Least-squares fitting of a straight line.",
+#' Canadian Journal of Physics 44.5 (1966), pp. 1079-1086.
+#'
+#' @examples
+#' x <- c(0.0, 0.9, 1.8, 2.6, 3.3, 4.4, 5.2, 6.1, 6.5, 7.4)
+#' y <- c(5.9, 5.4, 4.4, 4.6, 3.5, 3.7, 2.8, 2.8, 2.4, 1.5)
+#' weights.x <- c(1e+3, 1e+3, 5e+2, 8e+2, 2e+2, 8e+1, 6e+1, 2e+1, 1.8, 1)
+#' weights.y <- c(1, 1.8, 4, 8, 20, 20, 70, 70, 1e+2, 5e+2)
+#' r.xy <- 0
+#' york(x = x, y = y, tolerance = 1e-10, weights.x = weights.x,
+#' weights.y = weights.y, r.xy = r.xy, mult.samples = F)
+#'
+#' \dontrun{
+#' # Example: No standard errors or weights specified
+#' york(x, y, r.xy = 0)
+#' # Example: You can't specify weights and standard errors at the same time
+#' york(x , y, sd.x, sd.y, weights.x, weights.y, r.xy = 0)
+#' # Example: x and y must have same length
+#' york(x = c(0.0, 0.9, 1.8, 2.6, 3.3, 4.4, 5.2, 6.1, 6.5),
+#' y = c(5.9, 5.4, 4.4, 4.6, 3.5, 3.7, 2.8, 2.8, 2.4, 1.5),
+#' weights.x = weights.x, weights.y = weights.y, r.xy = 0)
+#' }
 #' @name york
 #' @export
 york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
