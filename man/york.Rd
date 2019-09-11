@@ -28,6 +28,12 @@ york(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
 
 \item{r.xy}{The prespecified correlation coefficient between the errors in
 \code{X} and \code{Y}}
+
+\item{mult.samples}{An indicator if the multiple samples option is turned on
+or not. The standard value is \code{FALSE}}
+
+\item{exact.solution}{An indicator if the exact solution option is turned on
+or not. The standard value is \code{FALSE}}
 }
 \value{
 York Returns an object of class "york" the York regression for the
@@ -63,8 +69,13 @@ York Returns an object of class "york" the York regression for the
   \item{number.of.iterations}{the total number of iterations}
   \item{slope.after.each.iteration}{the York slope after each iteration}
   \item{fitted.y.ols}{the fitted values for OLS}
+  \item{residuals.ols}{the OLS residuals}
+  \item{residual.sum.of.squares}{the residual sum of squares (RSS) of OLS}
+  \item{total.sum.of.squares}{the total sum of squares of OLS}
   \item{se.of.reg.ols}{the standard error of the regression (SER) for OLS}
   \item{r.squared.ols}{the R squared of the OLS regression}
+  \item{r.squared.adjusted.ols}{the adjusted R squared of OLS}
+  \item{f.statistic.ols}{the F statistic of OLS}
   \item{fitted.y.orthogonal}{the fitted values for orthogonal regression (See
   \url{https://en.wikipedia.org/wiki/Deming_regression})}
   \item{data}{a data matrix which contains as columns the observed points

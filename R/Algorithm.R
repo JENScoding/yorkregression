@@ -119,6 +119,7 @@
 #' }
 #' @name york
 #' @export
+#' @importFrom stats cor var
 york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
                  sd.x = NULL, sd.y = NULL, r.xy = NULL, mult.samples = FALSE,
                  exact.solution = FALSE) {
