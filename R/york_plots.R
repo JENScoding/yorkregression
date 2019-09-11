@@ -20,7 +20,7 @@
 #' weights.y <- c(1, 1.8, 4, 8, 20, 20, 70, 70, 1e+2, 5e+2)
 #' r.xy <- 0
 #' york.output <- york(x, y, weights.x = weights.x, weights.y = weights.y,
-#'                     r.xy = 0, mult.samples = T, exact.solution = FALSE)
+#'                     r.xy = 0)
 #' york.plots(york.output)
 #' @name york.plots
 #' @export
