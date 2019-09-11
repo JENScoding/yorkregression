@@ -1,4 +1,6 @@
-library(ggplot2)
+#' @importFrom ggplot2 ggplot aes geom_abline geom_point labs theme element_text
+#' draw_key_rect scale_colour_manual geom_vline geom_hline geom_smooth geom_line
+#' @importFrom utils stack
 york.plots <- function(york.output) {
   if (class(york.output) != "york") {
     stop("Input must be of class york (Output of york function)")
@@ -27,7 +29,7 @@ york.plots <- function(york.output) {
 
     ddf <- data.frame(x = x.data.1, y = y.data.1)
     plot.1 <- ggplot(data = ddf, aes(x = x,
-                                     y = y)) +
+                                   y = y)) +
       geom_abline(aes(slope = york.output$coefficients.york[2, 1],
                       intercept = york.output$coefficients.york[1, 1]), col = "red") +
       geom_point() +
@@ -38,7 +40,7 @@ york.plots <- function(york.output) {
 
   ddf2 <- data.frame(x = x.data, y = y.data)
   plot.2 <- ggplot(data = ddf2, aes(x = x,
-                                    y = y)) +
+                                 y = y)) +
     geom_abline(aes(slope = york.output$coefficients.york[2, 1],
                     intercept = york.output$coefficients.york[1, 1], colour="York"),
                 key_glyph = draw_key_rect) +

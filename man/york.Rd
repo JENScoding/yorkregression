@@ -30,65 +30,79 @@ york(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
 \code{X} and \code{Y}}
 }
 \value{
-York Returns an object of class "\linkS4class{york}" the York regression for the
-\code{x} and \code{y} data for either specified weights \code{weights.x}
-and \code{weights.y} or specified standard errors \code{sd.x} and \code{sd.y}
-An object of class "york" containing the following components:
+York Returns an object of class "york" the York regression for the
+  \code{x} and \code{y} data for either specified weights \code{weights.x}
+  and \code{weights.y} or specified standard errors \code{sd.x} and
+  \code{sd.y} An object of class "york" containing the following components:
 
-\describe{
+  \describe{
 
-\item{coefficients.york}{a matrix which contains the York estimates for
-intercept and slope of the best-fit straight line with the respective
-standard errors}
-\item{coefficients.orthogonal}{a matrix which contains the orthogonal
-estimates for intercept and slope with the respective standard errors}
-\item{coefficients.ols}{a matrix which contains the OLS estimates for the
-intercept and slope with the respective standard errors}
-\item{weights}{a matrix representation of the prespecified or calculated
-weights for the X- and Y-observations}
-\item{x.residuals}{a vector of the York X-residuals}
-\item{y.residuals}{a vector of the York Y-residuals}
-\item{fitted.y}{a vector of the fitted York Y-values}
-\item{df.regression}{the number of degrees of freedom of York's regression}
-\item{weighted.mean.x}{the weighted.mean of X}
-\item{weighted.mean.y}{the weighted.mean of Y}
-\item{reduced.chisq}{the reduced chi-squared statistic, i.e. the goodness
-of fit measure of York's regression}
-\item{std.error.chisq}{the standard error of the chi-squared statistic}
-\item{number.of.iterations}{the total number of iterations}
-\item{slope.after.each.iteration}{the York slope after each iteration}
-\item{fitted.y.ols}{the fitted values for OLS}
-\item{se.of.reg.ols}{the standard error of the regression for OLS}
-\item{r.squared.ols}{the R squared of the OLS regression}
-\item{fitted.y.orthogonal}{the fitted values for orthogonal regression}
-\item{data}{a data matrix which contains as columns the observed points X-,
-Y-, sd.X- and
-sd.Y-values}
-}
+  \item{coefficients.york}{a matrix which contains the York estimates for
+  intercept and slope of the best-fit straight line with the respective
+  standard errors}
+  \item{coefficients.orthogonal}{a matrix which contains the
+  orthogonal estimates for intercept and slope with the respective standard
+  errors}
+  \item{coefficients.ols}{a matrix which contains the OLS estimates
+  for the intercept and slope with the respective standard errors}
+  \item{weights}{a matrix representation of the prespecified or calculated
+  weights for the X- and Y-observations}
+  \item{x.residuals}{a vector of the
+  York X-residuals}
+  \item{y.residuals}{a vector of the York Y-residuals}
+  \item{fitted.y}{a vector of the fitted York Y-values}
+  \item{df.regression}{the number of degrees of freedom
+  (See \url{https://en.wikipedia.org/wiki/Degrees_of_freedom_(statistics)})
+  of York's regression}
+  \item{weighted.mean.x}{the weighted.mean of X}
+  \item{weighted.mean.y}{the weighted.mean of Y}
+  \item{reduced.chisq}{the reduced chi-squared statistic
+  (See \url{https://en.wikipedia.org/wiki/Reduced_chi-squared_statistic}),
+  i.e. the goodness of fit measure of York's regression}
+  \item{std.error.chisq}{the standard error of the chi-squared statistic}
+  \item{number.of.iterations}{the total number of iterations}
+  \item{slope.after.each.iteration}{the York slope after each iteration}
+  \item{fitted.y.ols}{the fitted values for OLS}
+  \item{se.of.reg.ols}{the standard error of the regression (SER) for OLS}
+  \item{r.squared.ols}{the R squared of the OLS regression}
+  \item{fitted.y.orthogonal}{the fitted values for orthogonal regression (See
+  \url{https://en.wikipedia.org/wiki/Deming_regression})}
+  \item{data}{a data matrix which contains as columns the observed points
+  X-, Y-, sd.X- and sd.Y-values}}
 }
 \description{
-Implements the algorithm for the problem of the best-ﬁt straight line to
-independent points with errors in both x and y general York 1969 solution
-according to the algorithm of Wehr & Saleska (2017)
+Implements the algorithm for the problem of the best-ﬁt straight
+line to independent points with errors in both x and y general York 1969
+solution according to the algorithm of Wehr & Saleska (2017)
 }
 \details{
-Given \eqn{n} pairs of \eqn{(X_i, Y_i), i = 1, \ldots, n}, their weights
-\eqn{(\omega(X_i), \omega(Y_i)), i = 1, \ldots, n} or their standard errors
-\eqn{SE(X_i)} and \eqn{SE(Y_i)}, the \code{york} function finds the best-fit
-straight line using the algorithm of York et al. (1966)/ York et al. (1969)
-as presented in Wehr & Saleska (2017). In addition, the function provides
-numerous statistics, parameters and goodness of fit criteria. If the data
-contains NA values then the share of \code{NA} values in the total values is
-calculated and the rows with \code{NA} values will be deleted.
+Given \eqn{n} pairs of \eqn{(X_i, Y_i), i = 1, \ldots, n}, their
+weights \eqn{(\omega(X_i), \omega(Y_i)), i = 1, \ldots, n} or their standard
+errors \eqn{SE(X_i)} and \eqn{SE(Y_i)}, the \code{york} function finds the
+best-fit straight line using the algorithm of York et al. (1966)/ York et al.
+(1969) as presented in Wehr & Saleska (2017). In addition, the function
+provides numerous statistics, parameters and goodness of fit criteria. If the
+data contains NA values then the share of \code{NA} values in the total
+values is calculated and the rows with \code{NA} values will be deleted.
 }
 \examples{
+# Example: York's regression with weight data taken from Pearson (1901):
 x <- c(0.0, 0.9, 1.8, 2.6, 3.3, 4.4, 5.2, 6.1, 6.5, 7.4)
 y <- c(5.9, 5.4, 4.4, 4.6, 3.5, 3.7, 2.8, 2.8, 2.4, 1.5)
 weights.x <- c(1e+3, 1e+3, 5e+2, 8e+2, 2e+2, 8e+1, 6e+1, 2e+1, 1.8, 1)
 weights.y <- c(1, 1.8, 4, 8, 20, 20, 70, 70, 1e+2, 5e+2)
 r.xy <- 0
 york(x = x, y = y, tolerance = 1e-10, weights.x = weights.x,
-weights.y = weights.y, r.xy = r.xy, mult.samples = F)
+weights.y = weights.y, r.xy = r.xy, mult.samples = FALSE)
+
+# Example: York's regression arbitrary values for sd.x and sd.y:
+x <- c(0.0, 0.9, 1.8, 2.6, 3.3, 4.4, 5.2, 6.1, 6.5, 7.4)
+y <- c(5.9, 5.4, 4.4, 4.6, 3.5, 3.7, 2.8, 2.8, 2.4, 1.5)
+sd.x <- 0.2
+sd.y <- 0.4
+r.xy <- 0.3
+york(x = x, y = y, tolerance = 1e-10, sd.x = sd.x,
+sd.y = sd.y, r.xy = r.xy, mult.samples = FALSE)
 
 \dontrun{
 # Example: No standard errors or weights specified
@@ -102,13 +116,17 @@ weights.x = weights.x, weights.y = weights.y, r.xy = 0)
 }
 }
 \references{
-Wehr, Richard, and Scott R. Saleska.
-"The long-solved problem of the best-fit straight line: Application to
- isotopic mixing lines." Biogeosciences 14.1 (2017). pp. 17-29.
+Wehr, Richard, and Scott R. Saleska. "The long-solved problem of
+the best-fit straight line: Application to isotopic mixing lines."
+Biogeosciences 14.1 (2017). pp. 17-29.
 
 York, Derek. "Least squares fitting of a straight line with correlated
 errors." Earth and planetary science letters 5 (1968), pp. 320-324.
 
-York, Derek. "Least-squares fitting of a straight line.",
-Canadian Journal of Physics 44.5 (1966), pp. 1079-1086.
+York, Derek. "Least-squares fitting of a straight line.", Canadian Journal of
+Physics 44.5 (1966), pp. 1079-1086.
+
+York, Derek, et al. "Unified equations for the slope, intercept, and standard
+errors of the best straight line." American Journal of Physics 72.3 (2004),
+pp. 367-375.
 }
