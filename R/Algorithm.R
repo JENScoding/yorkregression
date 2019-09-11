@@ -28,7 +28,7 @@
 #' \code{X} and \code{Y}
 #' @param sd.x The standard error of the \code{X}-values
 #' @param sd.y The standard error of the \code{Y}-values
-#' @return York Returns an object of class "York" the York regression for the
+#' @return York Returns an object of class "york" the York regression for the
 #' \code{x} and \code{y} data for either specified weights \code{weights.x}
 #' and \code{weights.y} or specified standard errors \code{sd.x} and \code{sd.y}
 #' An object of class "york" containing the following components:
@@ -57,7 +57,7 @@
 #' \item{slope.after.each.iteration}{the York slope after each iteration}
 #' \item{fitted.y.ols}{the fitted values for OLS}
 #' \item{se.of.reg.ols}{the standard error of the regression for OLS}
-#' \item{r.squared.ols}{the R squares of the OLS regression}
+#' \item{r.squared.ols}{the R squared of the OLS regression}
 #' \item{fitted.y.orthogonal}{the fitted values for orthogonal regression}
 #' \item{data}{a data matrix which contains as columns the observed points X-,
 #' Y-, sd.X- and
