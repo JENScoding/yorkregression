@@ -120,7 +120,7 @@ york.plots <- function(york.output) {
     geom_hline(yintercept = 0, linetype = "dashed", col = "red") +
     theme(plot.title = element_text(hjust = 0.5))
 
-  if (york.output$york.arguments$exact.solution == F) {
+  if (york.output$york.arguments$approx.solution == F) {
     ddf6 <- data.frame(x = 1:york.output$number.of.iterations, y = york.output$slope.after.each.iteration[,1])
     plot.6 <- ggplot(aes(x = x, y = y), data = ddf6)+
       geom_line() +

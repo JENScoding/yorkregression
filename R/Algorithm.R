@@ -13,8 +13,8 @@
 #' provides numerous statistics, parameters and goodness of fit criteria. If the
 #' data contains NA values then the share of \code{NA} values in the total
 #' values is calculated and the rows with \code{NA} values will be deleted.
-#' @param x A 1 times n numeric row vector of the \code{X}-variable
-#' @param y A 1 times n numeric row vector of the \code{Y}-variable
+#' @param x A 1 times n numeric row vector or a dataframe of the \code{X}-variable
+#' @param y A 1 times n numeric row vector or a dataframe of the \code{Y}-variable
 #' @param tolerance The tolerance for convergence which is set a priori to
 #'   \code{1e-10}
 #' @param weights.x The prespecified 1 times n weights vector for
@@ -27,7 +27,7 @@
 #'   \code{X} and \code{Y}
 #' @param mult.samples An indicator if the multiple samples option is turned on
 #' or not. The standard value is \code{FALSE}
-#' @param exact.solution An indicator if the exact solution option is turned on
+#' @param approx.solution An indicator if the approximate solution option is turned on
 #' or not. The standard value is \code{FALSE}
 #' @return York Returns an object of class "york" the York regression for the
 #'   \code{x} and \code{y} data for either specified weights \code{weights.x}
@@ -122,7 +122,7 @@
 #' @importFrom stats cor var
 york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
                  sd.x = NULL, sd.y = NULL, r.xy = NULL, mult.samples = FALSE,
-                 exact.solution = FALSE) {
+                 approx.solution = FALSE) {
 
   if (mult.samples == FALSE) {
     if (all(sapply(list(sd.x, sd.y, weights.x, weights.y), is.null))) {
@@ -193,8 +193,8 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
       stop("sd.x and sd.y must have the same length of x resp. y!")
     }
   } else {
-    if (exact.solution == T) {
-      stop("There is no exact solution in case of multiple samples!")
+    if (approx.solution == T) {
+      stop("There is no approximate solution in case of multiple samples!")
     }
     if (is.data.frame(x) == F|| is.data.frame(y) == F) {
       stop("Inputs x and y must be of class data.frame!")
@@ -207,7 +207,7 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
            if you specify mult.samples = T")
     }
 
-  #  stop.mult.sample(exact.solution = exact.solution, x = x, y = y)
+  #  stop.mult.sample(approx.solution = approx.solution, x = x, y = y)
 
     mean.xi <- apply(x, 1, mean)
     mean.yi <- apply(y, 1, mean)
@@ -250,7 +250,7 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
     (1 / (length(x)-2))
   f.statistic.ols <- (r.squared.ols / (1- r.squared.ols)) * ((length(x)-2))
 
-  if (exact.solution == F) {
+  if (approx.solution == F) {
     slope.diff <- 10
     count <- 0
     slope.per.iteration <- NULL
@@ -287,7 +287,7 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
 
   } else {
     if (any(r.xy != 0)) {
-      stop("There is no exact solution in case of correlation between x and y
+      stop("There is no approximate solution in case of correlation between x and y
            errors!")
     }
     ## Apply formula and use lm estimate as intitial value for b
@@ -382,8 +382,8 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
                  "y.errors" = y.errors, "r.xy" = r.xy, "mean.x.i" = x,
                  "mean.y.i" = y)
   }
-  york.arguments <- list("mult.samples" = mult.samples, "exact.solution" =
-                           exact.solution)
+  york.arguments <- list("mult.samples" = mult.samples, "approx.solution" =
+                           approx.solution)
 
   output <- list("coefficients.york" = york.reg,
                  "coefficients.orthogonal" = orthogonal.reg,
