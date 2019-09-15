@@ -203,7 +203,7 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
     }
     if (any(r.xy <= -1 | r.xy >= 1)) {
       stop("Wrong input for r.xy:
-       r.xy ∈ (-1, ... , 1)")
+       r.xy must be element of (-1, ... , 1)")
     }
   } else {
     if (approx.solution == T) {
@@ -271,7 +271,7 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
     all.tolerance.levels[5] <- (1e-5)^-1 # solve weird R behaviour
     if (isFALSE(any(inv.tolerance == all.tolerance.levels))) {
       stop("Wrong input for the tolerance level:
-       tolerance ∈ [1, 1e-1, 1e-2, 1e-3, ... , 1e-19, 1e-20]")
+       tolerance must be element of [1, 1e-1, 1e-2, 1e-3, ... , 1e-19, 1e-20]")
     }
     if (any(inv.tolerance / 1e5 == all.tolerance.levels[2:16])) {
       multiplicator <- which(inv.tolerance / 1e5 == all.tolerance.levels)
