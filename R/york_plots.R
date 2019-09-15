@@ -36,12 +36,14 @@ york.plots <- function(york.output) {
 
     x.data <- york.output$data[, 1]
     y.data <- york.output$data[, 2]
+    orthogonal <- york(x = x.data, y = y.data, weights.x = 1,
+                       weights.y = 1, r.xy = york.output$data[,5])
 
     ddf <- data.frame(x = x.data, y = y.data)
     plot.1 <- ggplot(data=ddf, aes(x = x,
                                    y = y)) +
-      geom_abline(aes(slope = york.output$coefficients.york[2, 1],
-                      intercept = york.output$coefficients.york[1, 1]), col = "red") +
+      geom_abline(aes(slope = york.output$coefficients[2, 1],
+                      intercept = york.output$coefficients[1, 1]), col = "red") +
       geom_point() +
       labs(title="York's best-fit straight line with correlated errors",
            x ="x data", y = "y data") +
@@ -50,15 +52,16 @@ york.plots <- function(york.output) {
 
     x.data <- york.output$data$mean.x.i
     y.data <- york.output$data$mean.y.i
-
     x.data.1 <- stack(york.output$data$x)[, 1]
     y.data.1 <- stack(york.output$data$y)[, 1]
+    orthogonal <- york(x = x.data, y = y.data, weights.x = 1,
+                       weights.y = 1, r.xy = york.output$data$r.xy)
 
     ddf <- data.frame(x = x.data.1, y = y.data.1)
     plot.1 <- ggplot(data = ddf, aes(x = x,
                                    y = y)) +
-      geom_abline(aes(slope = york.output$coefficients.york[2, 1],
-                      intercept = york.output$coefficients.york[1, 1]), col = "red") +
+      geom_abline(aes(slope = york.output$coefficients[2, 1],
+                      intercept = york.output$coefficients[1, 1]), col = "red") +
       geom_point() +
       labs(title="York's best-fit straight line with correlated errors",
            x ="x data", y = "y data") +
@@ -68,13 +71,13 @@ york.plots <- function(york.output) {
   ddf2 <- data.frame(x = x.data, y = y.data)
   plot.2 <- ggplot(data = ddf2, aes(x = x,
                                  y = y)) +
-    geom_abline(aes(slope = york.output$coefficients.york[2, 1],
-                    intercept = york.output$coefficients.york[1, 1], colour="York"),
+    geom_abline(aes(slope = york.output$coefficients[2, 1],
+                    intercept = york.output$coefficients[1, 1], colour="York"),
                 key_glyph = draw_key_rect) +
-    geom_abline(aes(slope = york.output$coefficients.ols[2, 1],
-                    intercept = york.output$coefficients.ols[1, 1], colour="OLS")) +
-    geom_abline(aes(slope = york.output$coefficients.orthogonal[2, 1], intercept =
-                      york.output$coefficients.orthogonal[1, 1], colour = "Orthogonal")) +
+    geom_abline(aes(slope = york.output$ols.summary$coefficients.ols[2, 1],
+                    intercept = york.output$ols.summary$coefficients.ols[1, 1], colour="OLS")) +
+    geom_abline(aes(slope = orthogonal$coefficients[2, 1], intercept =
+                      orthogonal$coefficients[1, 1], colour = "Orthogonal")) +
     labs(colour="") +
     scale_colour_manual(values=c("blue", "green", "red")) +
     geom_point() +
@@ -127,7 +130,7 @@ york.plots <- function(york.output) {
       geom_point() +
       labs(title = "Trace plot",
            x = "Number of iterations", y = "slope coefficient") +
-      geom_hline(yintercept = york.output$coefficients.york[2,1], col = "darkblue") +
+      geom_hline(yintercept = york.output$coefficients[2,1], col = "darkblue") +
       theme(plot.title = element_text(hjust = 0.5))
   } else {
     plot.6 <- NULL

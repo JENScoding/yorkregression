@@ -36,7 +36,7 @@
 #'
 #'   \describe{
 #'
-#'   \item{coefficients.york}{a matrix which contains the York estimates for
+#'   \item{coefficients}{a matrix which contains the York estimates for
 #'   intercept and slope of the best-fit straight line with the respective
 #'   standard errors}
 #'   \item{coefficients.orthogonal}{a matrix which contains the
@@ -376,19 +376,6 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
     (weights.y * weights.x)
   y.residuals <- (Weight * (intercept + slope * x - y) *
                     (weights.x - slope * c)) / (weights.y * weights.x)
-  #orthogonal regression
-
-  slope.orthogonal <- (SS.y - SS.x + sqrt((SS.y - SS.x)^2 + 4*(SS.xy)^2)) /
-    (2*SS.xy)
-  intercept.orthogonal <- mean.y - slope.orthogonal * mean.x
-  fitted.y.orthogonal <- intercept.orthogonal + slope.orthogonal * x
-  r <- SS.xy / (sqrt(SS.x) * sqrt(SS.y))
-  se.slope.orthogonal <- (slope.orthogonal/r) * sqrt((1 - r^2) / (length(x)))
-  se.intercept.orthogonal <- ((1 / length(x)) * (sqrt(var(y)) - sqrt(var(x)) *
-                                                   slope.orthogonal)^2 +
-                                (1 - r) * slope.orthogonal *
-                                (2 * sqrt(var(x)) * sqrt(var(y)) +
-                                   ((mean.x  *slope.orthogonal*(1+r)) / (r^2))))
 
   york.reg <- matrix(c(intercept, slope, sigma.intercept, sigma.slope),
                      nrow = 2)
@@ -398,11 +385,7 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
                     nrow = 2)
   rownames(ols.reg) <- c("intercept", "slope")
   colnames(ols.reg) <- c("Estimate", "Std.Error")
-  orthogonal.reg <- matrix(c(intercept.orthogonal, slope.orthogonal,
-                             se.intercept.orthogonal, se.slope.orthogonal),
-                           nrow = 2)
-  rownames(orthogonal.reg) <- c("intercept", "slope")
-  colnames(orthogonal.reg) <- c("Estimate", "Std.Error")
+
   weights.matrix <- matrix(c(weights.x, weights.y), ncol =2)
   colnames(weights.matrix) <- c("weights of X_i", "weights of Y_i")
   if (mult.samples == F) {
@@ -415,10 +398,17 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
   }
   york.arguments <- list("mult.samples" = mult.samples, "approx.solution" =
                            approx.solution)
+  ols.summary <- list("coefficients.ols" = ols.reg,
+                      "fitted.y.ols" = fitted.y.ols,
+                      "residuals.ols" = residuals.ols,
+                      "residual.sum.of.squares" = RSS,
+                      "total.sum.of.squares" = SS.y,
+                      "se.of.reg.ols" = se.of.reg.ols,
+                      "r.squared.ols" = r.squared.ols,
+                      "r.squared.adjusted.ols" = r.squared.adjusted.ols,
+                      "f.statistic.ols" = f.statistic.ols)
 
-  output <- list("coefficients.york" = york.reg,
-                 "coefficients.orthogonal" = orthogonal.reg,
-                 "coefficients.ols" = ols.reg,
+  output <- list("coefficients" = york.reg,
                  "weights" = weights.matrix,
                  "x.residuals" = x.residuals,
                  "y.residuals"= y.residuals,
@@ -430,15 +420,7 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
                  "std.error.chisq" = sigma.chisq,
                  "number.of.iterations" = count,
                  "slope.after.each.iteration" = slope.per.iteration,
-                 "fitted.y.ols" = fitted.y.ols,
-                 "residuals.ols" = residuals.ols,
-                 "residual.sum.of.squares" = RSS,
-                 "total.sum.of.squares" = SS.y,
-                 "se.of.reg.ols" = se.of.reg.ols,
-                 "r.squared.ols" = r.squared.ols,
-                 "r.squared.adjusted.ols" = r.squared.adjusted.ols,
-                 "f.statistic.ols" = f.statistic.ols,
-                 "fitted.y.orthogonal" = fitted.y.orthogonal,
+                 "ols.summary" = ols.summary,
                  "york.arguments" = york.arguments,
                  "data" = data)
   attr(output, "class") <- "york"

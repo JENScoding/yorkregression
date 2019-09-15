@@ -9,11 +9,11 @@ test_that("Test OLS implementation", {
   ## Test
   first <- york(x, y, weights.x = weights.x, weights.y = weights.y,
                 r.xy = 0)
-  expect_equal(first$coefficients.ols[1,2],
+  expect_equal(first$ols.summary$coefficients.ols[1,2],
                summary(lm(y ~ x))$coefficients[1, 2])
-  expect_equal(first$coefficients.ols[2,2],
+  expect_equal(first$ols.summary$coefficients.ols[2,2],
                summary(lm(y ~ x))$coefficients[2, 2])
-  expect_equal(first$coefficients.ols[2,2],
+  expect_equal(first$ols.summary$coefficients.ols[2,2],
                summary(lm(y ~ x))$coefficients[2, 2])
   expect_true(first$ols.summary$total.sum.of.squares > first$ols.summary$residual.sum.of.squares)
   expect_equal(first$ols.summary$r.squared.ols,
@@ -25,9 +25,9 @@ test_that("Test OLS implementation", {
                mean(y))
   expect_equal(sum(x*first$ols.summary$residuals.ols), 0)
   expect_equal(sum(first$ols.summary$residuals.ols*first$ols.summary$fitted.y.ols), 0)
-  expect_equal(first$coefficients.ols[1,1] / first$coefficients.ols[1,2],
+  expect_equal(first$ols.summary$coefficients.ols[1,1] / first$ols.summary$coefficients.ols[1,2],
                summary(lm(y ~ x))$coefficients[1, 3])
-  expect_equal(first$coefficients.ols[2,1] / first$coefficients.ols[2,2],
+  expect_equal(first$ols.summary$coefficients.ols[2,1] / first$ols.summary$coefficients.ols[2,2],
                summary(lm(y ~ x))$coefficients[2, 3])
   expect_equal(first$ols.summary$f.statistic.ols,
                as.numeric(summary(lm(y ~ x))$fstatistic[1]))

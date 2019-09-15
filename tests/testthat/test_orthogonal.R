@@ -8,7 +8,7 @@ test_that("Test orthogonal", {
 
   ## Test
   first <- york(x, y, weights.x = 1, weights.y = 1, r.xy = 0)
-  expect_equal(round(first$coefficients.york[2,1], 3),
+  expect_equal(round(first$coefficients[2,1], 3),
                -0.546)
 })
 

@@ -35,8 +35,8 @@ york.predict <- function(york.output, newdata) {
     stop("Input must be of class york (Output of york function)")
   }
   predict.y <- data.frame("x" = newdata, "predicted.y" =
-                            york.output$coefficients.york[1, 1] +
-                            york.output$coefficients.york[2, 1] * newdata)
+                            york.output$coefficients[1, 1] +
+                            york.output$coefficients[2, 1] * newdata)
   colnames(predict.y) <- c("x", "predicted.y")
 
   output <- list("prediction" = predict.y)
