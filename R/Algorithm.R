@@ -251,6 +251,24 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
   f.statistic.ols <- (r.squared.ols / (1- r.squared.ols)) * ((length(x)-2))
 
   if (approx.solution == F) {
+
+    # Limit number of iterations
+    inv.tolerance <- tolerance^-1
+    all.tolerance.levels <- 10^(0:20)
+    all.tolerance.levels[5] <- (1e-5)^-1 # solve weird R behaviour
+    if (isFALSE(any(inv.tolerance == all.tolerance.levels))) {
+      stop("Wrong input for the tolerance level. Possible values for the tolerance level are:\n
+       tolerance ∈ [1, 1e-1, 1e-2, 1e-3, ... , 1e-19, 1e-20]")
+    }
+    if (any(inv.tolerance / 1e5 == all.tolerance.levels[2:16])) {
+      multiplicator <- which(inv.tolerance / 1e5 == all.tolerance.levels)
+      add <- 1000 * multiplicator
+    } else {
+      add <- 0
+    }
+    iterations.limit <- 1000 + add
+
+    # Find york slope
     slope.diff <- 10
     count <- 0
     slope.per.iteration <- NULL
@@ -273,7 +291,7 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
       slope.diff <- abs(slope - slope.old)
       count <- count + 1
       slope.per.iteration <- append(slope.per.iteration, slope)
-      if (count > tolerance^-1) {
+      if (count > iterations.limit) {
         stop("\nThe slope coefficient does not converge after ",
              count," iterations. \nHint: You may reduce the tolerance level.",
              cat("Slope coefficient for last 5 iterations:"),
