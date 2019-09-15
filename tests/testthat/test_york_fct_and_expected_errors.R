@@ -18,4 +18,7 @@ test_that("Test york implementation and error messages", {
                     weights.x = NULL, weights.y = NULL, r.xy = 0.2))
   expect_error(york(x , y , sd.x = 4, sd.y = 2,
                     weights.x = weights.x, weights.y = weights.y, r.xy = 0.2))
+  x[2:3] <- NA
+  expect_warning(york(x, y, weights.y = weights.y , weights.x = weights.x,
+                      r.xy = 0))
 })

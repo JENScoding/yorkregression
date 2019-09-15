@@ -119,7 +119,6 @@
 #' }
 #' @name york
 #' @export
-#' @importFrom stats cor var
 york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
                  sd.x = NULL, sd.y = NULL, r.xy = NULL, mult.samples = FALSE,
                  approx.solution = FALSE) {
@@ -221,14 +220,21 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
     }
 
   #  stop.mult.sample(approx.solution = approx.solution, x = x, y = y)
-
+    calc.corr <- function(x, y) {
+      sum(x * y) / sqrt(sum(x^2) * sum(y^2))
+    }
+    calc.var <- function(x, mean.x) {
+      sum((x - mean.x)^2) / (ncol(x) - 1)
+    }
     mean.xi <- apply(x, 1, mean)
     mean.yi <- apply(y, 1, mean)
     x.errors<- x - mean.xi
     y.errors <- y - mean.yi
-    r.xy <- diag(cor(t(x.errors), t(y.errors)))
-    weights.x <- apply(x, 1, var)
-    weights.y <- apply(y, 1, var)
+    for (i in 1:nrow(x.errors)) {
+      r.xy[i] <- calc.corr(x.errors[i, ], y.errors[i, ])
+      weights.x[i] <- 1 / calc.var(x[i, ], mean.xi[i])
+      weights.y[i] <- 1 / calc.var(y[i, ], mean.yi[i])
+    }
     x.original <- x
     y.original <- y
     x <- mean.xi
@@ -291,15 +297,15 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
       Weight <- alpha^2 / (slope^2 * weights.y + weights.x -
                              2 * slope * r.xy * alpha)
       Weight.sum <- sum(Weight)
-      x.bar <- sum(Weight * x, na.rm = T) / Weight.sum
-      y.bar <- sum(Weight * y, na.rm = T) / Weight.sum
+      x.bar <- sum(Weight * x) / Weight.sum
+      y.bar <- sum(Weight * y) / Weight.sum
       x.centered <- x - x.bar
       y.centered <- y - y.bar
       beta <- Weight * ((x.centered / weights.y) + (slope * y.centered /
                                                       weights.x) -
                           (slope * x.centered + y.centered) * r.xy / alpha)
-      Q1 <- sum(Weight * beta * y.centered, na.rm = T)
-      Q2 <- sum(Weight * beta * x.centered, na.rm = T)
+      Q1 <- sum(Weight * beta * y.centered)
+      Q2 <- sum(Weight * beta * x.centered)
       slope <- Q1 / Q2
       slope.diff <- abs(slope - slope.old)
       count <- count + 1
@@ -327,8 +333,8 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
 
     # see formula 19 and 20 for the following:
     Weight.sum <- sum(Weight)
-    x.bar <- sum(Weight * x, na.rm = T) / Weight.sum
-    y.bar <- sum(Weight * y, na.rm = T) / Weight.sum
+    x.bar <- sum(Weight * x) / Weight.sum
+    y.bar <- sum(Weight * y) / Weight.sum
     x.centered <- x - x.bar
     y.centered <- y - y.bar
     # calculate alpha.cubic, beta.cubic and gamma.cubic. See York 66 page 1084
