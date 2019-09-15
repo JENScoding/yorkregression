@@ -148,6 +148,12 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
                    function(x) !is.null(x)))) {
       stop("You can't specify weights and standard errors at the same time!")
     }
+    if (length(weights.x) == 1) {
+      weights.x = rep(weights.x, length(x))
+    }
+    if (length(weights.y) == 1) {
+      weights.y = rep(weights.y, length(y))
+    }
     if (length(sd.x) == 1) {
       sd.x = rep(sd.x, length(x))
     }
@@ -189,8 +195,15 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
       sd.x <- 1/ sqrt(weights.x)
       sd.y <- 1/sqrt(weights.y)
     }
-    if(length(sd.x) != length(x) | length(sd.y) != length(y)) {
+    if (length(weights.x) != length(x) | length(weights.y) != length(y)) {
+      stop("weights.x and weights.y must have the same length of x resp. y!")
+    }
+    if (length(sd.x) != length(x) | length(sd.y) != length(y)) {
       stop("sd.x and sd.y must have the same length of x resp. y!")
+    }
+    if (any(r.xy <= -1 | r.xy >= 1)) {
+      stop("Wrong input for r.xy:
+       r.xy ∈ (-1, ... , 1)")
     }
   } else {
     if (approx.solution == T) {
@@ -257,7 +270,7 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
     all.tolerance.levels <- 10^(0:20)
     all.tolerance.levels[5] <- (1e-5)^-1 # solve weird R behaviour
     if (isFALSE(any(inv.tolerance == all.tolerance.levels))) {
-      stop("Wrong input for the tolerance level. Possible values for the tolerance level are:\n
+      stop("Wrong input for the tolerance level:
        tolerance ∈ [1, 1e-1, 1e-2, 1e-3, ... , 1e-19, 1e-20]")
     }
     if (any(inv.tolerance / 1e5 == all.tolerance.levels[2:16])) {
