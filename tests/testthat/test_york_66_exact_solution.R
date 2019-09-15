@@ -7,9 +7,9 @@ test_that("Test implementation of exact solution", {
   weights.x = c(1e+3, 1e+3, 5e+2, 8e+2, 2e+2, 8e+1, 6e+1, 2e+1, 1.8, 1)
 
   ## Test
-  expect_error(york(x, y, weights.x = weights.x, weights.y = weights.y, r.xy = 0, mult.samples = F, exact.solution = T), NA)
+  expect_error(york(x, y, weights.x = weights.x, weights.y = weights.y, r.xy = 0, mult.samples = F, approx.solution = T), NA)
 
-  first <- york(x, y, weights.x = weights.x, weights.y = weights.y, r.xy = 0, mult.samples = F, exact.solution = T)
+  first <- york(x, y, weights.x = weights.x, weights.y = weights.y, r.xy = 0, mult.samples = F, approx.solution = T)
   expect_type(first$coefficients.york[2, 1], "double")
   expect_true(first$coefficients.york[2, 1] < -0.477 && first$coefficients.york[2, 1] > -0.478)
 })

@@ -7,7 +7,7 @@ test_that("Test implementation of york.predicts function", {
   weights.x = c(1e+3, 1e+3, 5e+2, 8e+2, 2e+2, 8e+1, 6e+1, 2e+1, 1.8, 1)
 
   ## Test
-  first <- york(x, y, weights.x = weights.x, weights.y = weights.y, r.xy = 0, mult.samples = F, exact.solution = T)
+  first <- york(x, y, weights.x = weights.x, weights.y = weights.y, r.xy = 0, mult.samples = F, approx.solution = T)
   new <- c(2,3,4,3.6)
   expect_error(york.predict(first, new), NA)
 
