@@ -23,7 +23,7 @@ test_that("Test implementation in the multi sample case", {
 
   first <- york(x, y, mult.samples = T)
   expect_type(first$coefficients[2, 1], "double")
-  expect_true(first$coefficients[2, 1] < -0.47 && first$coefficients[2, 1] > -0.55)
+  expect_true(first$coefficients[2, 1] < -0.4 && first$coefficients[2, 1] > -0.6)
 
   expect_error(york(x, y, mult.samples = T, exact.solution = T))
 })
