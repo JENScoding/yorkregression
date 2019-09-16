@@ -15,8 +15,10 @@
 #' values is calculated and the rows with \code{NA} values will be deleted.
 #' @param x A 1 times n numeric row vector or a dataframe of the \code{X}-variable
 #' @param y A 1 times n numeric row vector or a dataframe of the \code{Y}-variable
-#' @param tolerance The tolerance for convergence which is set a priori to
-#'   \code{1e-10}
+#' @param tolerance The tolerance for convergence of the slope coefficent.
+#' It is set a priori to \code{1e-5}
+#'@param max.iterations The maximum number of iterations for convergence.
+#'   Default is \code{50}.
 #' @param weights.x The prespecified 1 times n weights vector for
 #'   \code{X}-values
 #' @param weights.y The prespecified 1 times n weights vector for
@@ -119,9 +121,10 @@
 #' }
 #' @name york
 #' @export
-york <- function(x, y, tolerance = 1e-5, max.iterations = 50, weights.x = NULL, weights.y = NULL,
-                 sd.x = NULL, sd.y = NULL, r.xy = NULL, mult.samples = FALSE,
-                 approx.solution = FALSE) {
+#' @importFrom stats pchisq
+york <- function(x, y, weights.x = NULL, weights.y = NULL, tolerance = 1e-5,
+                 max.iterations = 50, sd.x = NULL, sd.y = NULL, r.xy = NULL,
+                 mult.samples = FALSE, approx.solution = FALSE) {
 
   if (mult.samples == FALSE) {
     if (all(sapply(list(sd.x, sd.y, weights.x, weights.y), is.null))) {
@@ -214,26 +217,32 @@ york <- function(x, y, tolerance = 1e-5, max.iterations = 50, weights.x = NULL, 
     if (ncol(x) != ncol(y) || nrow(x) != nrow(y)) {
       stop("x and y must have the same number of columns/ rows")
     }
+
     if (ncol(x) == 1 || ncol(y) == 1) {
-      stop("You need more than one sample of x and y,
-           if you specify mult.samples = T")
+      stop(paste("You need more than one sample of x and y",
+                 "if you specify mult.samples = T.", sep = " "))
+    }
+    if (ncol(x) < 5) {
+      stop(paste("You need more than at least 4 samples",
+                 "of the x and y variables.", sep = " "))
+    }
+    if (ncol(x) < 10) {
+      warning(paste("You have less than 10 samples",
+                    "of the x and y variables.",
+                    "Increasing the number of samples is recommended",
+                    "in order to get accurate estimates", sep = " "))
     }
 
   #  stop.mult.sample(approx.solution = approx.solution, x = x, y = y)
-    calc.corr <- function(x, y) {
-      sum(x * y) / sqrt(sum(x^2) * sum(y^2))
-    }
-    calc.var <- function(x, mean.x) {
-      sum((x - mean.x)^2) / (ncol(x) - 1)
-    }
     mean.xi <- apply(x, 1, mean)
     mean.yi <- apply(y, 1, mean)
     x.errors<- x - mean.xi
     y.errors <- y - mean.yi
     for (i in 1:nrow(x.errors)) {
-      r.xy[i] <- calc.corr(x.errors[i, ], y.errors[i, ])
-      weights.x[i] <- 1 / calc.var(x[i, ], mean.xi[i])
-      weights.y[i] <- 1 / calc.var(y[i, ], mean.yi[i])
+      r.xy[i] <- calc.corr(x.errors[i, ],
+                           y.errors[i, ])
+      weights.x[i] <- 1 / calc.var(x[i, ])
+      weights.y[i] <- 1 / calc.var(y[i, ])
     }
     x.original <- x
     y.original <- y
