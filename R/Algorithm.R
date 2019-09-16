@@ -425,7 +425,8 @@ york <- function(x, y, weights.x = NULL, weights.y = NULL, tolerance = 1e-5,
                  "y.errors" = y.errors, "r.xy" = r.xy, "mean.x.i" = x,
                  "mean.y.i" = y)
   }
-  york.arguments <- list("mult.samples" = mult.samples, "approx.solution" =
+  york.arguments <- list("tolerance" = tolerance, "max.iterations" = max.iterations,
+                         "mult.samples" = mult.samples, "approx.solution" =
                            approx.solution)
   chisq.test.results <- list("test.result" = test.result, "p.value" = p.value)
   ols.summary <- list("coefficients.ols" = ols.reg,
