@@ -13,8 +13,5 @@ test_that("Test internal functions", {
   expect_error(calc.corr(x2, y2), NA)
   expect_equal(calc.corr(x2, y2),
                cor(x, y))
-
-  expect_equal(first$ols.summary$r.squared.adjusted.ols,
-               summary(lm(y ~ x))$adj.r.squared)
 })
 

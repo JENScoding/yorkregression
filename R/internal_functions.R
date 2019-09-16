@@ -1,10 +1,11 @@
 #'
 #'
 
-calc.var <- function(x, mean.x) {
-  sum((x - mean.x)^2) / (ncol(x) - 1)
+calc.var <- function(x) {
+  sum((x - apply(x, 1, mean))^2) / (length(x) - 1)
 }
 calc.corr <- function(x, y, mean.x, mean.y) {
-  sum((x - mean.x) * (y - mean.y)) /
-    sqrt(calc.var(x, mean.x) * calc.var(y, mean.y))
+  sum((x - apply(x, 1, mean)) * (y - apply(y, 1, mean))) /
+    (sqrt(calc.var(x) * calc.var(y)) * (length(x) - 1))
 }
+
