@@ -356,9 +356,25 @@ york <- function(x, y, tolerance = 1e-5, max.iterations = 50, weights.x = NULL, 
   sigma.intercept <- sqrt(x.mean^2 * sigma.slope^2 + 1 / Weight.sum)
   sigma.slope.intercept <- -x.mean*sigma.slope^2
 
+  # Goodness of fit + Test (H0: S <= df)
   S <- sum(Weight * (y - slope * x - intercept)^2)
-  reduced.chisq <- S / (length(x) - 2)
-  sigma.chisq <- sqrt(2 / (length(x) - 2))
+  S <- 20
+  chisq.df <- (length(x) - 2)
+  reduced.chisq <- S / chisq.df
+  sigma.chisq <- sqrt(2 / chisq.df)
+  p.value <- 1 - pchisq(S, df = chisq.df)
+  test.result <- if (p.value > 0.1 ) {
+    "The assumption of a good fit cannot be rejected."
+  } else if (p.value < 0.01) {
+    paste("The assumption of a good fit can be rejected",
+          "at a significance level of 1%.", sep = " ")
+  } else if (p.value < 0.05) {
+    paste("The assumption of a good fit can be rejected",
+          "at a significance level of 5%.", sep = " ")
+  } else {
+    paste("The assumption of a good fit can be rejected",
+          "at a significance level of 10%.", sep = " ")
+  }
 
   fitted.y <- intercept + slope * x
 
@@ -393,6 +409,7 @@ york <- function(x, y, tolerance = 1e-5, max.iterations = 50, weights.x = NULL, 
   }
   york.arguments <- list("mult.samples" = mult.samples, "approx.solution" =
                            approx.solution)
+  chisq.test.results <- list("test.result" = test.result, "p.value" = p.value)
   ols.summary <- list("coefficients.ols" = ols.reg,
                       "fitted.y.ols" = fitted.y.ols,
                       "residuals.ols" = residuals.ols,
@@ -413,6 +430,7 @@ york <- function(x, y, tolerance = 1e-5, max.iterations = 50, weights.x = NULL, 
                  "weighted.mean.y" = y.bar ,
                  "reduced.chisq" = reduced.chisq,
                  "std.error.chisq" = sigma.chisq,
+                 "Overall.significance.of.fit" = chisq.test.results,
                  "number.of.iterations" = count,
                  "slope.after.each.iteration" = slope.per.iteration,
                  "ols.summary" = ols.summary,
