@@ -21,14 +21,14 @@
 #' r.xy <- 0
 #' york.output <- york(x = x, y = y, weights.x = weights.x, weights.y = weights.y,
 #'                     r.xy = 0)
-#' york.plots(york.output)
-#' @name york.plots
+#' york_plots(york.output)
+#' @name york_plots
 #' @export
 #' @importFrom ggplot2 ggplot aes geom_abline geom_point labs theme element_text
 #' draw_key_rect scale_colour_manual geom_vline geom_hline geom_smooth geom_line
 #' @importFrom utils stack
 utils::globalVariables(c("x", "y"))
-york.plots <- function(york.output) {
+york_plots <- function(york.output) {
   if (class(york.output) != "york") {
     stop("Input must be of class york (Output of york function)")
   }

@@ -26,11 +26,11 @@
 #' fit <- york(x = x, y = y, weights.x = weights.x, weights.y = weights.y,
 #' r.xy = 0)
 #' data <- c(2,3,4,3.6)
-#' york.predict(york.output = fit, newdata = data)
+#' york_predict(york.output = fit, newdata = data)
 #'
-#' @name york.predict
+#' @name york_predict
 #' @export
-york.predict <- function(york.output, newdata) {
+york_predict <- function(york.output, newdata) {
   if (class(york.output) != "york") {
     stop("Input must be of class york (Output of york function)")
   }

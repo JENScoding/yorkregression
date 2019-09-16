@@ -9,14 +9,14 @@ test_that("Test implementation of york.predicts function", {
   ## Test
   first <- york(x, y, weights.x = weights.x, weights.y = weights.y, r.xy = 0, mult.samples = F, approx.solution = T)
   new <- c(2,3,4,3.6)
-  expect_error(york.predict(first, new), NA)
+  expect_error(york_predict(first, new), NA)
 
-  second <- york.predict(first, new)
+  second <- york_predict(first, new)
   expect_true(all(round(second$prediction[,2], 4) == c(4.5080, 4.0308, 3.5535, 3.7444)))
   expect_true(all(colnames(second$prediction) == c("x", "predicted.y")))
 
   new <- data.frame(c(2,3,4,3.6), fix.empty.names = F)
-  second <- york.predict(first, new)
+  second <- york_predict(first, new)
   expect_true(all(round(second$prediction[,2], 4) == c(4.5080, 4.0308, 3.5535, 3.7444)))
   expect_true(all(colnames(second$prediction) == c("x", "predicted.y")))
 })

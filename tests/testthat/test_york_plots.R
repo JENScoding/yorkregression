@@ -8,9 +8,9 @@ test_that("Test york.plots function", {
 
   ## Test
   first <- york(x, y, weights.x = weights.x, weights.y = weights.y, r.xy = 0, mult.samples = F, approx.solution = T)
-  expect_error(york.plots(first), NA)
+  expect_error(york_plots(first), NA)
   second <- data.frame("x" = rnorm(100), "y" = rnorm(100))
-  expect_error(york.plots(second))
+  expect_error(york_plots(second))
 })
 
 
