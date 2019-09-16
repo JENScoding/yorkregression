@@ -362,8 +362,10 @@ york <- function(x, y, weights.x = NULL, weights.y = NULL, tolerance = 1e-5,
     slope.per.iteration <- data.frame("slope.per.iteration" =
                                         slope)
   }
-
+  # York intercept
   intercept <- y.bar - slope * x.bar
+
+  # SE of coefficients
   x.adj <- x.bar + beta
   x.mean <- sum(Weight * beta) / (Weight.sum * (length(x) - 2))
   u <- x.adj - x.mean
@@ -390,10 +392,12 @@ york <- function(x, y, weights.x = NULL, weights.y = NULL, tolerance = 1e-5,
           "at a significance level of 10%.", sep = " ")
   }
 
-  fitted.y <- intercept + slope * x
-
   df.regression <- 2 * (length(x) - 1)
 
+  # fitted values
+  fitted.y <- intercept + slope * x
+
+  # residuals
   c <- r.xy * alpha
   x.residuals <- (Weight * (intercept + slope * x - y)
                   * (c - slope * weights.y)) /
