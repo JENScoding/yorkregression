@@ -119,7 +119,7 @@
 #' }
 #' @name york
 #' @export
-york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
+york <- function(x, y, tolerance = 1e-5, max.iterations = 50, weights.x = NULL, weights.y = NULL,
                  sd.x = NULL, sd.y = NULL, r.xy = NULL, mult.samples = FALSE,
                  approx.solution = FALSE) {
 
@@ -271,22 +271,6 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
 
   if (approx.solution == F) {
 
-    # Limit number of iterations
-    inv.tolerance <- tolerance^-1
-    all.tolerance.levels <- 10^(0:20)
-    all.tolerance.levels[5] <- (1e-5)^-1 # solve weird R behaviour
-    if (isFALSE(any(inv.tolerance == all.tolerance.levels))) {
-      stop("Wrong input for the tolerance level:
-       tolerance must be element of [1, 1e-1, 1e-2, 1e-3, ... , 1e-19, 1e-20]")
-    }
-    if (any(inv.tolerance / 1e5 == all.tolerance.levels[2:16])) {
-      multiplicator <- which(inv.tolerance / 1e5 == all.tolerance.levels)
-      add <- 1000 * multiplicator
-    } else {
-      add <- 0
-    }
-    iterations.limit <- 1000 + add
-
     # Find york slope
     slope.diff <- 10
     count <- 0
@@ -310,7 +294,7 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
       slope.diff <- abs(slope - slope.old)
       count <- count + 1
       slope.per.iteration <- append(slope.per.iteration, slope)
-      if (count > iterations.limit) {
+      if (count > max.iterations) {
         stop("\nThe slope coefficient does not converge after ",
              count," iterations. \nHint: You may reduce the tolerance level.",
              cat("Slope coefficient for last 5 iterations:"),
@@ -366,16 +350,20 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
 
   intercept <- y.bar - slope * x.bar
   x.adj <- x.bar + beta
-  x.mean <- sum(Weight * beta, na.rm = T) / (Weight.sum * (length(x) - 2))
+  x.mean <- sum(Weight * beta) / (Weight.sum * (length(x) - 2))
   u <- x.adj - x.mean
-  sigma.slope <- sqrt(1 / sum(Weight * u^2, na.rm = T))
+  sigma.slope <- sqrt(1 / sum(Weight * u^2))
   sigma.intercept <- sqrt(x.mean^2 * sigma.slope^2 + 1 / Weight.sum)
   sigma.slope.intercept <- -x.mean*sigma.slope^2
-  reduced.chisq <- sum(Weight * (y - slope * x - intercept)^2, na.rm = T) /
-    (length(x) - 2)
+
+  S <- sum(Weight * (y - slope * x - intercept)^2)
+  reduced.chisq <- S / (length(x) - 2)
   sigma.chisq <- sqrt(2 / (length(x) - 2))
+
   fitted.y <- intercept + slope * x
+
   df.regression <- 2*(length(x)-1)
+
   c <- r.xy*alpha
   x.residuals <- (Weight * (intercept + slope * x - y)
                   * (c - slope * weights.y)) /
@@ -383,6 +371,7 @@ york <- function(x, y, tolerance = 1e-10, weights.x = NULL, weights.y = NULL,
   y.residuals <- (Weight * (intercept + slope * x - y) *
                     (weights.x - slope * c)) / (weights.y * weights.x)
 
+  # define output
   york.reg <- matrix(c(intercept, slope, sigma.intercept, sigma.slope),
                      nrow = 2)
   rownames(york.reg) <- c("intercept", "slope")
