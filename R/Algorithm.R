@@ -190,12 +190,12 @@ york <- function(x, y, weights.x = NULL, weights.y = NULL, tolerance = 1e-5,
       r.xy <- r.xy[-to.delete]
     }
     if (is.null(weights.x) & is.null(weights.y)) {
-      weights.x <- 1/sd.x^2
-      weights.y <- 1/sd.y^2
+      weights.x <- 1 / sd.x^2
+      weights.y <- 1 / sd.y^2
     }
     if (is.null(sd.x) & is.null(sd.y)) {
-      sd.x <- 1/ sqrt(weights.x)
-      sd.y <- 1/sqrt(weights.y)
+      sd.x <- 1 / sqrt(weights.x)
+      sd.y <- 1 / sqrt(weights.y)
     }
     if (length(weights.x) != length(x) | length(weights.y) != length(y)) {
       stop("weights.x and weights.y must have the same length of x resp. y!")
@@ -255,8 +255,8 @@ york <- function(x, y, weights.x = NULL, weights.y = NULL, tolerance = 1e-5,
   lm.ols <- solve(t(x.input) %*% x.input) %*% t(x.input) %*% y
   fitted.y.ols <- x.input %*% lm.ols
   residuals.ols <- y - fitted.y.ols
-  slope <- as.numeric(lm.ols[2])
-  intercept.ols <- as.numeric(lm.ols[1])
+  slope <- lm.ols[2]
+  intercept.ols <- lm.ols[1]
   if (any(is.na(c(slope,intercept.ols)))){
     stop("Cannot fit a line through these data!")
   }
@@ -317,8 +317,8 @@ york <- function(x, y, weights.x = NULL, weights.y = NULL, tolerance = 1e-5,
 
   } else {
     if (any(r.xy != 0)) {
-      stop("There is no approximate solution in case of correlation between x and y
-           errors!")
+      stop(paste("There is no approximate solution in case of correlation",
+                 "between x and y errors!", sep = " "))
     }
     ## Apply formula and use lm estimate as intitial value for b
     alpha <- sqrt(weights.x * weights.y)
@@ -343,13 +343,19 @@ york <- function(x, y, weights.x = NULL, weights.y = NULL, tolerance = 1e-5,
 
     # use formula of York 66 to find slope, given on page 1084
     phi <- acos((alpha.cubic^3 - 3 /2 * alpha.cubic * beta.cubic + 0.5 *
-                   gamma.cubic) /
+                        gamma.cubic) /
                   (alpha.cubic^2 - beta.cubic)^(3 / 2))
 
     sol.cubic2 <- alpha.cubic + 2 * (alpha.cubic^2 - beta.cubic)^0.5 *
-      cos( 1 / 3 *(phi + 2 * pi * c(0:2)))
-    sol.cubic2
-    slope <- sol.cubic2[3]
+                        cos( 1 / 3 *(phi + 2 * pi * c(0:2)))
+    ols.range <- c(lm.ols[2] - 3 * se.slope.ols,
+                        lm.ols[2] + 3 * se.slope.ols)
+    pick.right.root <- which(sol.cubic2 >= ols.range[1] &
+                               sol.cubic2 <= ols.range[2])
+    slope <- sol.cubic2[pick.right.root]
+    if (length(slope) == 0 | length(slope) > 1) {
+      stop("An approximate solution does not exist!")
+    }
 
     beta <- Weight * (x.centered / weights.y) + (slope * y.centered / weights.x)
     count <- 0
@@ -367,7 +373,6 @@ york <- function(x, y, weights.x = NULL, weights.y = NULL, tolerance = 1e-5,
 
   # Goodness of fit + Test (H0: S <= df)
   S <- sum(Weight * (y - slope * x - intercept)^2)
-  S <- 20
   chisq.df <- (length(x) - 2)
   reduced.chisq <- S / chisq.df
   sigma.chisq <- sqrt(2 / chisq.df)
@@ -387,9 +392,9 @@ york <- function(x, y, weights.x = NULL, weights.y = NULL, tolerance = 1e-5,
 
   fitted.y <- intercept + slope * x
 
-  df.regression <- 2*(length(x)-1)
+  df.regression <- 2 * (length(x) - 1)
 
-  c <- r.xy*alpha
+  c <- r.xy * alpha
   x.residuals <- (Weight * (intercept + slope * x - y)
                   * (c - slope * weights.y)) /
     (weights.y * weights.x)
