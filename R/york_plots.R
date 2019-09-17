@@ -27,6 +27,7 @@
 #' @importFrom ggplot2 ggplot aes geom_abline geom_point labs theme element_text
 #' draw_key_rect scale_colour_manual geom_vline geom_hline geom_smooth geom_line
 #' @importFrom utils stack
+#' @importFrom stats pnorm
 utils::globalVariables(c("x", "y"))
 york_plots <- function(york.output) {
   if (class(york.output) != "york") {

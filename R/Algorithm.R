@@ -128,29 +128,15 @@ york <- function(x, y, weights.x = NULL, weights.y = NULL, tolerance = 1e-5,
                  mult.samples = FALSE, approx.solution = FALSE) {
 
   if (mult.samples == FALSE) {
-    if (all(sapply(list(sd.x, sd.y, weights.x, weights.y), is.null))) {
-      stop("Specify either standard errors or weights")
-    }
-    if (all(sapply(list(sd.x, sd.y, weights.x, weights.y),
-                   function(x) !is.null(x)))) {
-      stop("You can't specify weights and standard errors at the same time!")
-    }
-    if (length(sd.x) == 1) {
-      sd.x = rep(sd.x, length(x))
-    }
-    if (length(sd.y) == 1) {
-      sd.y = rep(sd.y, length(y))
-    }
-    if(length(x) != length(y)) {
-      stop("x and y must have same length!")
-    }
-    if (is.null(c(sd.x, sd.y, weights.x, weights.y))) {
-      stop("Specify either standard errors or weights")
-    }
-    if (all(sapply(list(sd.x, sd.y, weights.x, weights.y),
-                   function(x) !is.null(x)))) {
-      stop("You can't specify weights and standard errors at the same time!")
-    }
+
+    # rewrite input
+    # input <- rewrite(x, y, weights.x = weights.x, weights.y = weights.y,
+    #                  sd.x = sd.x, sd.y = sd.y, r.xy = r.xy)
+    # weights.x <- input$weights.x
+    # weights.y <- input$weights.x
+    # sd.x <- input$sd.x
+    # sd.y <- input$sd.y
+    # r.xy <- input$r.xy
     if (length(weights.x) == 1) {
       weights.x = rep(weights.x, length(x))
     }
@@ -163,16 +149,35 @@ york <- function(x, y, weights.x = NULL, weights.y = NULL, tolerance = 1e-5,
     if (length(sd.y) == 1) {
       sd.y = rep(sd.y, length(y))
     }
-    if(length(x) != length(y)) {
-      stop("x and y must have same length!")
-    }
     if (length(r.xy) == 1) {
       r.xy = rep(r.xy, length(x))
     }
-    if (length(r.xy) != length(x)) {
-      stop("Length of correlation vector must equal length of x")
+    if (all(sapply(list(sd.x, sd.y, weights.x, weights.y),
+                   function(x) !is.null(x)))) {
+      stop("You can't specify weights and standard errors at the same time!")
     }
-    #delete rows with NA values
+    if (is.null(weights.x) & is.null(weights.y)) {
+      weights.x <- 1 / sd.x^2
+      weights.y <- 1 / sd.y^2
+    }
+    if (is.null(sd.x) & is.null(sd.y)) {
+      sd.x <- 1 / sqrt(weights.x)
+      sd.y <- 1 / sqrt(weights.y)
+    }
+
+    # errors for wrongly specified input
+    error_wrong_input1(x, y, weights.x = weights.x, weights.y = weights.y,
+                       sd.x = sd.x, sd.y = sd.y, r.xy = r.xy)
+
+
+    if (length(weights.x) != length(x) | length(weights.y) != length(y)) {
+      stop("weights.x and weights.y must have the same length as x and y resp.!")
+    }
+    if (length(sd.x) != length(x) | length(sd.y) != length(y)) {
+      stop("sd.x and sd.y must have the same length as x and y resp.!")
+    }
+
+    # delete rows with NA values
     to.delete  <- c(which(is.na(x)), which(is.na(y)),
                     which(is.na(weights.x)), which(is.na(weights.y)),
                     which(is.na(sd.x)), which(is.na(sd.y)))
@@ -190,25 +195,8 @@ york <- function(x, y, weights.x = NULL, weights.y = NULL, tolerance = 1e-5,
       sd.y <- sd.y[-to.delete]
       r.xy <- r.xy[-to.delete]
     }
-    if (is.null(weights.x) & is.null(weights.y)) {
-      weights.x <- 1 / sd.x^2
-      weights.y <- 1 / sd.y^2
-    }
-    if (is.null(sd.x) & is.null(sd.y)) {
-      sd.x <- 1 / sqrt(weights.x)
-      sd.y <- 1 / sqrt(weights.y)
-    }
-    if (length(weights.x) != length(x) | length(weights.y) != length(y)) {
-      stop("weights.x and weights.y must have the same length of x resp. y!")
-    }
-    if (length(sd.x) != length(x) | length(sd.y) != length(y)) {
-      stop("sd.x and sd.y must have the same length of x resp. y!")
-    }
-    if (any(r.xy <= -1 | r.xy >= 1)) {
-      stop("Wrong input for r.xy:
-       r.xy must be element of (-1, ... , 1)")
-    }
   } else {
+
     if (approx.solution == T) {
       stop("There is no approximate solution in case of multiple samples!")
     }
