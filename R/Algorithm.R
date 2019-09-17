@@ -151,6 +151,7 @@ york <- function(x, y, weights.x = NULL, weights.y = NULL, tolerance = 1e-5,
                        sd.x = sd.x, sd.y = sd.y, r.xy = r.xy,
                        approx.solution = approx.solution)
 
+    # Define errors, the error correlation and weights
     mean.xi <- apply(x, 1, mean)
     mean.yi <- apply(y, 1, mean)
     x_errors<- x - mean.xi
@@ -161,57 +162,56 @@ york <- function(x, y, weights.x = NULL, weights.y = NULL, tolerance = 1e-5,
       weights.x[i] <- 1 / f_var_row(x[i, ])
       weights.y[i] <- 1 / f_var_row(y[i, ])
     }
-    x.original <- x
-    y.original <- y
-    x <- as.matrix(stack(data.frame(t(x.original)))[1])
-    y <- as.matrix(stack(data.frame(t(y.original)))[1])
+    x_original <- x
+    y_original <- y
+    x <- as.matrix(stack(data.frame(t(x_original)))[1])
+    y <- as.matrix(stack(data.frame(t(y_original)))[1])
   }
 
-  #initial value of the slope is the OLSE
+  # initial value of the slope is the olse
   ols_reg <- f_ols_reg(x, y)
   slope <- ols_reg$slope
 
 
   if (approx.solution == F) {
 
-    # Find york slope
-    slope.diff <- 10
+    # algorithm to find york slope
+    slope_diff <- 10
     count <- 0
-    slope.per.iteration <- NULL
+    slope_per_iteration <- NULL
     alpha <- sqrt(weights.x * weights.y)
-    while (slope.diff > tolerance) {
-      slope.old <- slope
+    while (slope_diff > tolerance) {
+      slope_old <- slope
       Weight <- alpha^2 / (slope^2 * weights.y + weights.x -
                              2 * slope * r.xy * alpha)
       if (mult.samples == TRUE) {
-        Weight <- rep(Weight, each = ncol(x.original))
+        Weight <- rep(Weight, each = ncol(x_original))
       }
-      Weight.sum <- sum(Weight)
-      x.bar <- sum(Weight * x) / Weight.sum
-      y.bar <- sum(Weight * y) / Weight.sum
-      x.centered <- x - x.bar
-      y.centered <- y - y.bar
-      beta <- Weight * ((x.centered / weights.y) + (slope * y.centered /
+      Weight_sum <- sum(Weight)
+      x_bar <- sum(Weight * x) / Weight_sum
+      y_bar <- sum(Weight * y) / Weight_sum
+      x_centered <- x - x_bar
+      y_centered <- y - y_bar
+      beta <- Weight * ((x_centered / weights.y) + (slope * y_centered /
                                                       weights.x) -
-                          (slope * x.centered + y.centered) * r.xy / alpha)
-      Q1 <- sum(Weight * beta * y.centered)
-      Q2 <- sum(Weight * beta * x.centered)
+                          (slope * x_centered + y_centered) * r.xy / alpha)
+      Q1 <- sum(Weight * beta * y_centered)
+      Q2 <- sum(Weight * beta * x_centered)
       slope <- Q1 / Q2
-      slope.diff <- abs(slope - slope.old)
+      slope_diff <- abs(slope - slope_old)
       count <- count + 1
-      slope.per.iteration <- append(slope.per.iteration, slope)
+      slope_per_iteration <- append(slope_per_iteration, slope)
       if (count > max.iterations) {
         stop("\nThe slope coefficient does not converge after ",
              count, paste(" iterations. \nHint: You may reduce the tolerance level",
              "or increase the maximum number of iterations.", sep = " "),
              cat("Slope coefficient for last 5 iterations:"),
              for (i in 4:0){
-               cat("\n\t", count - i, "\t", slope.per.iteration[count - i])},
+               cat("\n\t", count - i, "\t", slope_per_iteration[count - i])},
              cat("\n"))
       }
     }
-    slope.per.iteration <- data.frame("slope.per.iteration" =
-                                        slope.per.iteration)
+    slope_per_iteration <- data.frame("slope" = slope_per_iteration)
 
   } else {
     if (any(r.xy != 0)) {
@@ -223,66 +223,65 @@ york <- function(x, y, weights.x = NULL, weights.y = NULL, tolerance = 1e-5,
     Weight <- alpha^2 / (slope^2 * weights.y + weights.x)
 
     # see formula 19 and 20 for the following:
-    Weight.sum <- sum(Weight)
-    x.bar <- sum(Weight * x) / Weight.sum
-    y.bar <- sum(Weight * y) / Weight.sum
-    x.centered <- x - x.bar
-    y.centered <- y - y.bar
-    # calculate alpha.cubic, beta.cubic and gamma.cubic. See York 66 page 1084
-    xy <- x.centered * y.centered
-    xW.w <- x.centered^2 * Weight^2 / weights.x
-    yW.w <- y.centered^2 * Weight^2 / weights.x
-    alpha.cubic <- 2 * sum(xy * Weight^2 / weights.x) /
-                    (3 * sum(xW.w))
-    beta.cubic <- (sum(yW.w) - sum(Weight * x.centered^2)) /
-                    (3 * sum(xW.w))
-    gamma.cubic <- - sum(xy * Weight) / (sum(x.centered^2 *
+    Weight_sum <- sum(Weight)
+    x_bar <- sum(Weight * x) / Weight_sum
+    y_bar <- sum(Weight * y) / Weight_sum
+    x_centered <- x - x_bar
+    y_centered <- y - y_bar
+    # calculate alpha_cubic, beta_cubic and gamma_cubic. See York 66 page 1084
+    xy <- x_centered * y_centered
+    xW_w <- x_centered^2 * Weight^2 / weights.x
+    yW_w <- y_centered^2 * Weight^2 / weights.x
+    alpha_cubic <- 2 * sum(xy * Weight^2 / weights.x) /
+                    (3 * sum(xW_w))
+    beta_cubic <- (sum(yW_w) - sum(Weight * x_centered^2)) /
+                    (3 * sum(xW_w))
+    gamma_cubic <- - sum(xy * Weight) / (sum(x_centered^2 *
                     Weight^2 / weights.x))
 
     # use formula of York 66 to find slope, given on page 1084
-    phi <- acos((alpha.cubic^3 - 3 /2 * alpha.cubic * beta.cubic + 0.5 *
-                        gamma.cubic) /
-                  (alpha.cubic^2 - beta.cubic)^(3 / 2))
+    phi <- acos((alpha_cubic^3 - 3 /2 * alpha_cubic * beta_cubic + 0.5 *
+                        gamma_cubic) /
+                  (alpha_cubic^2 - beta_cubic)^(3 / 2))
 
-    sol.cubic2 <- alpha.cubic + 2 * (alpha.cubic^2 - beta.cubic)^0.5 *
+    sol_cubic2 <- alpha_cubic + 2 * (alpha_cubic^2 - beta_cubic)^0.5 *
                         cos( 1 / 3 *(phi + 2 * pi * c(0:2)))
     ols_range <- c(ols_reg$slope - 4 * ols_reg$se_slope,
                    ols_reg$slope + 4 * ols_reg$se_slope)
-    pick_right_root <- which(sol.cubic2 >= ols_range[1] &
-                               sol.cubic2 <= ols_range[2])
-    slope <- sol.cubic2[pick_right_root]
+    pick_right_root <- which(sol_cubic2 >= ols_range[1] &
+                               sol_cubic2 <= ols_range[2])
+    slope <- sol_cubic2[pick_right_root]
     if (length(slope) == 0 | length(slope) > 1) {
       stop("An approximate solution does not exist!")
     }
 
-    beta <- Weight * (x.centered / weights.y) + (slope * y.centered / weights.x)
+    beta <- Weight * (x_centered / weights.y) + (slope * y_centered / weights.x)
     count <- 0
-    slope.per.iteration <- data.frame("slope.per.iteration" =
-                                        slope)
+    slope_per_iteration <- data.frame("slope" = slope)
   }
   # York intercept
-  intercept <- y.bar - slope * x.bar
+  intercept <- y_bar - slope * x_bar
 
   # SE of coefficients
-  x.adj <- x.bar + beta
-  x.mean <- sum(Weight * beta) / (Weight.sum * (length(x) - 2))
-  u <- x.adj - x.mean
-  sigma.slope <- sqrt(1 / sum(Weight * u^2))
-  sigma.intercept <- sqrt(x.mean^2 * sigma.slope^2 + 1 / Weight.sum)
+  x_adj <- x_bar + beta
+  x_mean <- sum(Weight * beta) / (Weight_sum * (length(x) - 2))
+  u <- x_adj - x_mean
+  sigma_slope <- sqrt(1 / sum(Weight * u^2))
+  sigma_intercept <- sqrt(x_mean^2 * sigma_slope^2 + 1 / Weight_sum)
 
   # Goodness of fit + Test (H0: S <= df)
   S <- sum(Weight * (y - slope * x - intercept)^2)
-  chisq.df <- (length(x) - 2)
-  reduced.chisq <- S / chisq.df
-  sigma.chisq <- sqrt(2 / chisq.df)
+  chisq_df <- (length(x) - 2)
+  reduced_chisq <- S / chisq_df
+  sigma_chisq <- sqrt(2 / chisq_df)
   if (mult.samples == F) {
-    p.value <- 1 - pchisq(S, df = chisq.df)
-    test.result <- if (p.value > 0.1 ) {
+    p_value <- 1 - pchisq(S, df = chisq_df)
+    test_result <- if (p_value > 0.1 ) {
       "The assumption of a good fit cannot be rejected."
-    } else if (p.value < 0.01) {
+    } else if (p_value < 0.01) {
       paste("The assumption of a good fit can be rejected",
             "at a significance level of 1%.", sep = " ")
-    } else if (p.value < 0.05) {
+    } else if (p_value < 0.05) {
       paste("The assumption of a good fit can be rejected",
             "at a significance level of 5%.", sep = " ")
     } else {
@@ -290,61 +289,61 @@ york <- function(x, y, weights.x = NULL, weights.y = NULL, tolerance = 1e-5,
             "at a significance level of 10%.", sep = " ")
     }
   } else {
-    p.value <- "No p-value for multiple sample case."
-    test.result <- "No test results for multiple sample case."
+    p_value <- "No p-value for multiple sample case."
+    test_result <- "No test results for multiple sample case."
   }
 
 
 
-  df.regression <- 2 * (length(x) - 1)
+  df_regression <- 2 * (length(x) - 1)
 
   # fitted values
-  fitted.y <- intercept + slope * x
+  fitted_y <- intercept + slope * x
 
   # residuals
   c <- r.xy * alpha
-  x.residuals <- (Weight * (intercept + slope * x - y)
+  x_residuals <- (Weight * (intercept + slope * x - y)
                   * (c - slope * weights.y)) /
     (weights.y * weights.x)
-  y.residuals <- (Weight * (intercept + slope * x - y) *
+  y_residuals <- (Weight * (intercept + slope * x - y) *
                     (weights.x - slope * c)) / (weights.y * weights.x)
 
   # define output
-  york.reg <- matrix(c(intercept, slope, sigma.intercept, sigma.slope),
+  york_reg <- matrix(c(intercept, slope, sigma_intercept, sigma_slope),
                      nrow = 2)
-  rownames(york.reg) <- c("intercept", "slope")
-  colnames(york.reg) <- c("Estimate", "Std.Error")
+  rownames(york_reg) <- c("intercept", "slope")
+  colnames(york_reg) <- c("Estimate", "Std_Error")
 
-  weights.matrix <- matrix(c(weights.x, weights.y), ncol = 2)
-  colnames(weights.matrix) <- c("weights of X_i", "weights of Y_i")
+  weights_matrix <- matrix(c(weights.x, weights.y), ncol = 2)
+  colnames(weights_matrix) <- c("weights of X_i", "weights of Y_i")
   if (mult.samples == F) {
     data <- matrix(c(x, y, sd.x, sd.y, r.xy), ncol = 5)
     colnames(data) <- c("x", "y", "sd.x", "sd.y", "r.xy")
   } else {
-    data <- list("x" = x.original, "y" = y.original, "x_errors" = x_errors,
+    data <- list("x" = x_original, "y" = y_original, "x_errors" = x_errors,
                  "y_errors" = y_errors, "r.xy" = r.xy, "mean.x.i" = x,
                  "mean.y.i" = y)
   }
-  york.arguments <- list("tolerance" = tolerance, "max.iterations" = max.iterations,
+  york_arguments <- list("tolerance" = tolerance, "max.iterations" = max.iterations,
                          "mult.samples" = mult.samples, "approx.solution" =
                            approx.solution)
-  chisq.test.results <- list("test.result" = test.result, "p.value" = p.value)
+  chisq_test_results <- list("test.result" = test_result, "p.value" = p_value)
 
-  output <- list("coefficients" = york.reg,
-                 "weights" = weights.matrix,
-                 "x.residuals" = x.residuals,
-                 "y.residuals"= y.residuals,
-                 "fitted.y"=fitted.y,
-                 "df.regression" = df.regression,
-                 "weighted.mean.x" = x.bar,
-                 "weighted.mean.y" = y.bar ,
-                 "reduced.chisq" = reduced.chisq,
-                 "std.error.chisq" = sigma.chisq,
-                 "Overall.significance.of.fit" = chisq.test.results,
+  output <- list("coefficients" = york_reg,
+                 "weights" = weights_matrix,
+                 "x.residuals" = x_residuals,
+                 "y.residuals"= y_residuals,
+                 "fitted.y"=fitted_y,
+                 "df.regression" = df_regression,
+                 "weighted.mean.x" = x_bar,
+                 "weighted.mean.y" = y_bar ,
+                 "reduced.chisq" = reduced_chisq,
+                 "std.error.chisq" = sigma_chisq,
+                 "Overall.significance.of.fit" = chisq_test_results,
                  "number.of.iterations" = count,
-                 "slope.after.each.iteration" = slope.per.iteration,
+                 "slope.after.each.iteration" = slope_per_iteration,
                  "ols_summary" = ols_reg[-c(1:2)],
-                 "york.arguments" = york.arguments,
+                 "york.arguments" = york_arguments,
                  "data" = data)
   attr(output, "class") <- "york"
 
