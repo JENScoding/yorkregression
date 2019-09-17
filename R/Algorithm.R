@@ -151,7 +151,7 @@ york <- function(x, y, weights.x = NULL, weights.y = NULL, tolerance = 1e-5,
                        sd.x = sd.x, sd.y = sd.y, r.xy = r.xy,
                        approx.solution = approx.solution)
 
-    # Define errors, the error correlation and weights
+    # Define errors, error correlation and weights in multiple sample case
     mean.xi <- apply(x, 1, mean)
     mean.yi <- apply(y, 1, mean)
     x_errors<- x - mean.xi
@@ -168,12 +168,12 @@ york <- function(x, y, weights.x = NULL, weights.y = NULL, tolerance = 1e-5,
     y <- as.matrix(stack(data.frame(t(y_original)))[1])
   }
 
-  # initial value of the slope is the olse
+  # initial value of the slope is olse slope
   ols_reg <- f_ols_reg(x, y)
   slope <- ols_reg$slope
 
 
-  if (approx.solution == F) {
+  if (approx.solution == FALSE) {
 
     # algorithm to find york slope
     slope_diff <- 10
@@ -211,54 +211,22 @@ york <- function(x, y, weights.x = NULL, weights.y = NULL, tolerance = 1e-5,
              cat("\n"))
       }
     }
-    slope_per_iteration <- data.frame("slope" = slope_per_iteration)
 
-  } else {
-    if (any(r.xy != 0)) {
-      stop(paste("There is no approximate solution in case of correlation",
-                 "between x and y errors!", sep = " "))
-    }
-    ## Apply formula and use lm estimate as intitial value for b
-    alpha <- sqrt(weights.x * weights.y)
-    Weight <- alpha^2 / (slope^2 * weights.y + weights.x)
+  } else { # approx.solution = TRUE
 
-    # see formula 19 and 20 for the following:
-    Weight_sum <- sum(Weight)
-    x_bar <- sum(Weight * x) / Weight_sum
-    y_bar <- sum(Weight * y) / Weight_sum
-    x_centered <- x - x_bar
-    y_centered <- y - y_bar
-    # calculate alpha_cubic, beta_cubic and gamma_cubic. See York 66 page 1084
-    xy <- x_centered * y_centered
-    xW_w <- x_centered^2 * Weight^2 / weights.x
-    yW_w <- y_centered^2 * Weight^2 / weights.x
-    alpha_cubic <- 2 * sum(xy * Weight^2 / weights.x) /
-                    (3 * sum(xW_w))
-    beta_cubic <- (sum(yW_w) - sum(Weight * x_centered^2)) /
-                    (3 * sum(xW_w))
-    gamma_cubic <- - sum(xy * Weight) / (sum(x_centered^2 *
-                    Weight^2 / weights.x))
-
-    # use formula of York 66 to find slope, given on page 1084
-    phi <- acos((alpha_cubic^3 - 3 /2 * alpha_cubic * beta_cubic + 0.5 *
-                        gamma_cubic) /
-                  (alpha_cubic^2 - beta_cubic)^(3 / 2))
-
-    sol_cubic2 <- alpha_cubic + 2 * (alpha_cubic^2 - beta_cubic)^0.5 *
-                        cos( 1 / 3 *(phi + 2 * pi * c(0:2)))
-    ols_range <- c(ols_reg$slope - 4 * ols_reg$se_slope,
-                   ols_reg$slope + 4 * ols_reg$se_slope)
-    pick_right_root <- which(sol_cubic2 >= ols_range[1] &
-                               sol_cubic2 <= ols_range[2])
-    slope <- sol_cubic2[pick_right_root]
-    if (length(slope) == 0 | length(slope) > 1) {
-      stop("An approximate solution does not exist!")
-    }
-
-    beta <- Weight * (x_centered / weights.y) + (slope * y_centered / weights.x)
+    # solve cubic problem and use estimate as approximation
+    approx <- f_cubic_root(x, y, weights.x, weights.y,
+                                           r.xy, slope)
+    slope <- approx$slope
+    Weight <- approx$Weight
+    Weight_sum <- approx$Weight_sum
+    x_bar <- approx$x_bar
+    y_bar <- approx$y_bar
+    beta <- approx$beta
     count <- 0
-    slope_per_iteration <- data.frame("slope" = slope)
+    slope_per_iteration <- slope
   }
+
   # York intercept
   intercept <- y_bar - slope * x_bar
 
@@ -274,7 +242,7 @@ york <- function(x, y, weights.x = NULL, weights.y = NULL, tolerance = 1e-5,
   chisq_df <- (length(x) - 2)
   reduced_chisq <- S / chisq_df
   sigma_chisq <- sqrt(2 / chisq_df)
-  if (mult.samples == F) {
+  if (mult.samples == FALSE) {
     p_value <- 1 - pchisq(S, df = chisq_df)
     test_result <- if (p_value > 0.1 ) {
       "The assumption of a good fit cannot be rejected."
@@ -292,8 +260,6 @@ york <- function(x, y, weights.x = NULL, weights.y = NULL, tolerance = 1e-5,
     p_value <- "No p-value for multiple sample case."
     test_result <- "No test results for multiple sample case."
   }
-
-
 
   df_regression <- 2 * (length(x) - 1)
 
@@ -315,8 +281,8 @@ york <- function(x, y, weights.x = NULL, weights.y = NULL, tolerance = 1e-5,
   colnames(york_reg) <- c("Estimate", "Std_Error")
 
   weights_matrix <- matrix(c(weights.x, weights.y), ncol = 2)
-  colnames(weights_matrix) <- c("weights of X_i", "weights of Y_i")
-  if (mult.samples == F) {
+  colnames(weights_matrix) <- c("weights of x", "weights of y")
+  if (mult.samples == FALSE) {
     data <- matrix(c(x, y, sd.x, sd.y, r.xy), ncol = 5)
     colnames(data) <- c("x", "y", "sd.x", "sd.y", "r.xy")
   } else {
@@ -324,6 +290,7 @@ york <- function(x, y, weights.x = NULL, weights.y = NULL, tolerance = 1e-5,
                  "y_errors" = y_errors, "r.xy" = r.xy, "mean.x.i" = x,
                  "mean.y.i" = y)
   }
+  slope_per_iteration <- data.frame("slope" = slope_per_iteration)
   york_arguments <- list("tolerance" = tolerance, "max.iterations" = max.iterations,
                          "mult.samples" = mult.samples, "approx.solution" =
                            approx.solution)

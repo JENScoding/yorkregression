@@ -107,12 +107,14 @@ f_ols_reg <- function(x, y) {
     (1 / (length(x)-2))
   f_statistic <- (r_squared / (1- r_squared)) * ((length(x)-2))
 
+  # matrix for coefficients and their se
   coef <- matrix(c(intercept, slope, se_intercept,
                        se_slope),
                      nrow = 2)
   rownames(coef) <- c("intercept", "slope")
   colnames(coef) <- c("Estimate", "Std_Error")
 
+  # define output
   ols_output <- list("slope" = slope,
                      "se_slope" = se_slope,
                      "coefficients_ols" = coef,
@@ -124,4 +126,66 @@ f_ols_reg <- function(x, y) {
                      "r_squared_ols" = r_squared,
                      "r_squared_adjusted_ols" = r_squared_adjusted,
                      "f_statistic_ols" = f_statistic)
+
+  return(ols_output)
+}
+
+# Solve cubic root problem (approximate solution for slope from York (1966)
+f_cubic_root <- function(x, y, weights.x, weights.y, r.xy, slope) {
+
+  if (any(r.xy != 0)) {
+    stop(paste("There is no approximate solution in case of correlation",
+               "between x and y errors!", sep = " "))
+  }
+  # use ols slope as intitial slope value and estimate weight and
+  # centered data
+  alpha <- sqrt(weights.x * weights.y)
+  Weight <- alpha^2 / (slope^2 * weights.y + weights.x)
+  Weight_sum <- sum(Weight)
+  x_bar <- sum(Weight * x) / Weight_sum
+  y_bar <- sum(Weight * y) / Weight_sum
+  x_centered <- x - x_bar
+  y_centered <- y - y_bar
+
+  # calculate alpha_cubic, beta_cubic and gamma_cubic. See York (1966) p. 1084
+  xy <- x_centered * y_centered
+  xW_w <- x_centered^2 * Weight^2 / weights.x
+  yW_w <- y_centered^2 * Weight^2 / weights.x
+  alpha_cubic <- 2 * sum(xy * Weight^2 / weights.x) /
+    (3 * sum(xW_w))
+  beta_cubic <- (sum(yW_w) - sum(Weight * x_centered^2)) /
+    (3 * sum(xW_w))
+  gamma_cubic <- - sum(xy * Weight) / (sum(x_centered^2 *
+                                             Weight^2 / weights.x))
+
+  # determine phi and solve cubic equation
+  phi <- acos((alpha_cubic^3 - 3 /2 * alpha_cubic * beta_cubic + 0.5 *
+                 gamma_cubic) /
+                (alpha_cubic^2 - beta_cubic)^(3 / 2))
+
+  sol_cubic <- alpha_cubic + 2 * (alpha_cubic^2 - beta_cubic)^0.5 *
+    cos( 1 / 3 *(phi + 2 * pi * c(0:2)))
+
+  # pick the root that is closest to ols
+  ols_range <- c(ols_reg$slope - 4 * ols_reg$se_slope,
+                 ols_reg$slope + 4 * ols_reg$se_slope)
+  pick_right_root <- which(sol_cubic >= ols_range[1] &
+                             sol_cubic <= ols_range[2])
+  slope <- sol_cubic[pick_right_root]
+  if (length(slope) == 0 | length(slope) > 1) {
+    stop("An approximate solution does not exist!")
+  }
+
+  # later needed
+  beta <- Weight * (x_centered / weights.y) + (slope * y_centered / weights.x)
+
+  # define output
+  cubic_root <- list("slope" = slope,
+                     "Weight" = Weight,
+                     "Weight_sum" = Weight_sum,
+                     "x_bar" = x_bar,
+                     "y_bar" = y_bar,
+                     "beta" = beta)
+
+  return(cubic_root)
 }
