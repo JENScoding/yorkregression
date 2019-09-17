@@ -132,10 +132,8 @@ york_plots <- function(york.output) {
 
   # detect outliers, assume asymptotic normality of slope coefficients
   if (york.output$york.arguments$mult.samples == F) {
-    x.data <- york.output$data$x
-    y.data <- york.output$data$y
     slope.outlier <- NULL
-    for (i in 1:nrow(x.data)) {
+    for (i in 1:length(x.data)) {
       slope.outlier[i] <- york(x.data[-i], y.data[-i],
                                sd.x = york.output$data[-i, 3],
                                sd.y = york.output$data[-i, 4],
@@ -152,10 +150,12 @@ york_plots <- function(york.output) {
     detect.outlier4 <- x.data[detect.outlier3]
   } else {
     # multiple samples
+    x.data <- york.output$data$x
+    y.data <- york.output$data$y
     slope.outlier <- NULL
-    for (i in 1:ncol(york.output$data$x)) {
+    for (i in 1:nrow(x.data)) {
       slope.outlier[i] <- suppressWarnings(
-        york(x.data[-i], y.data[-i],
+        york(x.data[-i,], y.data[-i,],
              tolerance =
                york.output$york.arguments$tolerance,
              max.iterations =
