@@ -131,7 +131,7 @@ f_ols_reg <- function(x, y) {
 }
 
 # Solve cubic root problem (approximate solution for slope from York (1966)
-f_cubic_root <- function(x, y, weights.x, weights.y, r.xy, slope) {
+f_cubic_root <- function(x, y, weights.x, weights.y, r.xy, slope_ols, se_slope_ols) {
 
   if (any(r.xy != 0)) {
     stop(paste("There is no approximate solution in case of correlation",
@@ -140,7 +140,7 @@ f_cubic_root <- function(x, y, weights.x, weights.y, r.xy, slope) {
   # use ols slope as intitial slope value and estimate weight and
   # centered data
   alpha <- sqrt(weights.x * weights.y)
-  Weight <- alpha^2 / (slope^2 * weights.y + weights.x)
+  Weight <- alpha^2 / (slope_ols^2 * weights.y + weights.x)
   Weight_sum <- sum(Weight)
   x_bar <- sum(Weight * x) / Weight_sum
   y_bar <- sum(Weight * y) / Weight_sum
@@ -167,8 +167,8 @@ f_cubic_root <- function(x, y, weights.x, weights.y, r.xy, slope) {
     cos( 1 / 3 *(phi + 2 * pi * c(0:2)))
 
   # pick the root that is closest to ols
-  ols_range <- c(ols_reg$slope - 4 * ols_reg$se_slope,
-                 ols_reg$slope + 4 * ols_reg$se_slope)
+  ols_range <- c(slope_ols - 4 * se_slope_ols,
+                 slope_ols + 4 * se_slope_ols)
   pick_right_root <- which(sol_cubic >= ols_range[1] &
                              sol_cubic <= ols_range[2])
   slope <- sol_cubic[pick_right_root]

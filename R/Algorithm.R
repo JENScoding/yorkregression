@@ -216,7 +216,7 @@ york <- function(x, y, weights.x = NULL, weights.y = NULL, tolerance = 1e-5,
 
     # solve cubic problem and use estimate as approximation
     approx <- f_cubic_root(x, y, weights.x, weights.y,
-                                           r.xy, slope)
+                                           r.xy, slope, ols_reg$se_slope)
     slope <- approx$slope
     Weight <- approx$Weight
     Weight_sum <- approx$Weight_sum
