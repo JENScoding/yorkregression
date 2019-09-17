@@ -50,12 +50,10 @@ york_plots <- function(york.output) {
       theme(plot.title =element_text(hjust = 0.5))
   } else {
 
-    x.data <- york.output$data$mean.x.i
-    y.data <- york.output$data$mean.y.i
-    x.data.1 <- stack(york.output$data$x)[, 1]
-    y.data.1 <- stack(york.output$data$y)[, 1]
+    x.data <- stack(york.output$data$x)[, 1]
+    y.data <- stack(york.output$data$y)[, 1]
 
-    ddf <- data.frame(x = x.data.1, y = y.data.1)
+    ddf <- data.frame(x = x.data, y = y.data)
     plot.1 <- ggplot(data = ddf, aes(x = x,
                                    y = y)) +
       geom_abline(aes(slope = york.output$coefficients[2, 1],
@@ -75,14 +73,14 @@ york_plots <- function(york.output) {
   plot.2 <- ggplot(data = ddf2, aes(x = x,
                                  y = y)) +
     geom_abline(aes(slope = york.output$coefficients[2, 1],
-                    intercept = york.output$coefficients[1, 1], colour="York"),
+                    intercept = york.output$coefficients[1, 1], colour = "York"),
                 key_glyph = draw_key_rect) +
     geom_abline(aes(slope = york.output$ols.summary$coefficients.ols[2, 1],
                     intercept = york.output$ols.summary$coefficients.ols[1, 1],
-                    colour="OLS")) +
+                    colour = "OLS")) +
     geom_abline(aes(slope = orthogonal$coefficients[2, 1], intercept =
                       orthogonal$coefficients[1, 1], colour = "Orthogonal")) +
-    labs(colour="") +
+    labs(colour = "") +
     scale_colour_manual(values=c("blue", "green", "red")) +
     geom_point() +
     labs(title="York' best fit straight line compared to OLS and orthogonal ",
@@ -102,7 +100,8 @@ york_plots <- function(york.output) {
     theme(plot.title = element_text(hjust = 0.5))
 
   # X Y residuals plotted against each other
-  ddf3 <- data.frame(x = york.output$x.residuals,  y = york.output$y.residuals)
+  ddf3 <- data.frame(x = as.numeric(york.output$x.residuals),
+                     y = as.numeric(york.output$y.residuals))
   plot.3 <- ggplot(aes(x = x, y = y), data = ddf3) +
     geom_point() +
     labs( title = "y residuals vs. x residuals",
@@ -112,7 +111,8 @@ york_plots <- function(york.output) {
     theme(plot.title = element_text(hjust = 0.5))
 
   # x resid vs fitted y
-  ddf4 <- data.frame( x = york.output$fitted.y, y = york.output$x.residuals)
+  ddf4 <- data.frame(x = as.numeric(york.output$fitted.y),
+                     y = as.numeric(york.output$x.residuals))
   plot.4 <- ggplot(aes(x = x, y = y), data = ddf4) +
     geom_point() +
     labs( title = "x residuals vs. fitted y",
@@ -121,7 +121,8 @@ york_plots <- function(york.output) {
     theme(plot.title = element_text(hjust = 0.5))
 
   # y resid vs fitted y
-  ddf5 <- data.frame(x = york.output$fitted.y, y = york.output$y.residuals)
+  ddf5 <- data.frame(x = as.numeric(york.output$fitted.y),
+                     y = as.numeric(york.output$y.residuals))
   plot.5 <- ggplot(aes(x = x, y = y), data = ddf5) +
     geom_point() +
     labs(title = "y residuals vs. fitted y",
@@ -130,22 +131,43 @@ york_plots <- function(york.output) {
     theme(plot.title = element_text(hjust = 0.5))
 
   # detect outliers, assume asymptotic normality of slope coefficients
-  slope.outlier <- NULL
-  for (i in 1:length(x.data)) {
-    slope.outlier[i] <- york(x.data[-i], y.data[-i],
-                             sd.x = york.output$data[-i, 3],
-                             sd.y = york.output$data[-i, 4],
-                             r.xy = york.output$data[-i, 5],
-                             tolerance =
-                               york.output$york.arguments$tolerance,
-                             max.iterations =
-                               york.output$york.arguments$max.iterations)[[1]][2, 1]
+  if (york.output$york.arguments$mult.samples == F) {
+    x.data <- york.output$data$x
+    y.data <- york.output$data$y
+    slope.outlier <- NULL
+    for (i in 1:nrow(x.data)) {
+      slope.outlier[i] <- york(x.data[-i], y.data[-i],
+                               sd.x = york.output$data[-i, 3],
+                               sd.y = york.output$data[-i, 4],
+                               r.xy = york.output$data[-i, 5],
+                               tolerance =
+                                 york.output$york.arguments$tolerance,
+                               max.iterations =
+                                 york.output$york.arguments$max.iterations)[[1]][2, 1]
+    }
+    detect.outlier1 <- (york.output$coefficients[2, 1] - slope.outlier) /
+      york.output$coefficients[2, 2]
+    detect.outlier2 <- 2 * (1 - pnorm(abs(detect.outlier1)))
+    detect.outlier3 <- which(detect.outlier2 <= 0.01)
+    detect.outlier4 <- x.data[detect.outlier3]
+  } else {
+    # multiple samples
+    slope.outlier <- NULL
+    for (i in 1:ncol(york.output$data$x)) {
+      slope.outlier[i] <- suppressWarnings(
+        york(x.data[-i], y.data[-i],
+             tolerance =
+               york.output$york.arguments$tolerance,
+             max.iterations =
+               york.output$york.arguments$max.iterations,
+             mult.samples =
+               york.output$york.arguments$mult.samples)[[1]][2, 1])
+    }
+    detect.outlier1 <- (york.output$coefficients[2, 1] - slope.outlier) /
+      york.output$coefficients[2, 2]
+    detect.outlier2 <- 2 * (1 - pnorm(abs(detect.outlier1)))
+    detect.outlier3 <- which(detect.outlier2 <= 0.01)
   }
-  detect.outlier1 <- (york.output$coefficients[2, 1] - slope.outlier) /
-                        york.output$coefficients[2, 2]
-  detect.outlier2 <- 2 * (1 - pnorm(abs(detect.outlier1)))
-  detect.outlier3 <- which(detect.outlier2 <= 0.01)
-  detect.outlier4 <- x.data[detect.outlier3]
 
 
   # ddf6 <- data.frame(x = x.data, y = y.data)
@@ -160,7 +182,7 @@ york_plots <- function(york.output) {
   #   labs(title = "York's best-fit straight line with correlated errors",
   #        x = "x data", y = "y data") +
   #   theme(plot.title =element_text(hjust = 0.5))
-
+  plot.6 <- NULL
 
   # Trace plot -> Convergence of slope
   if (york.output$york.arguments$approx.solution == F) {

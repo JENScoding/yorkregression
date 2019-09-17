@@ -122,6 +122,7 @@
 #' @name york
 #' @export
 #' @importFrom stats pchisq
+#' @importFrom utils stack
 york <- function(x, y, weights.x = NULL, weights.y = NULL, tolerance = 1e-5,
                  max.iterations = 50, sd.x = NULL, sd.y = NULL, r.xy = NULL,
                  mult.samples = FALSE, approx.solution = FALSE) {
@@ -230,7 +231,7 @@ york <- function(x, y, weights.x = NULL, weights.y = NULL, tolerance = 1e-5,
       warning(paste("You have less than 10 samples",
                     "of the x and y variables.",
                     "Increasing the number of samples is recommended",
-                    "in order to get accurate estimates", sep = " "))
+                    "in order to get accurate estimates.", sep = " "))
     }
 
   #  stop.mult.sample(approx.solution = approx.solution, x = x, y = y)
@@ -246,8 +247,8 @@ york <- function(x, y, weights.x = NULL, weights.y = NULL, tolerance = 1e-5,
     }
     x.original <- x
     y.original <- y
-    x <- mean.xi
-    y <- mean.yi
+    x <- as.matrix(stack(data.frame(t(x.original)))[1])
+    y <- as.matrix(stack(data.frame(t(y.original)))[1])
   }
 
   #initial value of the slope is the OLSE
@@ -289,6 +290,9 @@ york <- function(x, y, weights.x = NULL, weights.y = NULL, tolerance = 1e-5,
       slope.old <- slope
       Weight <- alpha^2 / (slope^2 * weights.y + weights.x -
                              2 * slope * r.xy * alpha)
+      if (mult.samples == TRUE) {
+        Weight <- rep(Weight, each = ncol(x.original))
+      }
       Weight.sum <- sum(Weight)
       x.bar <- sum(Weight * x) / Weight.sum
       y.bar <- sum(Weight * y) / Weight.sum
@@ -305,7 +309,8 @@ york <- function(x, y, weights.x = NULL, weights.y = NULL, tolerance = 1e-5,
       slope.per.iteration <- append(slope.per.iteration, slope)
       if (count > max.iterations) {
         stop("\nThe slope coefficient does not converge after ",
-             count," iterations. \nHint: You may reduce the tolerance level.",
+             count, paste(" iterations. \nHint: You may reduce the tolerance level",
+             "or increase the maximum number of iterations.", sep = " "),
              cat("Slope coefficient for last 5 iterations:"),
              for (i in 4:0){
                cat("\n\t", count - i, "\t", slope.per.iteration[count - i])},
@@ -371,26 +376,32 @@ york <- function(x, y, weights.x = NULL, weights.y = NULL, tolerance = 1e-5,
   u <- x.adj - x.mean
   sigma.slope <- sqrt(1 / sum(Weight * u^2))
   sigma.intercept <- sqrt(x.mean^2 * sigma.slope^2 + 1 / Weight.sum)
-  sigma.slope.intercept <- -x.mean*sigma.slope^2
 
   # Goodness of fit + Test (H0: S <= df)
   S <- sum(Weight * (y - slope * x - intercept)^2)
   chisq.df <- (length(x) - 2)
   reduced.chisq <- S / chisq.df
   sigma.chisq <- sqrt(2 / chisq.df)
-  p.value <- 1 - pchisq(S, df = chisq.df)
-  test.result <- if (p.value > 0.1 ) {
-    "The assumption of a good fit cannot be rejected."
-  } else if (p.value < 0.01) {
-    paste("The assumption of a good fit can be rejected",
-          "at a significance level of 1%.", sep = " ")
-  } else if (p.value < 0.05) {
-    paste("The assumption of a good fit can be rejected",
-          "at a significance level of 5%.", sep = " ")
+  if (mult.samples == F) {
+    p.value <- 1 - pchisq(S, df = chisq.df)
+    test.result <- if (p.value > 0.1 ) {
+      "The assumption of a good fit cannot be rejected."
+    } else if (p.value < 0.01) {
+      paste("The assumption of a good fit can be rejected",
+            "at a significance level of 1%.", sep = " ")
+    } else if (p.value < 0.05) {
+      paste("The assumption of a good fit can be rejected",
+            "at a significance level of 5%.", sep = " ")
+    } else {
+      paste("The assumption of a good fit can be rejected",
+            "at a significance level of 10%.", sep = " ")
+    }
   } else {
-    paste("The assumption of a good fit can be rejected",
-          "at a significance level of 10%.", sep = " ")
+    p.value <- "No p-value for multiple sample case."
+    test.result <- "No test results for multiple sample case."
   }
+
+
 
   df.regression <- 2 * (length(x) - 1)
 
@@ -415,7 +426,7 @@ york <- function(x, y, weights.x = NULL, weights.y = NULL, tolerance = 1e-5,
   rownames(ols.reg) <- c("intercept", "slope")
   colnames(ols.reg) <- c("Estimate", "Std.Error")
 
-  weights.matrix <- matrix(c(weights.x, weights.y), ncol =2)
+  weights.matrix <- matrix(c(weights.x, weights.y), ncol = 2)
   colnames(weights.matrix) <- c("weights of X_i", "weights of Y_i")
   if (mult.samples == F) {
     data <- matrix(c(x, y, sd.x, sd.y, r.xy), ncol = 5)
