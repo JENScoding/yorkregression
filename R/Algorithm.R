@@ -374,13 +374,6 @@ york <- function(x, y, weights.x = NULL, weights.y = NULL, tolerance = 1e-5,
   x.adj <- x.bar + beta
   x.mean <- sum(Weight * beta) / (Weight.sum * (length(x) - 2))
   u <- x.adj - x.mean
-  if (mult.samples == T) {
-    nr.columns <- 0:(ncol(x.original) - 1)
-    Weight.se <- Weight[c(ncol(x.original) * nr.columns + 1)]
-    Weight.sum.se <- sum(Weight)
-    sigma.slope <- sqrt(1 / sum(Weight.se * u^2))
-    sigma.intercept <- sqrt(x.mean^2 * sigma.slope^2 + 1 / Weight.sum.se)
-  }
   sigma.slope <- sqrt(1 / sum(Weight * u^2))
   sigma.intercept <- sqrt(x.mean^2 * sigma.slope^2 + 1 / Weight.sum)
 

@@ -65,6 +65,8 @@ york_plots <- function(york.output) {
   }
 
   # Compare York's best fit line with olse and orthogonal
+  mean.x <- mean(x.data)
+  mean.y <- mean(y.data)
   orthogonal <- york(x = x.data, y = y.data, weights.x = 1,
                      weights.y = 1, r.xy = 0,
                      tolerance = york.output$york.arguments$tolerance,
@@ -89,12 +91,12 @@ york_plots <- function(york.output) {
                color = "red", size = 0.4) +
     geom_hline(yintercept = york.output$weighted.mean.y, linetype = "dashed",
                color = "red", size = 0.4) +
-    geom_vline(xintercept = mean(x.data),
+    geom_vline(xintercept = mean.x,
                linetype = "dashed", color = "blue", size = 0.4) +
-    geom_hline(yintercept = mean(y.data),
+    geom_hline(yintercept = mean.y,
                linetype= "dashed", color = "blue", size = 0.4) +
-    geom_point(aes(x = mean(x.data),
-                   y = mean(y.data)), col = "blue") +
+    geom_point(aes(x = mean.x,
+                   y = mean.y), col = "blue") +
     geom_point(aes(x = york.output$weighted.mean.x,
                    y = york.output$weighted.mean.y), col = "red") +
     theme(plot.title = element_text(hjust = 0.5))
