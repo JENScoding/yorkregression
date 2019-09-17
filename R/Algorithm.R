@@ -130,7 +130,7 @@ york <- function(x, y, weights.x = NULL, weights.y = NULL, tolerance = 1e-5,
   if (mult.samples == FALSE) {
 
     # rewrite input and delete rows with NA values
-    input <- rewrite(x, y, weights.x = weights.x, weights.y = weights.y,
+    input <- f_rewrite(x, y, weights.x = weights.x, weights.y = weights.y,
                      sd.x = sd.x, sd.y = sd.y, r.xy = r.xy)
     x <- input$x
     y <- input$y
@@ -153,13 +153,13 @@ york <- function(x, y, weights.x = NULL, weights.y = NULL, tolerance = 1e-5,
 
     mean.xi <- apply(x, 1, mean)
     mean.yi <- apply(y, 1, mean)
-    x.errors<- x - mean.xi
-    y.errors <- y - mean.yi
-    for (i in 1:nrow(x.errors)) {
-      r.xy[i] <- calc.corr(x.errors[i, ],
-                           y.errors[i, ])
-      weights.x[i] <- 1 / calc.var(x[i, ])
-      weights.y[i] <- 1 / calc.var(y[i, ])
+    x_errors<- x - mean.xi
+    y_errors <- y - mean.yi
+    for (i in 1:nrow(x_errors)) {
+      r.xy[i] <- f_corr_row(x_errors[i, ],
+                           y_errors[i, ])
+      weights.x[i] <- 1 / f_var_row(x[i, ])
+      weights.y[i] <- 1 / f_var_row(y[i, ])
     }
     x.original <- x
     y.original <- y
@@ -168,32 +168,9 @@ york <- function(x, y, weights.x = NULL, weights.y = NULL, tolerance = 1e-5,
   }
 
   #initial value of the slope is the OLSE
-  x.input <- matrix(c(rep(1, length(x)), x), ncol =2)
-  lm.ols <- solve(t(x.input) %*% x.input) %*% t(x.input) %*% y
-  fitted.y.ols <- x.input %*% lm.ols
-  residuals.ols <- y - fitted.y.ols
-  slope <- lm.ols[2]
-  intercept.ols <- lm.ols[1]
-  if (any(is.na(c(slope,intercept.ols)))){
-    stop("Cannot fit a line through these data!")
-  }
-  RSS <- sum(residuals.ols^2)
-  sigma.squared.hat <- (1 / (length(x) - 2)) * RSS
-  se.of.reg.ols <- sqrt(sigma.squared.hat)
-  mean.x <- mean(x)
-  mean.y <- mean(y)
-  centered.x <- x - mean.x
-  centered.y <- y - mean.y
-  SS.x <- sum(centered.x^2)
-  SS.y <- sum(centered.y^2)
-  S.x <- sum(x^2)
-  SS.xy <- sum((centered.x) * (centered.y))
-  se.intercept.ols <- sqrt(sigma.squared.hat * (S.x / (length(x) * SS.x)))
-  se.slope.ols <- sqrt(sigma.squared.hat / SS.x)
-  r.squared.ols <- 1 - RSS / SS.y
-  r.squared.adjusted.ols <- r.squared.ols - (1 - r.squared.ols)*
-    (1 / (length(x)-2))
-  f.statistic.ols <- (r.squared.ols / (1- r.squared.ols)) * ((length(x)-2))
+  ols_reg <- f_ols_reg(x, y)
+  slope <- ols_reg$slope
+
 
   if (approx.solution == F) {
 
@@ -269,11 +246,11 @@ york <- function(x, y, weights.x = NULL, weights.y = NULL, tolerance = 1e-5,
 
     sol.cubic2 <- alpha.cubic + 2 * (alpha.cubic^2 - beta.cubic)^0.5 *
                         cos( 1 / 3 *(phi + 2 * pi * c(0:2)))
-    ols.range <- c(lm.ols[2] - 3 * se.slope.ols,
-                        lm.ols[2] + 3 * se.slope.ols)
-    pick.right.root <- which(sol.cubic2 >= ols.range[1] &
-                               sol.cubic2 <= ols.range[2])
-    slope <- sol.cubic2[pick.right.root]
+    ols_range <- c(ols_reg$slope - 4 * ols_reg$se_slope,
+                   ols_reg$slope + 4 * ols_reg$se_slope)
+    pick_right_root <- which(sol.cubic2 >= ols_range[1] &
+                               sol.cubic2 <= ols_range[2])
+    slope <- sol.cubic2[pick_right_root]
     if (length(slope) == 0 | length(slope) > 1) {
       stop("An approximate solution does not exist!")
     }
@@ -337,10 +314,6 @@ york <- function(x, y, weights.x = NULL, weights.y = NULL, tolerance = 1e-5,
                      nrow = 2)
   rownames(york.reg) <- c("intercept", "slope")
   colnames(york.reg) <- c("Estimate", "Std.Error")
-  ols.reg <- matrix(c(intercept.ols, lm.ols[2], se.intercept.ols, se.slope.ols),
-                    nrow = 2)
-  rownames(ols.reg) <- c("intercept", "slope")
-  colnames(ols.reg) <- c("Estimate", "Std.Error")
 
   weights.matrix <- matrix(c(weights.x, weights.y), ncol = 2)
   colnames(weights.matrix) <- c("weights of X_i", "weights of Y_i")
@@ -348,23 +321,14 @@ york <- function(x, y, weights.x = NULL, weights.y = NULL, tolerance = 1e-5,
     data <- matrix(c(x, y, sd.x, sd.y, r.xy), ncol = 5)
     colnames(data) <- c("x", "y", "sd.x", "sd.y", "r.xy")
   } else {
-    data <- list("x" = x.original, "y" = y.original, "x.errors" = x.errors,
-                 "y.errors" = y.errors, "r.xy" = r.xy, "mean.x.i" = x,
+    data <- list("x" = x.original, "y" = y.original, "x_errors" = x_errors,
+                 "y_errors" = y_errors, "r.xy" = r.xy, "mean.x.i" = x,
                  "mean.y.i" = y)
   }
   york.arguments <- list("tolerance" = tolerance, "max.iterations" = max.iterations,
                          "mult.samples" = mult.samples, "approx.solution" =
                            approx.solution)
   chisq.test.results <- list("test.result" = test.result, "p.value" = p.value)
-  ols.summary <- list("coefficients.ols" = ols.reg,
-                      "fitted.y.ols" = fitted.y.ols,
-                      "residuals.ols" = residuals.ols,
-                      "residual.sum.of.squares" = RSS,
-                      "total.sum.of.squares" = SS.y,
-                      "se.of.reg.ols" = se.of.reg.ols,
-                      "r.squared.ols" = r.squared.ols,
-                      "r.squared.adjusted.ols" = r.squared.adjusted.ols,
-                      "f.statistic.ols" = f.statistic.ols)
 
   output <- list("coefficients" = york.reg,
                  "weights" = weights.matrix,
@@ -379,7 +343,7 @@ york <- function(x, y, weights.x = NULL, weights.y = NULL, tolerance = 1e-5,
                  "Overall.significance.of.fit" = chisq.test.results,
                  "number.of.iterations" = count,
                  "slope.after.each.iteration" = slope.per.iteration,
-                 "ols.summary" = ols.summary,
+                 "ols_summary" = ols_reg[-c(1:2)],
                  "york.arguments" = york.arguments,
                  "data" = data)
   attr(output, "class") <- "york"

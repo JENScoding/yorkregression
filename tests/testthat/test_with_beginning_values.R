@@ -20,7 +20,7 @@ test_that("Test single values compared to what they were at the beginning", {
   expect_true(all(round(first$reduced.chisq, 4) == 1.4833))
   expect_true(all(round(first$Overall.significance.of.fit$p.value, 4) == 0.1573))
   expect_true(first$number.of.iterations == 4)
-  expect_true(round(first$ols.summary$r.squared.ols, 4) == 0.9535)
+  expect_true(round(first$ols_summary$r_squared_ols, 4) == 0.9535)
   expect_true(first$york.arguments[2] == 50)
   expect_true(all(round(first$data[,3], 4) == c(0.0316, 0.0316, 0.0447, 0.0354, 0.0707, 0.1118, 0.1291,
                                                 0.2236, 0.7454, 1.0000)))

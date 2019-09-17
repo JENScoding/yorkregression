@@ -78,8 +78,8 @@ york_plots <- function(york.output) {
     geom_abline(aes(slope = york.output$coefficients[2, 1],
                     intercept = york.output$coefficients[1, 1], colour = "York"),
                 key_glyph = draw_key_rect) +
-    geom_abline(aes(slope = york.output$ols.summary$coefficients.ols[2, 1],
-                    intercept = york.output$ols.summary$coefficients.ols[1, 1],
+    geom_abline(aes(slope = york.output$ols_summary$coefficients_ols[2, 1],
+                    intercept = york.output$ols_summary$coefficients_ols[1, 1],
                     colour = "OLS")) +
     geom_abline(aes(slope = orthogonal$coefficients[2, 1], intercept =
                       orthogonal$coefficients[1, 1], colour = "Orthogonal")) +

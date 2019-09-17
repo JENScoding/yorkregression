@@ -7,15 +7,15 @@ test_that("Test implementation of exact solution", {
   weights.x = c(1e+3, 1e+3, 5e+2, 8e+2, 2e+2, 8e+1, 6e+1, 2e+1, 1.8, 1)
 
   ## Test
-  expect_error(york(x, y, weights.x = weights.x, weights.y = weights.y, r.xy = 0, mult.samples = F, approx.solution = T), NA)
+  expect_error(york(x, y, weights.x = weights.x, weights.y = weights.y, r.xy = 0, approx.solution = TRUE), NA)
 
   first <- york(x, y, weights.x = 1, weights.y = 1, r.xy = 0)
   expect_equal(round(first$coefficients[2,1], 3),
                -0.546)
   second <- york(x, y, weights.x = 1e10, weights.y = 1, r.xy = 0)
   expect_equal(round(second$coefficients[2,1], 3),
-               round(second$ols.summary$coefficients.ols[2,1], 3))
-  third <- york(x, y, weights.x = weights.x, weights.y = weights.y, r.xy = 0, mult.samples = F, approx.solution = T)
+               round(second$ols_summary$coefficients_ols[2,1], 3))
+  third <- york(x, y, weights.x = weights.x, weights.y = weights.y, r.xy = 0, approx.solution = TRUE)
   expect_type(third$coefficients[2, 1], "double")
   expect_true(third$coefficients[2, 1] < -0.477 && third$coefficients[2, 1] > -0.478)
 })

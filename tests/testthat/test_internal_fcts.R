@@ -6,12 +6,12 @@ test_that("Test internal functions", {
   y2 <- data.frame(t(y))
 
   ## Test
-  expect_error(calc.var(x2), NA)
+  expect_error(f_var_row(x2), NA)
   library(stats)
-  expect_equal(calc.var(x2),
+  expect_equal(f_var_row(x2),
                var(x))
-  expect_error(calc.corr(x2, y2), NA)
-  expect_equal(calc.corr(x2, y2),
+  expect_error(f_corr_row(x2, y2), NA)
+  expect_equal(f_corr_row(x2, y2),
                cor(x, y))
 })
 
