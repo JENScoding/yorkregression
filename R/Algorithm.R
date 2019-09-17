@@ -129,100 +129,28 @@ york <- function(x, y, weights.x = NULL, weights.y = NULL, tolerance = 1e-5,
 
   if (mult.samples == FALSE) {
 
-    # rewrite input
-    # input <- rewrite(x, y, weights.x = weights.x, weights.y = weights.y,
-    #                  sd.x = sd.x, sd.y = sd.y, r.xy = r.xy)
-    # weights.x <- input$weights.x
-    # weights.y <- input$weights.x
-    # sd.x <- input$sd.x
-    # sd.y <- input$sd.y
-    # r.xy <- input$r.xy
-    if (length(weights.x) == 1) {
-      weights.x = rep(weights.x, length(x))
-    }
-    if (length(weights.y) == 1) {
-      weights.y = rep(weights.y, length(y))
-    }
-    if (length(sd.x) == 1) {
-      sd.x = rep(sd.x, length(x))
-    }
-    if (length(sd.y) == 1) {
-      sd.y = rep(sd.y, length(y))
-    }
-    if (length(r.xy) == 1) {
-      r.xy = rep(r.xy, length(x))
-    }
-    if (all(sapply(list(sd.x, sd.y, weights.x, weights.y),
-                   function(x) !is.null(x)))) {
-      stop("You can't specify weights and standard errors at the same time!")
-    }
-    if (is.null(weights.x) & is.null(weights.y)) {
-      weights.x <- 1 / sd.x^2
-      weights.y <- 1 / sd.y^2
-    }
-    if (is.null(sd.x) & is.null(sd.y)) {
-      sd.x <- 1 / sqrt(weights.x)
-      sd.y <- 1 / sqrt(weights.y)
-    }
+    # rewrite input and delete rows with NA values
+    input <- rewrite(x, y, weights.x = weights.x, weights.y = weights.y,
+                     sd.x = sd.x, sd.y = sd.y, r.xy = r.xy)
+    x <- input$x
+    y <- input$y
+    weights.x <- input$weights.x
+    weights.y <- input$weights.y
+    sd.x <- input$sd.x
+    sd.y <- input$sd.y
+    r.xy <- input$r.xy
 
-    # errors for wrongly specified input
-    error_wrong_input1(x, y, weights.x = weights.x, weights.y = weights.y,
+    # expected errors for wrongly specified input
+    exp_error_simple(x, y, weights.x = weights.x, weights.y = weights.y,
                        sd.x = sd.x, sd.y = sd.y, r.xy = r.xy)
 
+  } else { # mult.sample = TRUE
 
-    if (length(weights.x) != length(x) | length(weights.y) != length(y)) {
-      stop("weights.x and weights.y must have the same length as x and y resp.!")
-    }
-    if (length(sd.x) != length(x) | length(sd.y) != length(y)) {
-      stop("sd.x and sd.y must have the same length as x and y resp.!")
-    }
+    # expected errors for wrongly specified multiple sample input
+    exp_error_multiple(x, y, weights.x = weights.x, weights.y = weights.y,
+                       sd.x = sd.x, sd.y = sd.y, r.xy = r.xy,
+                       approx.solution = approx.solution)
 
-    # delete rows with NA values
-    to.delete  <- c(which(is.na(x)), which(is.na(y)),
-                    which(is.na(weights.x)), which(is.na(weights.y)),
-                    which(is.na(sd.x)), which(is.na(sd.y)))
-    rm.share <- length(to.delete) / length(x)
-    if (rm.share > 0.1) {
-      warning(rm.share * 100,
-              "% of the data were removed due to missing values!")
-    }
-    if (length(to.delete) > 0){
-      y <- y[-to.delete]
-      x <- x[-to.delete]
-      weights.x <- weights.x[-to.delete]
-      weights.y <- weights.y[-to.delete]
-      sd.x <- sd.x[-to.delete]
-      sd.y <- sd.y[-to.delete]
-      r.xy <- r.xy[-to.delete]
-    }
-  } else {
-
-    if (approx.solution == T) {
-      stop("There is no approximate solution in case of multiple samples!")
-    }
-    if (is.data.frame(x) == F|| is.data.frame(y) == F) {
-      stop("Inputs x and y must be of class data.frame!")
-    }
-    if (ncol(x) != ncol(y) || nrow(x) != nrow(y)) {
-      stop("x and y must have the same number of columns/ rows")
-    }
-
-    if (ncol(x) == 1 || ncol(y) == 1) {
-      stop(paste("You need more than one sample of x and y",
-                 "if you specify mult.samples = T.", sep = " "))
-    }
-    if (ncol(x) < 5) {
-      stop(paste("You need more than at least 4 samples",
-                 "of the x and y variables.", sep = " "))
-    }
-    if (ncol(x) < 10) {
-      warning(paste("You have less than 10 samples",
-                    "of the x and y variables.",
-                    "Increasing the number of samples is recommended",
-                    "in order to get accurate estimates.", sep = " "))
-    }
-
-  #  stop.mult.sample(approx.solution = approx.solution, x = x, y = y)
     mean.xi <- apply(x, 1, mean)
     mean.yi <- apply(y, 1, mean)
     x.errors<- x - mean.xi
