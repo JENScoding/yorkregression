@@ -4,6 +4,7 @@
 rewrite <- function(x, y, weights.x = NULL, weights.y = NULL,
                     sd.x = NULL, sd.y = NULL, r.xy = NULL) {
 
+  # if input was only 1 value repeat it to adjust to sample size
   if (length(weights.x) == 1) {
     weights.x = rep(weights.x, length(x))
   }
@@ -19,6 +20,8 @@ rewrite <- function(x, y, weights.x = NULL, weights.y = NULL,
   if (length(r.xy) == 1) {
     r.xy = rep(r.xy, length(x))
   }
+
+  # specify weights and standard errors
   if (all(sapply(list(sd.x, sd.y, weights.x, weights.y),
                  function(x) !is.null(x)))) {
     stop("You can't specify weights and standard errors at the same time!")
@@ -31,7 +34,29 @@ rewrite <- function(x, y, weights.x = NULL, weights.y = NULL,
     sd.x <- 1 / sqrt(weights.x)
     sd.y <- 1 / sqrt(weights.y)
   }
-  input <- list("weights.x" = weights.x,
+
+  # delete rows with NA values
+  omit_na  <- c(which(is.na(x)), which(is.na(y)),
+                  which(is.na(weights.x)), which(is.na(weights.y)),
+                  which(is.na(sd.x)), which(is.na(sd.y)))
+  if (length(omit_na) > 0){
+    y <- y[-omit_na]
+    x <- x[-omit_na]
+    weights.x <- weights.x[-omit_na]
+    weights.y <- weights.y[-omit_na]
+    sd.x <- sd.x[-omit_na]
+    sd.y <- sd.y[-omit_na]
+    r.xy <- r.xy[-omit_na]
+    omitted.share <- length(omit_na) / length(x)
+    if (omitted.share > 0.1) {
+      warning(omitted.share * 100,
+              "% of the data were removed due to missing values!")
+    }
+  }
+
+  input <- list("x" = x,
+                "y" = y,
+                "weights.x" = weights.x,
                 "weights.y" = weights.y,
                 "sd.x" = sd.x,
                 "sd.y" = sd.y,
