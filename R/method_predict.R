@@ -30,7 +30,7 @@
 #'
 #' @name predict.york
 #' @export
-predict.york <- function(york_output, newdata) {
+predict.york <- function(york_output, newdata = NULL) {
 
   if (class(york_output) != "york") {
     stop("Input must be of class york (Output of york function)")
@@ -42,7 +42,7 @@ predict.york <- function(york_output, newdata) {
     x_data <- stack(york_output$data$x)[, 1]
     y_data <- stack(york_output$data$y)[, 1]
   }
-  if (length(newdata) == 0) {
+  if (is.null(newdata)) {
     predict_y <- data.frame("x" = x_data, "predicted_y" =
                               york_output$fitted_y)
   } else {
