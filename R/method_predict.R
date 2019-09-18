@@ -26,7 +26,7 @@
 #' york_output <- york(x = x, y = y, weights_x = weights_x, weights_y = weights_y,
 #' r_xy_errors = 0)
 #' data <- c(2,3,4,3.6)
-#' york_predict(york_output = york_output, newdata = data)
+#' predict(york_output = york_output, newdata = data)
 #'
 #' @name predict.york
 #' @export
