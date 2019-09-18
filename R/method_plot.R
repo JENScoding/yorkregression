@@ -9,7 +9,7 @@
 #' "x-residuals vs. fitted-y plot". The fith plot is a "y-residuals vs.
 #' fitted y" plot and the last plot is a "trace plot" which shows the slope after
 #' each interation, i.e. how the slope coefficient converges.
-#' @param york_output An object of class "york"
+#' @param x An object of class "york"
 #' @param ... Arguments to be passed to methods.
 #'
 #' @return The plot function returns 7 different plots.
@@ -21,9 +21,9 @@
 #' weights_x <- c(1e+3, 1e+3, 5e+2, 8e+2, 2e+2, 8e+1, 6e+1, 2e+1, 1.8, 1)
 #' weights_y <- c(1, 1.8, 4, 8, 20, 20, 70, 70, 1e+2, 5e+2)
 #' r_xy_errors <- 0
-#' york_output <- york(x = x, y = y, weights_x = weights_x, weights_y = weights_y,
+#' york_fit <- york(x = x, y = y, weights_x = weights_x, weights_y = weights_y,
 #'                     r_xy_errors = 0)
-#' plot(york_output)
+#' plot(york_fit)
 #'
 #' @name plot.york
 #'
@@ -31,40 +31,44 @@
 #' draw_key_rect scale_colour_manual geom_vline geom_hline geom_smooth geom_line
 #' @importFrom utils stack
 #' @importFrom stats pnorm
+#'
 #' @method plot york
 #' @S3method plot york
-utils::globalVariables(c("x", "y"))
 
-plot.york <- function(york_output, ...) {
-  if (class(york_output) != "york") {
+plot.york <- function(x, ...) {
+  if (class(x) != "york") {
     stop("Input must be of class york (Output of york function)")
   }
 
-  # York's best fit line with data points
-  if (york_output$york_arguments$mult_samples == FALSE) {
+  # Rename x and make variable y global
+  york_fit <- x
+  y <- NULL
 
-    x_data <- york_output$data[, 1]
-    y_data <- york_output$data[, 2]
+  # York's best fit line with data points
+  if (york_fit$york_arguments$mult_samples == FALSE) {
+
+    x_data <- york_fit$data[, 1]
+    y_data <- york_fit$data[, 2]
 
     ddf <- data.frame(x = x_data, y = y_data)
-    plot_1 <- ggplot(data=ddf, aes(x = x,
+    plot_1 <- ggplot(data = ddf, aes(x = x,
                                    y = y)) +
-      geom_abline(aes(slope = york_output$coefficients[2, 1],
-                      intercept = york_output$coefficients[1, 1]), col = "red") +
+      geom_abline(aes(slope = york_fit$coefficients[2, 1],
+                      intercept = york_fit$coefficients[1, 1]), col = "red") +
       geom_point() +
       labs(title="York's best-fit straight line",
            x ="x data", y = "y data") +
       theme(plot.title =element_text(hjust = 0.5))
   } else {
 
-    x_data <- stack(york_output$data$x)[, 1]
-    y_data <- stack(york_output$data$y)[, 1]
+    x_data <- stack(york_fit$data$x)[, 1]
+    y_data <- stack(york_fit$data$y)[, 1]
 
     ddf <- data.frame(x = x_data, y = y_data)
     plot_1 <- ggplot(data = ddf, aes(x = x,
                                      y = y)) +
-      geom_abline(aes(slope = york_output$coefficients[2, 1],
-                      intercept = york_output$coefficients[1, 1]), col = "red") +
+      geom_abline(aes(slope = york_fit$coefficients[2, 1],
+                      intercept = york_fit$coefficients[1, 1]), col = "red") +
       geom_point() +
       labs(title="York's best-fit straight line",
            x ="x data", y = "y data") +
@@ -76,16 +80,16 @@ plot.york <- function(york_output, ...) {
   mean_y <- mean(y_data)
   orthogonal <- york(x = x_data, y = y_data, weights_x = 1,
                      weights_y = 1, r_xy_errors = 0,
-                     tolerance = york_output$york_arguments$tolerance,
-                     max_iterations = york_output$york_arguments$max_iterations)
+                     tolerance = york_fit$york_arguments$tolerance,
+                     max_iterations = york_fit$york_arguments$max_iterations)
   ddf2 <- data.frame(x = x_data, y = y_data)
   plot_2 <- ggplot(data = ddf2, aes(x = x,
                                     y = y)) +
-    geom_abline(aes(slope = york_output$coefficients[2, 1],
-                    intercept = york_output$coefficients[1, 1], colour = "York"),
+    geom_abline(aes(slope = york_fit$coefficients[2, 1],
+                    intercept = york_fit$coefficients[1, 1], colour = "York"),
                 key_glyph = draw_key_rect) +
-    geom_abline(aes(slope = york_output$ols_summary$coefficients_ols[2, 1],
-                    intercept = york_output$ols_summary$coefficients_ols[1, 1],
+    geom_abline(aes(slope = york_fit$ols_summary$coefficients_ols[2, 1],
+                    intercept = york_fit$ols_summary$coefficients_ols[1, 1],
                     colour = "OLS")) +
     geom_abline(aes(slope = orthogonal$coefficients[2, 1], intercept =
                       orthogonal$coefficients[1, 1], colour = "Orthogonal")) +
@@ -94,9 +98,9 @@ plot.york <- function(york_output, ...) {
     geom_point() +
     labs(title="York' best fit straight line compared to OLS and orthogonal ",
          x ="x data", y = "y data") +
-    geom_vline(xintercept = york_output$weighted_mean_x, linetype = "dashed",
+    geom_vline(xintercept = york_fit$weighted_mean_x, linetype = "dashed",
                color = "red", size = 0.4) +
-    geom_hline(yintercept = york_output$weighted_mean_y, linetype = "dashed",
+    geom_hline(yintercept = york_fit$weighted_mean_y, linetype = "dashed",
                color = "red", size = 0.4) +
     geom_vline(xintercept = mean_x,
                linetype = "dashed", color = "blue", size = 0.4) +
@@ -104,13 +108,13 @@ plot.york <- function(york_output, ...) {
                linetype= "dashed", color = "blue", size = 0.4) +
     geom_point(aes(x = mean_x,
                    y = mean_y), col = "blue") +
-    geom_point(aes(x = york_output$weighted_mean_x,
-                   y = york_output$weighted_mean_y), col = "red") +
+    geom_point(aes(x = york_fit$weighted_mean_x,
+                   y = york_fit$weighted_mean_y), col = "red") +
     theme(plot.title = element_text(hjust = 0.5))
 
   # X Y residuals plotted against each other
-  ddf3 <- data.frame(x = as.numeric(york_output$x_residuals),
-                     y = as.numeric(york_output$y_residuals))
+  ddf3 <- data.frame(x = as.numeric(york_fit$x_residuals),
+                     y = as.numeric(york_fit$y_residuals))
   plot_3 <- ggplot(aes(x = x, y = y), data = ddf3) +
     geom_point() +
     labs( title = "y residuals vs. x residuals",
@@ -120,8 +124,8 @@ plot.york <- function(york_output, ...) {
     theme(plot.title = element_text(hjust = 0.5))
 
   # x resid vs fitted y
-  ddf4 <- data.frame(x = as.numeric(york_output$fitted_y),
-                     y = as.numeric(york_output$x_residuals))
+  ddf4 <- data.frame(x = as.numeric(york_fit$fitted_y),
+                     y = as.numeric(york_fit$x_residuals))
   plot_4 <- ggplot(aes(x = x, y = y), data = ddf4) +
     geom_point() +
     labs( title = "x residuals vs. fitted y",
@@ -130,8 +134,8 @@ plot.york <- function(york_output, ...) {
     theme(plot.title = element_text(hjust = 0.5))
 
   # y resid vs fitted y
-  ddf5 <- data.frame(x = as.numeric(york_output$fitted_y),
-                     y = as.numeric(york_output$y_residuals))
+  ddf5 <- data.frame(x = as.numeric(york_fit$fitted_y),
+                     y = as.numeric(york_fit$y_residuals))
   plot_5 <- ggplot(aes(x = x, y = y), data = ddf5) +
     geom_point() +
     labs(title = "y residuals vs. fitted y",
@@ -140,40 +144,40 @@ plot.york <- function(york_output, ...) {
     theme(plot.title = element_text(hjust = 0.5))
 
   # detect outliers, assume asymptotic normality of slope coefficients
-  if (york_output$york_arguments$mult_samples == FALSE) {
+  if (york_fit$york_arguments$mult_samples == FALSE) {
     slope_outlier <- NULL
     for (i in 1:length(x_data)) {
       slope_outlier[i] <- york(x_data[-i], y_data[-i],
-                               sd_x = york_output$data[-i, 3],
-                               sd_y = york_output$data[-i, 4],
-                               r_xy_errors = york_output$data[-i, 5],
+                               sd_x = york_fit$data[-i, 3],
+                               sd_y = york_fit$data[-i, 4],
+                               r_xy_errors = york_fit$data[-i, 5],
                                tolerance =
-                                 york_output$york_arguments$tolerance,
+                                 york_fit$york_arguments$tolerance,
                                max_iterations =
-                                 york_output$york_arguments$max_iterations)[[1]][2, 1]
+                                 york_fit$york_arguments$max_iterations)[[1]][2, 1]
     }
-    detect_outlier1 <- (york_output$coefficients[2, 1] - slope_outlier) /
-      york_output$coefficients[2, 2]
+    detect_outlier1 <- (york_fit$coefficients[2, 1] - slope_outlier) /
+      york_fit$coefficients[2, 2]
     detect_outlier2 <- 2 * (1 - pnorm(abs(detect_outlier1)))
     detect_outlier3 <- which(detect_outlier2 <= 0.01)
     detect_outlier4 <- x_data[detect_outlier3]
   } else {
     # multiple samples
-    x_data <- york_output$data$x
-    y_data <- york_output$data$y
+    x_data <- york_fit$data$x
+    y_data <- york_fit$data$y
     slope_outlier <- NULL
     for (i in 1:nrow(x_data)) {
       slope_outlier[i] <- suppressWarnings(
         york(x_data[-i,], y_data[-i,],
              tolerance =
-               york_output$york_arguments$tolerance,
+               york_fit$york_arguments$tolerance,
              max_iterations =
-               york_output$york_arguments$max_iterations,
+               york_fit$york_arguments$max_iterations,
              mult_samples =
-               york_output$york_arguments$mult_samples)[[1]][2, 1])
+               york_fit$york_arguments$mult_samples)[[1]][2, 1])
     }
-    detect_outlier1 <- (york_output$coefficients[2, 1] - slope_outlier) /
-      york_output$coefficients[2, 2]
+    detect_outlier1 <- (york_fit$coefficients[2, 1] - slope_outlier) /
+      york_fit$coefficients[2, 2]
     detect_outlier2 <- 2 * (1 - pnorm(abs(detect_outlier1)))
     detect_outlier3 <- which(detect_outlier2 <= 0.01)
   }
@@ -182,8 +186,8 @@ plot.york <- function(york_output, ...) {
   # ddf6 <- data.frame(x = x_data, y = y_data)
   # plot_6 <- ggplot(aes(x = x, y = y),
   #                       data = ddf6) +
-  #   geom_abline(aes(slope = york_output$coefficients[2, 1],
-  #                   intercept = york_output$coefficients[1, 1]), col = "red") +
+  #   geom_abline(aes(slope = x$coefficients[2, 1],
+  #                   intercept = x$coefficients[1, 1]), col = "red") +
   #   geom_point() +
   #   geom_point(aes(x = detect_outlier4[1],
   #                  y = y_data[detect_outlier3][1]), col = "blue", fill = "white",
@@ -194,15 +198,15 @@ plot.york <- function(york_output, ...) {
   plot_6 <- NULL
 
   # Trace plot -> Convergence of slope
-  if (york_output$york_arguments$approx_solution == FALSE) {
-    ddf7 <- data.frame(x = 1:york_output$n_iterations,
-                       y = york_output$slope_per_iteration[,1])
+  if (york_fit$york_arguments$approx_solution == FALSE) {
+    ddf7 <- data.frame(x = 1:york_fit$n_iterations,
+                       y = york_fit$slope_per_iteration[,1])
     plot_7 <- ggplot(aes(x = x, y = y), data = ddf7)+
       geom_line() +
       geom_point() +
       labs(title = "Trace plot",
            x = "Number of iterations", y = "slope coefficient") +
-      geom_hline(yintercept = york_output$coefficients[2,1], col = "darkblue") +
+      geom_hline(yintercept = york_fit$coefficients[2,1], col = "darkblue") +
       theme(plot.title = element_text(hjust = 0.5))
   } else {
     plot_7 <- NULL
