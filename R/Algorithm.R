@@ -130,8 +130,8 @@ york <- function(x, y, weights_x = NULL, weights_y = NULL, tolerance = 1e-5,
   if (mult_samples == FALSE) {
 
     # rewrite input and delete rows with NA values
-    input <- f_rewrite(x, y, weights_x = weights_x, weights_y = weights_y,
-                     sd_x = sd_x, sd_y = sd_y, r_xy_errors = r_xy_errors)
+    input <- f_rewrite(x, y, weights_x, weights_y,
+                       sd_x, sd_y, r_xy_errors)
     x <- input$x
     y <- input$y
     weights_x <- input$weights_x
@@ -139,28 +139,36 @@ york <- function(x, y, weights_x = NULL, weights_y = NULL, tolerance = 1e-5,
     sd_x <- input$sd_x
     sd_y <- input$sd_y
     r_xy_errors <- input$r_xy_errors
+    x_original <- NULL
+    y_original <- NULL
+    x_errors <- NULL
+    y_errors <- NULL
+    mean_x_i <- NULL
+    mean_y_i <- NULL
+
 
     # expected errors for wrongly specified input
-    exp_error_simple(x, y, weights_x = weights_x, weights_y = weights_y,
-                       sd_x = sd_x, sd_y = sd_y, r_xy_errors = r_xy_errors)
+    exp_error_simple(x, y, weights_x, weights_y,
+                       sd_x, sd_y, r_xy_errors)
 
   } else { # mult_samples = TRUE
 
     # expected errors for wrongly specified multiple sample input
-    exp_error_multiple(x, y, weights_x = weights_x, weights_y = weights_y,
-                       sd_x = sd_x, sd_y = sd_y, r_xy_errors = r_xy_errors,
-                       approx_solution = approx_solution)
+    exp_error_multiple(x, y, weights_x, weights_y,
+                       sd_x, sd_y, r_xy_errors, approx_solution)
 
     # Define errors, error correlation and weights in multiple sample case
-    mean.xi <- apply(x, 1, mean)
-    mean.yi <- apply(y, 1, mean)
-    x_errors<- x - mean.xi
-    y_errors <- y - mean.yi
+    mean_x_i <- apply(x, 1, mean)
+    mean_y_i <- apply(y, 1, mean)
+    x_errors<- x - mean_x_i
+    y_errors <- y - mean_y_i
     for (i in 1:nrow(x_errors)) {
       r_xy_errors[i] <- f_corr_row(x_errors[i, ],
                            y_errors[i, ])
-      weights_x[i] <- 1 / f_var_row(x[i, ])
-      weights_y[i] <- 1 / f_var_row(y[i, ])
+      sd_x[i] <- f_var_row(x[i, ])
+      sd_y[i] <- f_var_row(y[i, ])
+      weights_x[i] <- 1 / sd_x[i]
+      weights_y[i] <- 1 / sd_y[i]
     }
     x_original <- x
     y_original <- y
@@ -197,19 +205,17 @@ york <- function(x, y, weights_x = NULL, weights_y = NULL, tolerance = 1e-5,
                           (slope * x_centered + y_centered) * r_xy_errors / alpha)
       Q1 <- sum(Weight * beta * y_centered)
       Q2 <- sum(Weight * beta * x_centered)
+
+      ### the slope
       slope <- Q1 / Q2
+
+      # save values and start if slope_diff < tolerance next iteration
       slope_diff <- abs(slope - slope_old)
       count <- count + 1
       slope_per_iteration <- append(slope_per_iteration, slope)
-      if (count == max_iterations) {
-        stop("\nThe slope coefficient does not converge after ",
-             count, paste(" iterations. \nHint: You may reduce the tolerance level",
-             "or increase the maximum number of iterations.", sep = " "),
-             cat("Slope coefficient for last 5 iterations:"),
-             for (i in 4:0){
-               cat("\n\t", count - i, "\t", slope_per_iteration[count - i])},
-             cat("\n"))
-      }
+
+      # error if it does not converge
+      exp_error_convergence(count, max_iterations, slope_per_iteration)
     }
 
   } else { # approx_solution = TRUE
@@ -269,43 +275,29 @@ york <- function(x, y, weights_x = NULL, weights_y = NULL, tolerance = 1e-5,
                     (weights_x - slope * c)) / (weights_y * weights_x)
 
   # define output
-  york_reg <- matrix(c(intercept, slope, sigma_intercept, sigma_slope),
-                     nrow = 2)
-  rownames(york_reg) <- c("intercept", "slope")
-  colnames(york_reg) <- c("Estimate", "Std_Error")
+  def_output <- f_define_output(intercept, slope, sigma_intercept, sigma_slope,
+                                weights_x, weights_y, mult_samples, x, y, sd_x,
+                                sd_y, r_xy_errors, x_original, y_original,
+                                x_errors, y_errors, mean_x_i, mean_y_i,
+                                slope_per_iteration, tolerance, max_iterations,
+                                approx_solution, S, chisq_df, p_value,
+                                test_result)
 
-  weights_matrix <- matrix(c(weights_x, weights_y), ncol = 2)
-  colnames(weights_matrix) <- c("weights of x", "weights of y")
-  if (mult_samples == FALSE) {
-    data <- matrix(c(x, y, sd_x, sd_y, r_xy_errors), ncol = 5)
-    colnames(data) <- c("x", "y", "sd_x", "sd_y", "r_xy_errors")
-  } else {
-    data <- list("x" = x_original, "y" = y_original, "x_errors" = x_errors,
-                 "y_errors" = y_errors, "r_xy_errors" = r_xy_errors, "mean_x_i" = x,
-                 "mean_y_i" = y)
-  }
-  slope_per_iteration <- data.frame("slope" = slope_per_iteration)
-  york_arguments <- list("tolerance" = tolerance, "max_iterations" = max_iterations,
-                         "mult_samples" = mult_samples, "approx_solution" =
-                           approx_solution)
-  chisq_test_results <- list("chisq_statistic" = S, "chisq_df" = chisq_df,
-                             "p_value" = p_value, "test_result" = test_result)
-
-  output <- list("coefficients" = york_reg,
-                 "weights" = weights_matrix,
+  output <- list("coefficients" = def_output$york_reg,
+                 "weights" = def_output$weights_matrix,
                  "x_residuals" = x_residuals,
                  "y_residuals" = y_residuals,
-                 "fitted_y" =fitted_y,
+                 "fitted_y" = fitted_y,
                  "weighted_mean_x" = x_bar,
                  "weighted_mean_y" = y_bar ,
                  "reduced_chisq" = reduced_chisq,
                  "se_chisq" = sigma_chisq,
-                 "goodness_of_fit" = chisq_test_results,
+                 "goodness_of_fit" = def_output$chisq_test_results,
                  "n_iterations" = count,
-                 "slope_per_iteration" = slope_per_iteration,
+                 "slope_per_iteration" = def_output$slope_per_iteration,
                  "ols_summary" = ols_reg[-c(1:2)],
-                 "york_arguments" = york_arguments,
-                 "data" = data)
+                 "york_arguments" = def_output$york_arguments,
+                 "data" = def_output$data)
   attr(output, "class") <- "york"
 
   return(output)

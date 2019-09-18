@@ -30,6 +30,10 @@ exp_error_multiple <- function(x, y, weights_x = NULL, weights_y = NULL,
                                approx_solution = FALSE) {
 
   # Specify all wrong inputs if mult.sample = FALSE
+  if (is.null(c(sd_x, sd_y, weights_x, weights_y)) == FALSE) {
+    stop(paste("Standard errors and weights cannot be specified",
+               "in multiple sample case!", sep = " "))
+  }
   if (approx_solution == TRUE) {
     stop("There is no approximate solution in case of multiple samples!")
   }
@@ -53,5 +57,24 @@ exp_error_multiple <- function(x, y, weights_x = NULL, weights_y = NULL,
                   "of the x and y variables.",
                   "Increasing the number of samples is recommended",
                   "in order to get accurate estimates.", sep = " "))
+  }
+}
+
+# expected error when slope does not converge
+exp_error_convergence <- function(count, max_iterations, slope_per_iteration) {
+
+  if (count <= 3) {
+    last <- count - 1
+  } else {
+    last <- 4
+  }
+  if (count == max_iterations) {
+    stop("\nThe slope coefficient does not converge after ",
+         count, paste(" iterations. \nHint: You may reduce the tolerance level",
+                      "or increase the maximum number of iterations.", sep = " "),
+         cat("Slope coefficient for the last", last + 1, "iterations:"),
+         for (i in last:0){
+           cat("\n\t", count - i, "\t", slope_per_iteration[count - i])},
+         cat("\n"))
   }
 }

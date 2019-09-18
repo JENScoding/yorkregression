@@ -189,3 +189,48 @@ f_cubic_root <- function(x, y, weights_x, weights_y, r_xy, slope_ols, se_slope_o
 
   return(cubic_root)
 }
+
+
+f_define_output <- function(intercept, slope, sigma_intercept, sigma_slope,
+                            weights_x, weights_y, mult_samples, x, y, sd_x,
+                            sd_y, r_xy_errors, x_original, y_original,
+                            x_errors, y_errors, mean_x_i, mean_y_i,
+                            slope_per_iteration, tolerance, max_iterations,
+                            approx_solution, S, chisq_df, p_value,
+                            test_result) {
+  york_reg <- matrix(c(intercept, slope, sigma_intercept, sigma_slope),
+                     nrow = 2)
+  rownames(york_reg) <- c("intercept", "slope")
+  colnames(york_reg) <- c("Estimate", "Std_Error")
+
+  weights_matrix <- matrix(c(weights_x, weights_y), ncol = 2)
+  colnames(weights_matrix) <- c("weights of x", "weights of y")
+
+  slope_per_iteration <- data.frame("slope" = slope_per_iteration)
+  york_arguments <- list("tolerance" = tolerance, "max_iterations" = max_iterations,
+                         "mult_samples" = mult_samples, "approx_solution" =
+                           approx_solution)
+  chisq_test_results <- list("chisq_statistic" = S, "chisq_df" = chisq_df,
+                             "p_value" = p_value, "test_result" = test_result)
+
+  if (mult_samples == FALSE) {
+    data <- matrix(c(x, y, sd_x, sd_y, r_xy_errors), ncol = 5)
+    colnames(data) <- c("x", "y", "sd_x", "sd_y", "r_xy_errors")
+  } else {
+    data <- list("x" = x_original, "y" = y_original, "sd_x" = sd_x,
+                 "sd_y" = sd_y, "r_xy_errors" = r_xy_errors, "x_errors" = x_errors,
+                 "y_errors" = y_errors, "mean_x_i" = mean_x_i,
+                 "mean_y_i" = mean_y_i)
+  }
+
+  output <- list("york_reg" = york_reg,
+                 "weights_matrix" = weights_matrix,
+                 "slope_per_iteration" = slope_per_iteration,
+                 "york_arguments" = york_arguments,
+                 "chisq_test_results" = chisq_test_results,
+                 "data" = data)
+
+  return(output)
+}
+
+
