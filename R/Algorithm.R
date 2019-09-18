@@ -17,24 +17,24 @@
 #' @param y A 1 times n numeric row vector or a dataframe of the \code{Y}-variable
 #' @param tolerance The tolerance for convergence of the slope coefficent.
 #' It is set a priori to \code{1e-5}
-#'@param max.iterations The maximum number of iterations for convergence.
+#'@param max_iterations The maximum number of iterations for convergence.
 #'   Default is \code{50}.
-#' @param weights.x The prespecified 1 times n weights vector for
+#' @param weights_x The prespecified 1 times n weights vector for
 #'   \code{X}-values
-#' @param weights.y The prespecified 1 times n weights vector for
+#' @param weights_y The prespecified 1 times n weights vector for
 #'   \code{Y}-values
-#' @param sd.x The standard error of the \code{X}-values
-#' @param sd.y The standard error of the \code{Y}-values
-#' @param r.xy The prespecified correlation coefficient between the errors in
+#' @param sd_x The standard error of the \code{X}-values
+#' @param sd_y The standard error of the \code{Y}-values
+#' @param r_xy_errors The prespecified correlation coefficient between the errors in
 #'   \code{X} and \code{Y}
-#' @param mult.samples An indicator if the multiple samples option is turned on
+#' @param mult_samples An indicator if the multiple samples option is turned on
 #' or not. The standard value is \code{FALSE}
-#' @param approx.solution An indicator if the approximate solution option is turned on
+#' @param approx_solution An indicator if the approximate solution option is turned on
 #' or not. The standard value is \code{FALSE}
 #' @return York Returns an object of class "york" the York regression for the
-#'   \code{x} and \code{y} data for either specified weights \code{weights.x}
-#'   and \code{weights.y} or specified standard errors \code{sd.x} and
-#'   \code{sd.y} An object of class "york" containing the following components:
+#'   \code{x} and \code{y} data for either specified weights \code{weights_x}
+#'   and \code{weights_y} or specified standard errors \code{sd_x} and
+#'   \code{sd_y} An object of class "york" containing the following components:
 #'
 #'   \describe{
 #'
@@ -48,22 +48,22 @@
 #'   for the intercept and slope with the respective standard errors}
 #'   \item{weights}{a matrix representation of the prespecified or calculated
 #'   weights for the X- and Y-observations}
-#'   \item{x.residuals}{a vector of the
+#'   \item{x_residuals}{a vector of the
 #'   York X-residuals}
-#'   \item{y.residuals}{a vector of the York Y-residuals}
-#'   \item{fitted.y}{a vector of the fitted York Y-values}
-#'   \item{df.regression}{the number of degrees of freedom
+#'   \item{y_residuals}{a vector of the York Y-residuals}
+#'   \item{fitted_y}{a vector of the fitted York Y-values}
+#'   \item{df_regression}{the number of degrees of freedom
 #'   (See \url{https://en.wikipedia.org/wiki/Degrees_of_freedom_(statistics)})
 #'   of York's regression}
-#'   \item{weighted.mean.x}{the weighted.mean of X}
-#'   \item{weighted.mean.y}{the weighted.mean of Y}
-#'   \item{reduced.chisq}{the reduced chi-squared statistic
+#'   \item{weighted_mean_x}{the weighted.mean of X}
+#'   \item{weighted_mean_y}{the weighted.mean of Y}
+#'   \item{reduced_chisq}{the reduced chi-squared statistic
 #'   (See \url{https://en.wikipedia.org/wiki/Reduced_chi-squared_statistic}),
 #'   i.e. the goodness of fit measure of York's regression}
-#'   \item{std.error.chisq}{the standard error of the chi-squared statistic}
-#'   \item{number.of.iterations}{the total number of iterations}
-#'   \item{slope.after.each.iteration}{the York slope after each iteration}
-#'   \item{fitted.y.ols}{the fitted values for OLS}
+#'   \item{se_chisq}{the standard error of the chi-squared statistic}
+#'   \item{n_iterations}{the total number of iterations}
+#'   \item{slope_per_iteration}{the York slope after each iteration}
+#'   \item{fitted_y.ols}{the fitted values for OLS}
 #'   \item{residuals.ols}{the OLS residuals}
 #'   \item{residual.sum.of.squares}{the residual sum of squares (RSS) of OLS}
 #'   \item{total.sum.of.squares}{the total sum of squares of OLS}
@@ -71,10 +71,10 @@
 #'   \item{r.squared.ols}{the R squared of the OLS regression}
 #'   \item{r.squared.adjusted.ols}{the adjusted R squared of OLS}
 #'   \item{f.statistic.ols}{the F statistic of OLS}
-#'   \item{fitted.y.orthogonal}{the fitted values for orthogonal regression (See
+#'   \item{fitted_y.orthogonal}{the fitted values for orthogonal regression (See
 #'   \url{https://en.wikipedia.org/wiki/Deming_regression})}
 #'   \item{data}{a data matrix which contains as columns the observed points
-#'   X-, Y-, sd.X- and sd.Y-values}}
+#'   X-, Y-, sd_x- and sd_y-values}}
 #'
 #' @references Wehr, Richard, and Scott R. Saleska. "The long-solved problem of
 #' the best-fit straight line: Application to isotopic mixing lines."
@@ -94,62 +94,62 @@
 #' # Example: York's regression with weight data taken from Pearson (1901):
 #' x <- c(0.0, 0.9, 1.8, 2.6, 3.3, 4.4, 5.2, 6.1, 6.5, 7.4)
 #' y <- c(5.9, 5.4, 4.4, 4.6, 3.5, 3.7, 2.8, 2.8, 2.4, 1.5)
-#' weights.x <- c(1e+3, 1e+3, 5e+2, 8e+2, 2e+2, 8e+1, 6e+1, 2e+1, 1.8, 1)
-#' weights.y <- c(1, 1.8, 4, 8, 20, 20, 70, 70, 1e+2, 5e+2)
-#' r.xy <- 0
-#' york(x = x, y = y, tolerance = 1e-10, weights.x = weights.x,
-#' weights.y = weights.y, r.xy = r.xy)
+#' weights_x <- c(1e+3, 1e+3, 5e+2, 8e+2, 2e+2, 8e+1, 6e+1, 2e+1, 1.8, 1)
+#' weights_y <- c(1, 1.8, 4, 8, 20, 20, 70, 70, 1e+2, 5e+2)
+#' r_xy_errors <- 0
+#' york(x = x, y = y, tolerance = 1e-10, weights_x = weights_x,
+#' weights_y = weights_y, r_xy_errors = r_xy_errors)
 #'
-#' # Example: York's regression arbitrary values for sd.x and sd.y:
+#' # Example: York's regression arbitrary values for sd_x and sd_y:
 #' x <- c(0.0, 0.9, 1.8, 2.6, 3.3, 4.4, 5.2, 6.1, 6.5, 7.4)
 #' y <- c(5.9, 5.4, 4.4, 4.6, 3.5, 3.7, 2.8, 2.8, 2.4, 1.5)
-#' sd.x <- 0.2
-#' sd.y <- 0.4
-#' r.xy <- 0.3
-#' york(x = x, y = y, tolerance = 1e-10, sd.x = sd.x,
-#' sd.y = sd.y, r.xy = r.xy)
+#' sd_x <- 0.2
+#' sd_y <- 0.4
+#' r_xy_errors <- 0.3
+#' york(x = x, y = y, tolerance = 1e-10, sd_x = sd_x,
+#' sd_y = sd_y, r_xy_errors = r_xy_errors)
 #'
 #' \dontrun{
 #' # Example: No standard errors or weights specified
-#' york(x, y, r.xy = 0)
+#' york(x, y, r_xy_errors = 0)
 #' # Example: You can't specify weights and standard errors at the same time
-#' york(x , y, sd.x, sd.y, weights.x, weights.y, r.xy = 0)
+#' york(x , y, sd_x, sd_y, weights_x, weights_y, r_xy_errors = 0)
 #' # Example: x and y must have same length
 #' york(x = c(0.0, 0.9, 1.8, 2.6, 3.3, 4.4, 5.2, 6.1, 6.5),
 #' y = c(5.9, 5.4, 4.4, 4.6, 3.5, 3.7, 2.8, 2.8, 2.4, 1.5),
-#' weights.x = weights.x, weights.y = weights.y,  r.xy = 0)
+#' weights_x = weights_x, weights_y = weights_y,  r_xy_errors = 0)
 #' }
 #' @name york
 #' @export
 #' @importFrom stats pchisq
 #' @importFrom utils stack
-york <- function(x, y, weights.x = NULL, weights.y = NULL, tolerance = 1e-5,
-                 max.iterations = 50, sd.x = NULL, sd.y = NULL, r.xy = NULL,
-                 mult.samples = FALSE, approx.solution = FALSE) {
+york <- function(x, y, weights_x = NULL, weights_y = NULL, tolerance = 1e-5,
+                 max_iterations = 50, sd_x = NULL, sd_y = NULL, r_xy_errors = NULL,
+                 mult_samples = FALSE, approx_solution = FALSE) {
 
-  if (mult.samples == FALSE) {
+  if (mult_samples == FALSE) {
 
     # rewrite input and delete rows with NA values
-    input <- f_rewrite(x, y, weights.x = weights.x, weights.y = weights.y,
-                     sd.x = sd.x, sd.y = sd.y, r.xy = r.xy)
+    input <- f_rewrite(x, y, weights_x = weights_x, weights_y = weights_y,
+                     sd_x = sd_x, sd_y = sd_y, r_xy_errors = r_xy_errors)
     x <- input$x
     y <- input$y
-    weights.x <- input$weights.x
-    weights.y <- input$weights.y
-    sd.x <- input$sd.x
-    sd.y <- input$sd.y
-    r.xy <- input$r.xy
+    weights_x <- input$weights_x
+    weights_y <- input$weights_y
+    sd_x <- input$sd_x
+    sd_y <- input$sd_y
+    r_xy_errors <- input$r_xy_errors
 
     # expected errors for wrongly specified input
-    exp_error_simple(x, y, weights.x = weights.x, weights.y = weights.y,
-                       sd.x = sd.x, sd.y = sd.y, r.xy = r.xy)
+    exp_error_simple(x, y, weights_x = weights_x, weights_y = weights_y,
+                       sd_x = sd_x, sd_y = sd_y, r_xy_errors = r_xy_errors)
 
-  } else { # mult.sample = TRUE
+  } else { # mult_samples = TRUE
 
     # expected errors for wrongly specified multiple sample input
-    exp_error_multiple(x, y, weights.x = weights.x, weights.y = weights.y,
-                       sd.x = sd.x, sd.y = sd.y, r.xy = r.xy,
-                       approx.solution = approx.solution)
+    exp_error_multiple(x, y, weights_x = weights_x, weights_y = weights_y,
+                       sd_x = sd_x, sd_y = sd_y, r_xy_errors = r_xy_errors,
+                       approx_solution = approx_solution)
 
     # Define errors, error correlation and weights in multiple sample case
     mean.xi <- apply(x, 1, mean)
@@ -157,10 +157,10 @@ york <- function(x, y, weights.x = NULL, weights.y = NULL, tolerance = 1e-5,
     x_errors<- x - mean.xi
     y_errors <- y - mean.yi
     for (i in 1:nrow(x_errors)) {
-      r.xy[i] <- f_corr_row(x_errors[i, ],
+      r_xy_errors[i] <- f_corr_row(x_errors[i, ],
                            y_errors[i, ])
-      weights.x[i] <- 1 / f_var_row(x[i, ])
-      weights.y[i] <- 1 / f_var_row(y[i, ])
+      weights_x[i] <- 1 / f_var_row(x[i, ])
+      weights_y[i] <- 1 / f_var_row(y[i, ])
     }
     x_original <- x
     y_original <- y
@@ -173,18 +173,18 @@ york <- function(x, y, weights.x = NULL, weights.y = NULL, tolerance = 1e-5,
   slope <- ols_reg$slope
 
 
-  if (approx.solution == FALSE) {
+  if (approx_solution == FALSE) {
 
     # algorithm to find york slope
     slope_diff <- 10
     count <- 0
     slope_per_iteration <- NULL
-    alpha <- sqrt(weights.x * weights.y)
+    alpha <- sqrt(weights_x * weights_y)
     while (slope_diff > tolerance) {
       slope_old <- slope
-      Weight <- alpha^2 / (slope^2 * weights.y + weights.x -
-                             2 * slope * r.xy * alpha)
-      if (mult.samples == TRUE) {
+      Weight <- alpha^2 / (slope^2 * weights_y + weights_x -
+                             2 * slope * r_xy_errors * alpha)
+      if (mult_samples == TRUE) {
         Weight <- rep(Weight, each = ncol(x_original))
       }
       Weight_sum <- sum(Weight)
@@ -192,16 +192,16 @@ york <- function(x, y, weights.x = NULL, weights.y = NULL, tolerance = 1e-5,
       y_bar <- sum(Weight * y) / Weight_sum
       x_centered <- x - x_bar
       y_centered <- y - y_bar
-      beta <- Weight * ((x_centered / weights.y) + (slope * y_centered /
-                                                      weights.x) -
-                          (slope * x_centered + y_centered) * r.xy / alpha)
+      beta <- Weight * ((x_centered / weights_y) + (slope * y_centered /
+                                                      weights_x) -
+                          (slope * x_centered + y_centered) * r_xy_errors / alpha)
       Q1 <- sum(Weight * beta * y_centered)
       Q2 <- sum(Weight * beta * x_centered)
       slope <- Q1 / Q2
       slope_diff <- abs(slope - slope_old)
       count <- count + 1
       slope_per_iteration <- append(slope_per_iteration, slope)
-      if (count > max.iterations) {
+      if (count == max_iterations) {
         stop("\nThe slope coefficient does not converge after ",
              count, paste(" iterations. \nHint: You may reduce the tolerance level",
              "or increase the maximum number of iterations.", sep = " "),
@@ -212,16 +212,17 @@ york <- function(x, y, weights.x = NULL, weights.y = NULL, tolerance = 1e-5,
       }
     }
 
-  } else { # approx.solution = TRUE
+  } else { # approx_solution = TRUE
 
-    # solve cubic problem and use estimate as approximation
-    approx <- f_cubic_root(x, y, weights.x, weights.y,
-                                           r.xy, slope, ols_reg$se_slope)
+    # solve cubic problem and use estimates as approximation
+    approx <- f_cubic_root(x, y, weights_x, weights_y,
+                                           r_xy_errors, slope, ols_reg$se_slope)
     slope <- approx$slope
     Weight <- approx$Weight
     Weight_sum <- approx$Weight_sum
     x_bar <- approx$x_bar
     y_bar <- approx$y_bar
+    alpha <- approx$alpha
     beta <- approx$beta
     count <- 0
     slope_per_iteration <- slope
@@ -237,12 +238,12 @@ york <- function(x, y, weights.x = NULL, weights.y = NULL, tolerance = 1e-5,
   sigma_slope <- sqrt(1 / sum(Weight * u^2))
   sigma_intercept <- sqrt(x_mean^2 * sigma_slope^2 + 1 / Weight_sum)
 
-  # Goodness of fit + Test (H0: S <= df)
+  # Goodness of fit + Test (H0: S <= chisq_df)
   S <- sum(Weight * (y - slope * x - intercept)^2)
   chisq_df <- (length(x) - 2)
   reduced_chisq <- S / chisq_df
   sigma_chisq <- sqrt(2 / chisq_df)
-  if (mult.samples == FALSE) {
+  if (mult_samples == FALSE) {
     p_value <- 1 - pchisq(S, df = chisq_df)
     test_result <- if (p_value > 0.1 ) {
       "The assumption of a good fit cannot be rejected."
@@ -261,18 +262,19 @@ york <- function(x, y, weights.x = NULL, weights.y = NULL, tolerance = 1e-5,
     test_result <- "No test results for multiple sample case."
   }
 
+  # degrees of freedom of regression
   df_regression <- 2 * (length(x) - 1)
 
   # fitted values
   fitted_y <- intercept + slope * x
 
   # residuals
-  c <- r.xy * alpha
+  c <- r_xy_errors * alpha
   x_residuals <- (Weight * (intercept + slope * x - y)
-                  * (c - slope * weights.y)) /
-    (weights.y * weights.x)
+                  * (c - slope * weights_y)) /
+    (weights_y * weights_x)
   y_residuals <- (Weight * (intercept + slope * x - y) *
-                    (weights.x - slope * c)) / (weights.y * weights.x)
+                    (weights_x - slope * c)) / (weights_y * weights_x)
 
   # define output
   york_reg <- matrix(c(intercept, slope, sigma_intercept, sigma_slope),
@@ -280,37 +282,37 @@ york <- function(x, y, weights.x = NULL, weights.y = NULL, tolerance = 1e-5,
   rownames(york_reg) <- c("intercept", "slope")
   colnames(york_reg) <- c("Estimate", "Std_Error")
 
-  weights_matrix <- matrix(c(weights.x, weights.y), ncol = 2)
+  weights_matrix <- matrix(c(weights_x, weights_y), ncol = 2)
   colnames(weights_matrix) <- c("weights of x", "weights of y")
-  if (mult.samples == FALSE) {
-    data <- matrix(c(x, y, sd.x, sd.y, r.xy), ncol = 5)
-    colnames(data) <- c("x", "y", "sd.x", "sd.y", "r.xy")
+  if (mult_samples == FALSE) {
+    data <- matrix(c(x, y, sd_x, sd_y, r_xy_errors), ncol = 5)
+    colnames(data) <- c("x", "y", "sd_x", "sd_y", "r_xy_errors")
   } else {
     data <- list("x" = x_original, "y" = y_original, "x_errors" = x_errors,
-                 "y_errors" = y_errors, "r.xy" = r.xy, "mean.x.i" = x,
-                 "mean.y.i" = y)
+                 "y_errors" = y_errors, "r_xy_errors" = r_xy_errors, "mean_x_i" = x,
+                 "mean_y_i" = y)
   }
   slope_per_iteration <- data.frame("slope" = slope_per_iteration)
-  york_arguments <- list("tolerance" = tolerance, "max.iterations" = max.iterations,
-                         "mult.samples" = mult.samples, "approx.solution" =
-                           approx.solution)
-  chisq_test_results <- list("test.result" = test_result, "p.value" = p_value)
+  york_arguments <- list("tolerance" = tolerance, "max_iterations" = max_iterations,
+                         "mult_samples" = mult_samples, "approx_solution" =
+                           approx_solution)
+  chisq_test_results <- list("test_result" = test_result, "p_value" = p_value)
 
   output <- list("coefficients" = york_reg,
                  "weights" = weights_matrix,
-                 "x.residuals" = x_residuals,
-                 "y.residuals"= y_residuals,
-                 "fitted.y"=fitted_y,
-                 "df.regression" = df_regression,
-                 "weighted.mean.x" = x_bar,
-                 "weighted.mean.y" = y_bar ,
-                 "reduced.chisq" = reduced_chisq,
-                 "std.error.chisq" = sigma_chisq,
-                 "Overall.significance.of.fit" = chisq_test_results,
-                 "number.of.iterations" = count,
-                 "slope.after.each.iteration" = slope_per_iteration,
+                 "x_residuals" = x_residuals,
+                 "y_residuals" = y_residuals,
+                 "fitted_y" =fitted_y,
+                 "df_regression" = df_regression,
+                 "weighted_mean_x" = x_bar,
+                 "weighted_mean_y" = y_bar ,
+                 "reduced_chisq" = reduced_chisq,
+                 "se_chisq" = sigma_chisq,
+                 "Overall_significance_of_fit" = chisq_test_results,
+                 "n_iterations" = count,
+                 "slope_per_iteration" = slope_per_iteration,
                  "ols_summary" = ols_reg[-c(1:2)],
-                 "york.arguments" = york_arguments,
+                 "york_arguments" = york_arguments,
                  "data" = data)
   attr(output, "class") <- "york"
 

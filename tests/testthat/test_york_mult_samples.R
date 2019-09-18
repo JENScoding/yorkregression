@@ -19,26 +19,26 @@ test_that("Test implementation in the multi sample case", {
 
   ## test
 
-  expect_error(york(x, y, mult.samples = T), NA)
+  expect_error(york(x, y, mult_samples = TRUE), NA)
 
-  first <- york(x, y, mult.samples = T)
+  first <- york(x, y, mult_samples = TRUE)
   expect_type(first$coefficients[2, 1], "double")
   expect_true(first$coefficients[2, 1] < -0.4 && first$coefficients[2, 1] > -0.6)
 
-  expect_error(york(x, y, mult.samples = T, exact.solution = T))
+  expect_error(york(x, y, mult_samples = TRUE, exact_solution = TRUE))
 
   ## only 5 samples
   x <- x[,-c(1:7)]
   y <- y[,-c(1:7)]
 
   ## test
-  expect_warning(york(x, y, mult.samples = T))
+  expect_warning(york(x, y, mult_samples = TRUE))
 
   ## only 4 samples
   x <- x[,-1]
   y <- y[,-1]
 
   ## test
-  expect_error(york(x, y, mult.samples = T))
+  expect_error(york(x, y, mult_samples = TRUE))
 })
 

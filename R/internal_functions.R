@@ -2,53 +2,54 @@
 #'
 
 # Make data suitable for Algorithm
-f_rewrite <- function(x, y, weights.x = NULL, weights.y = NULL,
-                    sd.x = NULL, sd.y = NULL, r.xy = NULL) {
+f_rewrite <- function(x, y, weights_x = NULL, weights_y = NULL,
+                    sd_x = NULL, sd_y = NULL, r_xy_errors = NULL) {
 
   # if input was only 1 value repeat it to adjust to sample size
-  if (length(weights.x) == 1) {
-    weights.x = rep(weights.x, length(x))
+  if (length(weights_x) == 1) {
+    weights_x = rep(weights_x, length(x))
   }
-  if (length(weights.y) == 1) {
-    weights.y = rep(weights.y, length(y))
+  if (length(weights_y) == 1) {
+    weights_y = rep(weights_y, length(y))
   }
-  if (length(sd.x) == 1) {
-    sd.x = rep(sd.x, length(x))
+  if (length(sd_x) == 1) {
+    sd_x = rep(sd_x, length(x))
   }
-  if (length(sd.y) == 1) {
-    sd.y = rep(sd.y, length(y))
+  if (length(sd_y) == 1) {
+    sd_y = rep(sd_y, length(y))
   }
-  if (length(r.xy) == 1) {
-    r.xy = rep(r.xy, length(x))
+  if (length(r_xy_errors) == 1) {
+    r_xy_errors = rep(r_xy_errors, length(x))
   }
 
   # specify weights and standard errors
-  if (all(sapply(list(sd.x, sd.y, weights.x, weights.y),
+  if (all(sapply(list(sd_x, sd_y, weights_x, weights_y),
                  function(x) !is.null(x)))) {
     stop("You can't specify weights and standard errors at the same time!")
   }
-  if (is.null(weights.x) & is.null(weights.y)) {
-    weights.x <- 1 / sd.x^2
-    weights.y <- 1 / sd.y^2
+  if (is.null(weights_x) & is.null(weights_y)) {
+    weights_x <- 1 / sd_x^2
+    weights_y <- 1 / sd_y^2
   }
-  if (is.null(sd.x) & is.null(sd.y)) {
-    sd.x <- 1 / sqrt(weights.x)
-    sd.y <- 1 / sqrt(weights.y)
+  if (is.null(sd_x) & is.null(sd_y)) {
+    sd_x <- 1 / sqrt(weights_x)
+    sd_y <- 1 / sqrt(weights_y)
   }
 
   # delete rows with NA values
   omit_na  <- c(which(is.na(x)), which(is.na(y)),
-                  which(is.na(weights.x)), which(is.na(weights.y)),
-                  which(is.na(sd.x)), which(is.na(sd.y)))
+                  which(is.na(weights_x)), which(is.na(weights_y)),
+                  which(is.na(sd_x)), which(is.na(sd_y)))
   if (length(omit_na) > 0){
+    x_original <- x
     y <- y[-omit_na]
     x <- x[-omit_na]
-    weights.x <- weights.x[-omit_na]
-    weights.y <- weights.y[-omit_na]
-    sd.x <- sd.x[-omit_na]
-    sd.y <- sd.y[-omit_na]
-    r.xy <- r.xy[-omit_na]
-    omitted.share <- length(omit_na) / length(x)
+    weights_x <- weights_x[-omit_na]
+    weights_y <- weights_y[-omit_na]
+    sd_x <- sd_x[-omit_na]
+    sd_y <- sd_y[-omit_na]
+    r_xy_errors <- r_xy_errors[-omit_na]
+    omitted.share <- length(omit_na) / length(x_original)
     if (omitted.share > 0.1) {
       warning(omitted.share * 100,
               "% of the data were removed due to missing values!")
@@ -57,11 +58,11 @@ f_rewrite <- function(x, y, weights.x = NULL, weights.y = NULL,
 
   input <- list("x" = x,
                 "y" = y,
-                "weights.x" = weights.x,
-                "weights.y" = weights.y,
-                "sd.x" = sd.x,
-                "sd.y" = sd.y,
-                "r.xy" = r.xy)
+                "weights_x" = weights_x,
+                "weights_y" = weights_y,
+                "sd_x" = sd_x,
+                "sd_y" = sd_y,
+                "r_xy_errors" = r_xy_errors)
   return(input)
 }
 
@@ -131,16 +132,16 @@ f_ols_reg <- function(x, y) {
 }
 
 # Solve cubic root problem (approximate solution for slope from York (1966)
-f_cubic_root <- function(x, y, weights.x, weights.y, r.xy, slope_ols, se_slope_ols) {
+f_cubic_root <- function(x, y, weights_x, weights_y, r_xy, slope_ols, se_slope_ols) {
 
-  if (any(r.xy != 0)) {
+  if (any(r_xy != 0)) {
     stop(paste("There is no approximate solution in case of correlation",
                "between x and y errors!", sep = " "))
   }
   # use ols slope as intitial slope value and estimate weight and
   # centered data
-  alpha <- sqrt(weights.x * weights.y)
-  Weight <- alpha^2 / (slope_ols^2 * weights.y + weights.x)
+  alpha <- sqrt(weights_x * weights_y)
+  Weight <- alpha^2 / (slope_ols^2 * weights_y + weights_x)
   Weight_sum <- sum(Weight)
   x_bar <- sum(Weight * x) / Weight_sum
   y_bar <- sum(Weight * y) / Weight_sum
@@ -149,14 +150,14 @@ f_cubic_root <- function(x, y, weights.x, weights.y, r.xy, slope_ols, se_slope_o
 
   # calculate alpha_cubic, beta_cubic and gamma_cubic. See York (1966) p. 1084
   xy <- x_centered * y_centered
-  xW_w <- x_centered^2 * Weight^2 / weights.x
-  yW_w <- y_centered^2 * Weight^2 / weights.x
-  alpha_cubic <- 2 * sum(xy * Weight^2 / weights.x) /
+  xW_w <- x_centered^2 * Weight^2 / weights_x
+  yW_w <- y_centered^2 * Weight^2 / weights_x
+  alpha_cubic <- 2 * sum(xy * Weight^2 / weights_x) /
     (3 * sum(xW_w))
   beta_cubic <- (sum(yW_w) - sum(Weight * x_centered^2)) /
     (3 * sum(xW_w))
   gamma_cubic <- - sum(xy * Weight) / (sum(x_centered^2 *
-                                             Weight^2 / weights.x))
+                                             Weight^2 / weights_x))
 
   # determine phi and solve cubic equation
   phi <- acos((alpha_cubic^3 - 3 /2 * alpha_cubic * beta_cubic + 0.5 *
@@ -177,7 +178,7 @@ f_cubic_root <- function(x, y, weights.x, weights.y, r.xy, slope_ols, se_slope_o
   }
 
   # later needed
-  beta <- Weight * (x_centered / weights.y) + (slope * y_centered / weights.x)
+  beta <- Weight * (x_centered / weights_y) + (slope * y_centered / weights_x)
 
   # define output
   cubic_root <- list("slope" = slope,
@@ -185,6 +186,7 @@ f_cubic_root <- function(x, y, weights.x, weights.y, r.xy, slope_ols, se_slope_o
                      "Weight_sum" = Weight_sum,
                      "x_bar" = x_bar,
                      "y_bar" = y_bar,
+                     "alpha" = alpha,
                      "beta" = beta)
 
   return(cubic_root)

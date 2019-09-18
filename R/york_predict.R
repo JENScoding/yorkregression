@@ -5,7 +5,7 @@
 #'
 #' @description Obtains predictions from a fitted York's regression.
 #'
-#' @param york.output A fitted object of class inheriting from "york".
+#' @param york_output A fitted object of class inheriting from "york".
 #' @param newdata A vector or a dataframe in which to look for variables
 #' with which to predict.
 #'
@@ -21,25 +21,39 @@
 #' # Example: York's regression with weight data taken from Pearson (1901):
 #' x <- c(0.0, 0.9, 1.8, 2.6, 3.3, 4.4, 5.2, 6.1, 6.5, 7.4)
 #' y <- c(5.9, 5.4, 4.4, 4.6, 3.5, 3.7, 2.8, 2.8, 2.4, 1.5)
-#' weights.x <- c(1e+3, 1e+3, 5e+2, 8e+2, 2e+2, 8e+1, 6e+1, 2e+1, 1.8, 1)
-#' weights.y <- c(1, 1.8, 4, 8, 20, 20, 70, 70, 1e+2, 5e+2)
-#' fit <- york(x = x, y = y, weights.x = weights.x, weights.y = weights.y,
-#' r.xy = 0)
+#' weights_x <- c(1e+3, 1e+3, 5e+2, 8e+2, 2e+2, 8e+1, 6e+1, 2e+1, 1.8, 1)
+#' weights_y <- c(1, 1.8, 4, 8, 20, 20, 70, 70, 1e+2, 5e+2)
+#' york_output <- york(x = x, y = y, weights_x = weights_x, weights_y = weights_y,
+#' r_xy_errors = 0)
 #' data <- c(2,3,4,3.6)
-#' york_predict(york.output = fit, newdata = data)
+#' york_predict(york_output = york_output, newdata = data)
 #'
-#' @name york_predict
+#' @name predict.york
 #' @export
-york_predict <- function(york.output, newdata) {
-  if (class(york.output) != "york") {
+predict.york <- function(york_output, newdata) {
+
+  if (class(york_output) != "york") {
     stop("Input must be of class york (Output of york function)")
   }
-  predict.y <- data.frame("x" = newdata, "predicted.y" =
-                            york.output$coefficients[1, 1] +
-                            york.output$coefficients[2, 1] * newdata)
-  colnames(predict.y) <- c("x", "predicted.y")
+  if (york_output$york_arguments$mult_samples == FALSE) {
+    x_data <- york_output$data[, 1]
+    y_data <- york_output$data[, 2]
+  } else {
+    x_data <- stack(york_output$data$x)[, 1]
+    y_data <- stack(york_output$data$y)[, 1]
+  }
+  if (length(newdata) == 0) {
+    predict_y <- data.frame("x" = x_data, "predicted_y" =
+                              york_output$fitted_y)
+  } else {
+    predict_y <- data.frame("x" = newdata, "predicted_y" =
+                              york_output$coefficients[1, 1] +
+                              york_output$coefficients[2, 1] * newdata)
+    colnames(predict_y) <- c("x", "predicted_y")
+  }
 
-  output <- list("prediction" = predict.y)
+  output <- list("prediction" = predict_y)
+
   return(output)
 }
 

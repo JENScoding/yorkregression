@@ -1,39 +1,39 @@
 ### expected errors with only one sample each (simple) (mult.sample = FALSE)
-exp_error_simple <- function(x, y, weights.x = NULL, weights.y = NULL,
-                               sd.x = NULL, sd.y = NULL, r.xy = NULL) {
+exp_error_simple <- function(x, y, weights_x = NULL, weights_y = NULL,
+                               sd_x = NULL, sd_y = NULL, r_xy_errors = NULL) {
 
   # Specify all wrong inputs if mult.sample = FALSE
-  if (is.null(c(sd.x, sd.y, weights.x, weights.y))) {
+  if (is.null(c(sd_x, sd_y, weights_x, weights_y))) {
     stop("Specify either standard errors or weights")
   }
   if(length(x) != length(y)) {
     stop("x and y must have the same length!")
   }
-  if (length(r.xy) != length(x)) {
+  if (length(r_xy_errors) != length(x)) {
     stop("Length of correlation vector must equal length of x")
   }
-  if (any(r.xy <= -1 | r.xy >= 1)) {
-    stop("Wrong input for r.xy:
-       r.xy must be element of (-1, ... , 1)")
+  if (any(r_xy_errors <= -1 | r_xy_errors >= 1)) {
+    stop("Wrong input for r_xy_errors:
+       r_xy_errors must be element of (-1, ... , 1)")
   }
-  if (length(weights.x) != length(x) | length(weights.y) != length(y)) {
-    stop("weights.x and weights.y must have the same length as x and y resp.!")
+  if (length(weights_x) != length(x) | length(weights_y) != length(y)) {
+    stop("weights_x and weights_y must have the same length as x and y resp.!")
   }
-  if (length(sd.x) != length(x) | length(sd.y) != length(y)) {
-    stop("sd.x and sd.y must have the same length as x and y resp.!")
+  if (length(sd_x) != length(x) | length(sd_y) != length(y)) {
+    stop("sd_x and sd_y must have the same length as x and y resp.!")
   }
 }
 
 ### expected errors when input has multiple samples (mult.sample = TRUE)
-exp_error_multiple <- function(x, y, weights.x = NULL, weights.y = NULL,
-                               sd.x = NULL, sd.y = NULL, r.xy = NULL,
-                               approx.solution = FALSE) {
+exp_error_multiple <- function(x, y, weights_x = NULL, weights_y = NULL,
+                               sd_x = NULL, sd_y = NULL, r_xy_errors = NULL,
+                               approx_solution = FALSE) {
 
   # Specify all wrong inputs if mult.sample = FALSE
-  if (approx.solution == T) {
+  if (approx_solution == TRUE) {
     stop("There is no approximate solution in case of multiple samples!")
   }
-  if (is.data.frame(x) == F|| is.data.frame(y) == F) {
+  if (is.data.frame(x) == FALSE || is.data.frame(y) == FALSE) {
     stop("Inputs x and y must be of class data.frame!")
   }
   if (ncol(x) != ncol(y) || nrow(x) != nrow(y)) {
