@@ -10,7 +10,9 @@
 #' fitted y" plot and the last plot is a "trace plot" which shows the slope after
 #' each interation, i.e. how the slope coefficient converges.
 #' @param york_output An object of class "york"
-#' @return york_plots returns 7 different plots.
+#' @param ... Arguments to be passed to methods.
+#'
+#' @return The plot function returns 7 different plots.
 #'
 #' @examples
 #' # Example: York's regression with weight data taken from Pearson (1901):
@@ -21,15 +23,19 @@
 #' r_xy_errors <- 0
 #' york_output <- york(x = x, y = y, weights_x = weights_x, weights_y = weights_y,
 #'                     r_xy_errors = 0)
-#' york_plots(york_output)
-#' @name york_plots
-#' @export
+#' plot(york_output)
+#'
+#' @name plot.york
+#'
 #' @importFrom ggplot2 ggplot aes geom_abline geom_point labs theme element_text
 #' draw_key_rect scale_colour_manual geom_vline geom_hline geom_smooth geom_line
 #' @importFrom utils stack
 #' @importFrom stats pnorm
+#' @method plot york
+#' @S3method plot york
 utils::globalVariables(c("x", "y"))
-york_plots <- function(york_output) {
+
+plot.york <- function(york_output, ...) {
   if (class(york_output) != "york") {
     stop("Input must be of class york (Output of york function)")
   }
@@ -56,7 +62,7 @@ york_plots <- function(york_output) {
 
     ddf <- data.frame(x = x_data, y = y_data)
     plot_1 <- ggplot(data = ddf, aes(x = x,
-                                   y = y)) +
+                                     y = y)) +
       geom_abline(aes(slope = york_output$coefficients[2, 1],
                       intercept = york_output$coefficients[1, 1]), col = "red") +
       geom_point() +
@@ -74,7 +80,7 @@ york_plots <- function(york_output) {
                      max_iterations = york_output$york_arguments$max_iterations)
   ddf2 <- data.frame(x = x_data, y = y_data)
   plot_2 <- ggplot(data = ddf2, aes(x = x,
-                                 y = y)) +
+                                    y = y)) +
     geom_abline(aes(slope = york_output$coefficients[2, 1],
                     intercept = york_output$coefficients[1, 1], colour = "York"),
                 key_glyph = draw_key_rect) +

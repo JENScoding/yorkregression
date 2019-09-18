@@ -17,7 +17,7 @@ test_that("Test single values compared to what they were at the beginning", {
   expect_true(round(first$weighted_mean_x, 4) == 4.9110)
   expect_true(round(first$weighted_mean_y, 4) == 3.1200)
   expect_true(all(round(first$reduced_chisq, 4) == 1.4833))
-  expect_true(all(round(first$Overall_significance_of_fit$p_value, 4) == 0.1573))
+  expect_true(all(round(first$goodness_of_fit$p_value, 4) == 0.1573))
   expect_true(first$n_iterations == 4)
   expect_true(round(first$ols_summary$r_squared_ols, 4) == 0.9535)
   expect_true(first$york_arguments[2] == 50)

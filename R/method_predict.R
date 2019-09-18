@@ -8,6 +8,7 @@
 #' @param york_output A fitted object of class inheriting from "york".
 #' @param newdata A vector or a dataframe in which to look for variables
 #' with which to predict.
+#' @param ... additional arguments affecting the predictions produced.
 #'
 #' @return Returns a list, containing a dataframe with predicted values
 #' as first element.
@@ -30,7 +31,7 @@
 #'
 #' @name predict.york
 #' @export
-predict.york <- function(york_output, newdata = NULL) {
+predict.york <- function(york_output, newdata = NULL, ...) {
 
   if (class(york_output) != "york") {
     stop("Input must be of class york (Output of york function)")

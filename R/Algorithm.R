@@ -243,27 +243,19 @@ york <- function(x, y, weights_x = NULL, weights_y = NULL, tolerance = 1e-5,
   chisq_df <- (length(x) - 2)
   reduced_chisq <- S / chisq_df
   sigma_chisq <- sqrt(2 / chisq_df)
-  if (mult_samples == FALSE) {
-    p_value <- 1 - pchisq(S, df = chisq_df)
-    test_result <- if (p_value > 0.1 ) {
-      "The assumption of a good fit cannot be rejected."
-    } else if (p_value < 0.01) {
-      paste("The assumption of a good fit can be rejected",
-            "at a significance level of 1%.", sep = " ")
-    } else if (p_value < 0.05) {
-      paste("The assumption of a good fit can be rejected",
-            "at a significance level of 5%.", sep = " ")
-    } else {
-      paste("The assumption of a good fit can be rejected",
-            "at a significance level of 10%.", sep = " ")
-    }
+  p_value <- 1 - pchisq(S, df = chisq_df)
+  test_result <- if (p_value > 0.1 ) {
+    "The assumption of a good fit cannot be rejected."
+  } else if (p_value < 0.01) {
+    paste("The assumption of a good fit can be rejected",
+          "at a significance level of 1%.", sep = " ")
+  } else if (p_value < 0.05) {
+    paste("The assumption of a good fit can be rejected",
+          "at a significance level of 5%.", sep = " ")
   } else {
-    p_value <- "No p-value for multiple sample case."
-    test_result <- "No test results for multiple sample case."
+    paste("The assumption of a good fit can be rejected",
+          "at a significance level of 10%.", sep = " ")
   }
-
-  # degrees of freedom of regression
-  df_regression <- 2 * (length(x) - 1)
 
   # fitted values
   fitted_y <- intercept + slope * x
@@ -296,19 +288,19 @@ york <- function(x, y, weights_x = NULL, weights_y = NULL, tolerance = 1e-5,
   york_arguments <- list("tolerance" = tolerance, "max_iterations" = max_iterations,
                          "mult_samples" = mult_samples, "approx_solution" =
                            approx_solution)
-  chisq_test_results <- list("test_result" = test_result, "p_value" = p_value)
+  chisq_test_results <- list("chisq_statistic" = S, "chisq_df" = chisq_df,
+                             "p_value" = p_value, "test_result" = test_result)
 
   output <- list("coefficients" = york_reg,
                  "weights" = weights_matrix,
                  "x_residuals" = x_residuals,
                  "y_residuals" = y_residuals,
                  "fitted_y" =fitted_y,
-                 "df_regression" = df_regression,
                  "weighted_mean_x" = x_bar,
                  "weighted_mean_y" = y_bar ,
                  "reduced_chisq" = reduced_chisq,
                  "se_chisq" = sigma_chisq,
-                 "Overall_significance_of_fit" = chisq_test_results,
+                 "goodness_of_fit" = chisq_test_results,
                  "n_iterations" = count,
                  "slope_per_iteration" = slope_per_iteration,
                  "ols_summary" = ols_reg[-c(1:2)],

@@ -1,5 +1,3 @@
-#'
-#'
 
 # Make data suitable for Algorithm
 f_rewrite <- function(x, y, weights_x = NULL, weights_y = NULL,
