@@ -1,4 +1,4 @@
-test_that("Test plot.york method", {
+test_that("Test summary.york method", {
   ## Input from Table I and Table II in York 1966
   x <- c(0,0.9, 1.8, 2.6, 3.3, 4.4, 5.2, 6.1, 6.5, 7.4)
   y <- c(5.9, 5.4, 4.4, 4.6, 3.5, 3.7, 2.8, 2.8, 2.4, 1.5)
@@ -9,12 +9,11 @@ test_that("Test plot.york method", {
   ## Test
   first <- york(x, y, weights_x = weights_x, weights_y = weights_y, r_xy_errors = 0,
                 mult_samples = FALSE, approx_solution = TRUE)
-  expect_error(plot(first), NA)
-  expect_error(plot.york(first), NA)
+  expect_error(summary(first), NA)
+  expect_error(summary.york(first), NA)
+
   second <- data.frame("x" = rnorm(100), "y" = rnorm(100))
-  expect_error(plot.york(second))
+  expect_error(summary.york(second))
 })
-
-
 
 
