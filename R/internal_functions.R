@@ -74,12 +74,16 @@ f_rewrite <- function(x, y, weights_x = NULL, weights_y = NULL,
     sd_y <- 1 / sqrt(weights_y)
   }
 
-  # delete rows with NA values
+  # delete elements with NA values
   omit_na  <- c(which(is.na(x)), which(is.na(y)),
                   which(is.na(weights_x)), which(is.na(weights_y)),
-                  which(is.na(sd_x)), which(is.na(sd_y)))
+                  which(is.na(sd_x)), which(is.na(sd_y)),
+                  which(is.na(r_xy_errors)))
+
   if (length(omit_na) > 0){
-    x_original <- x
+
+    # omit all NA values and corresponding elements in other vectors
+    omitted.share <- length(omit_na) / length(x)
     y <- y[-omit_na]
     x <- x[-omit_na]
     weights_x <- weights_x[-omit_na]
@@ -87,21 +91,54 @@ f_rewrite <- function(x, y, weights_x = NULL, weights_y = NULL,
     sd_x <- sd_x[-omit_na]
     sd_y <- sd_y[-omit_na]
     r_xy_errors <- r_xy_errors[-omit_na]
-    omitted.share <- length(omit_na) / length(x_original)
     if (omitted.share > 0.1) {
       warning(omitted.share * 100,
               "% of the data were removed due to missing values!")
     }
   }
 
-  input <- list("x" = x,
+  re_input <- list("x" = x,
                 "y" = y,
                 "weights_x" = weights_x,
                 "weights_y" = weights_y,
                 "sd_x" = sd_x,
                 "sd_y" = sd_y,
                 "r_xy_errors" = r_xy_errors)
-  return(input)
+  return(re_input)
+}
+
+
+#' @title
+#'  Internal Functions I
+#'
+#' @name internal_functions_I
+#'
+#' @keywords
+#'  internal
+#'
+# function to rewrite input if input is of class data frame:
+f_rewrite_mult <- function(x, y) {
+
+
+  # omit row if NA
+  omit_row_na <- unique(c(which(is.na(x), arr.ind = TRUE)[,1],
+                          which(is.na(y), arr.ind = TRUE)[,1]))
+
+  if (length(omit_row_na) > 0){
+
+    # omit all NA values and corresponding rows in data frames
+    omitted.share <- length(omit_row_na) / nrow(x)
+    y <- y[-omit_row_na,]
+    x <- x[-omit_row_na,]
+    if (omitted.share > 0.1) {
+      warning(omitted.share * 100,
+              "% of the data were removed due to missing values!")
+    }
+  }
+
+  re_input <- list("x" = x, "y" = y)
+  return(re_input)
+
 }
 
 
@@ -280,7 +317,7 @@ f_cubic_root <- function(x, y, weights_x, weights_y, r_xy, slope_ols, se_slope_o
 # function to rewrite output:
 f_define_output <- function(intercept, slope, sigma_intercept, sigma_slope,
                             weights_x, weights_y, mult_samples, x, y, sd_x,
-                            sd_y, r_xy_errors, x_original, y_original,
+                            sd_y, r_xy_errors, x_data, y_original,
                             x_errors, y_errors, mean_x_i, mean_y_i,
                             slope_per_iteration, tolerance, max_iterations,
                             approx_solution, S, chisq_df, p_value,
@@ -304,7 +341,7 @@ f_define_output <- function(intercept, slope, sigma_intercept, sigma_slope,
     data <- matrix(c(x, y, sd_x, sd_y, r_xy_errors), ncol = 5)
     colnames(data) <- c("x", "y", "sd_x", "sd_y", "error_correlation")
   } else {
-    data <- list("x" = x_original, "y" = y_original, "sd_x" = sd_x,
+    data <- list("x" = x_data, "y" = y_original, "sd_x" = sd_x,
                  "sd_y" = sd_y, "error_correlation" = r_xy_errors, "x_errors" = x_errors,
                  "y_errors" = y_errors, "mean_x_i" = mean_x_i,
                  "mean_y_i" = mean_y_i)

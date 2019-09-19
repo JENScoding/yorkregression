@@ -15,12 +15,12 @@ test_that("Test implementation of predict.york method", {
 
   second <- predict(first, new)
   expect_true(all(round(second$prediction[,2], 4) == c(4.5080, 4.0308, 3.5535, 3.7444)))
-  expect_true(all(colnames(second$prediction) == c("x", "predicted_y")))
+  expect_true(all(colnames(second$prediction) == c("x", "predict_y")))
 
   new <- data.frame(c(2,3,4,3.6), fix.empty.names = FALSE)
   second <- predict.york(first, new)
   expect_true(all(round(second$prediction[,2], 4) == c(4.5080, 4.0308, 3.5535, 3.7444)))
-  expect_true(all(colnames(second$prediction) == c("x", "predicted_y")))
+  expect_true(all(colnames(second$prediction) == c("x", "predict_y")))
 })
 
 

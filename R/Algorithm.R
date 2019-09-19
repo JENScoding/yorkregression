@@ -146,16 +146,16 @@ york <- function(x, y, weights_x = NULL, weights_y = NULL, r_xy_errors = NULL,
   if (mult_samples == FALSE) {
 
     # rewrite input and delete rows with NA values
-    input <- f_rewrite(x, y, weights_x, weights_y,
+    re_input <- f_rewrite(x, y, weights_x, weights_y,
                        sd_x, sd_y, r_xy_errors)
-    x <- input$x
-    y <- input$y
-    weights_x <- input$weights_x
-    weights_y <- input$weights_y
-    sd_x <- input$sd_x
-    sd_y <- input$sd_y
-    r_xy_errors <- input$r_xy_errors
-    x_original <- NULL
+    x <- re_input$x
+    y <- re_input$y
+    weights_x <- re_input$weights_x
+    weights_y <- re_input$weights_y
+    sd_x <- re_input$sd_x
+    sd_y <- re_input$sd_y
+    r_xy_errors <- re_input$r_xy_errors
+    x_data <- NULL
     y_original <- NULL
     x_errors <- NULL
     y_errors <- NULL
@@ -173,6 +173,12 @@ york <- function(x, y, weights_x = NULL, weights_y = NULL, r_xy_errors = NULL,
     exp_error_multiple(x, y, weights_x, weights_y,
                        sd_x, sd_y, r_xy_errors, approx_solution)
 
+    # omit rows with NA values
+    # rewrite input and delete rows with NA values
+    re_input <- f_rewrite_mult(x, y)
+    x <- re_input$x
+    y <- re_input$y
+
     # Define errors, error correlation and weights in multiple sample case
     mean_x_i <- apply(x, 1, mean)
     mean_y_i <- apply(y, 1, mean)
@@ -185,9 +191,9 @@ york <- function(x, y, weights_x = NULL, weights_y = NULL, r_xy_errors = NULL,
     weights_x <- 1 / sd_x
     weights_y <- 1 / sd_y
 
-    x_original <- x
+    x_data <- x
     y_original <- y
-    x <- as.matrix(stack(data.frame(t(x_original)))[1])
+    x <- as.matrix(stack(data.frame(t(x_data)))[1])
     y <- as.matrix(stack(data.frame(t(y_original)))[1])
   }
 
@@ -208,7 +214,7 @@ york <- function(x, y, weights_x = NULL, weights_y = NULL, r_xy_errors = NULL,
       Weight <- alpha^2 / (slope^2 * weights_y + weights_x -
                              2 * slope * r_xy_errors * alpha)
       if (mult_samples == TRUE) {
-        Weight <- rep(Weight, each = ncol(x_original))
+        Weight <- rep(Weight, each = ncol(x_data))
       }
       Weight_sum <- sum(Weight)
       x_bar <- sum(Weight * x) / Weight_sum
@@ -292,7 +298,7 @@ york <- function(x, y, weights_x = NULL, weights_y = NULL, r_xy_errors = NULL,
   # define output
   def_output <- f_define_output(intercept, slope, sigma_intercept, sigma_slope,
                                 weights_x, weights_y, mult_samples, x, y, sd_x,
-                                sd_y, r_xy_errors, x_original, y_original,
+                                sd_y, r_xy_errors, x_data, y_original,
                                 x_errors, y_errors, mean_x_i, mean_y_i,
                                 slope_per_iteration, tolerance, max_iterations,
                                 approx_solution, S, chisq_df, p_value,
