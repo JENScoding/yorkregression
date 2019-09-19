@@ -2,10 +2,10 @@
 #'  Fitting Linear Models With York's Method.
 #'
 #' @description
-#'  The york function is used to fit a model when both x and y variables are subject
-#'  to measurement errors. The york function returnes an object of class "york", which is a fit of a
-#'  York's regression. The model can also take into account correlations between
-#'  x and y errors.
+#'  The function york is used to fit a model when both X and Y variables are
+#'  subject to measurement errors. The york function returns an object of class
+#'  "york", which is a fit of a York's regression. The model can also take into
+#'  account correlations between x and y errors.
 #'
 #' @param x
 #'  a 1 times n vector or in case of multiple samples a dataframe, where
@@ -19,7 +19,7 @@
 #'  the prespecified 1 times n weighting vector for \code{y}-values.
 #' @param r_xy_errors
 #'  the prespecified correlation coefficient between the errors
-#'  in \code{x} and \code{y}. Either a 1 times n vector or a single value.
+#'  in \code{X} and \code{Y}. Either a 1 times n vector or a single value.
 #' @param tolerance
 #'  the tolerance for convergence of the slope coefficent. The default
 #'  is \code{1e-5}.
@@ -41,7 +41,7 @@
 #'  more than one decimal point.
 #'
 #' @details
-#'  The york function implements the algorithm for the problem of the
+#'  \code{york} implements the algorithm for the problem of the
 #'  best-ﬁt straight line to independent points with errors in both x and y
 #'  variables. General York (1969) solution according to the algorithm of Wehr & Saleska
 #'  (2017).
@@ -167,7 +167,7 @@ york <- function(x, y, weights_x = NULL, weights_y = NULL, r_xy_errors = NULL,
     exp_error_simple(x, y, weights_x, weights_y,
                        sd_x, sd_y, r_xy_errors)
 
-  } else { # mult_samples = TRUE
+  } else {# mult_samples = TRUE
 
     # expected errors for wrongly specified multiple sample input
     exp_error_multiple(x, y, weights_x, weights_y,
@@ -181,7 +181,7 @@ york <- function(x, y, weights_x = NULL, weights_y = NULL, r_xy_errors = NULL,
     # Define errors, error correlation and weights in multiple sample case
     mean_x_i <- apply(x, 1, mean)
     mean_y_i <- apply(y, 1, mean)
-    x_errors<- x - mean_x_i
+    x_errors <- x - mean_x_i
     y_errors <- y - mean_y_i
     r_xy_errors <- f_corr_row(x_errors,
                            y_errors)
@@ -238,7 +238,7 @@ york <- function(x, y, weights_x = NULL, weights_y = NULL, r_xy_errors = NULL,
       exp_error_convergence(count, max_iterations, slope_per_iteration)
     }
 
-  } else { # approx_solution = TRUE
+  } else {# approx_solution = TRUE
 
     # solve cubic problem and use estimates as approximation
     approx <- f_cubic_root(x, y, weights_x, weights_y,
@@ -322,4 +322,6 @@ york <- function(x, y, weights_x = NULL, weights_y = NULL, r_xy_errors = NULL,
 
   return(output)
 }
+
+
 

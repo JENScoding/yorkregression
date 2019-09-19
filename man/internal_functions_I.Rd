@@ -3,6 +3,7 @@
 \name{internal_functions_I}
 \alias{internal_functions_I}
 \alias{f_rewrite}
+\alias{f_rewrite_mult}
 \alias{f_var_row}
 \alias{f_corr_row}
 \alias{f_ols_reg}
@@ -13,6 +14,8 @@
 f_rewrite(x, y, weights_x = NULL, weights_y = NULL, sd_x = NULL,
   sd_y = NULL, r_xy_errors = NULL)
 
+f_rewrite_mult(x, y)
+
 f_var_row(x)
 
 f_corr_row(x, y)
@@ -22,7 +25,7 @@ f_ols_reg(x, y)
 f_cubic_root(x, y, weights_x, weights_y, r_xy, slope_ols, se_slope_ols)
 
 f_define_output(intercept, slope, sigma_intercept, sigma_slope, weights_x,
-  weights_y, mult_samples, x, y, sd_x, sd_y, r_xy_errors, x_original,
+  weights_y, mult_samples, x, y, sd_x, sd_y, r_xy_errors, x_data,
   y_original, x_errors, y_errors, mean_x_i, mean_y_i, slope_per_iteration,
   tolerance, max_iterations, approx_solution, S, chisq_df, p_value,
   test_result)
@@ -42,7 +45,7 @@ Function used in york function. For Internal Functions I
  f_var_row calculates the variance of the respective rows of a data frame
  and f_corr_row the correlations of the respective rows of a data frame.
 
- f_ols_reg returns the fit of a linear model. The ols slope coefficient
+ f_ols_reg returns the fit of a linear model. The OLS slope coefficient
  is then used in the first iteration of the york algorithm.
 
  f_cubic_root avoids the iterative determination of the slope coefficient.
