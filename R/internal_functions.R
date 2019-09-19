@@ -80,7 +80,7 @@ f_rewrite <- function(x, y, weights_x = NULL, weights_y = NULL,
                   which(is.na(sd_x)), which(is.na(sd_y)),
                   which(is.na(r_xy_errors)))
 
-  if (length(omit_na) > 0){
+  if (length(omit_na) > 0) {
 
     # omit all NA values and corresponding elements in other vectors
     omitted.share <- length(omit_na) / length(x)
@@ -124,7 +124,7 @@ f_rewrite_mult <- function(x, y) {
   omit_row_na <- unique(c(which(is.na(x), arr.ind = TRUE)[,1],
                           which(is.na(y), arr.ind = TRUE)[,1]))
 
-  if (length(omit_row_na) > 0){
+  if (length(omit_row_na) > 0) {
 
     # omit all NA values and corresponding rows in data frames
     omitted.share <- length(omit_row_na) / nrow(x)
@@ -187,15 +187,15 @@ f_corr_row <- function(x, y) {
 f_ols_reg <- function(x, y) {
 
   # find ols slope
-  x_input <- matrix(c(rep(1, length(x)), x), ncol =2)
+  x_input <- matrix(c(rep(1, length(x)), x), ncol = 2)
   lm <- solve(t(x_input) %*% x_input) %*% t(x_input) %*% y
   slope <- lm[2]
   intercept <- lm[1]
-  if (any(is.na(c(slope,intercept)))){
+  if (any(is.na(c(slope,intercept)))) {
     stop("Cannot fit a line through these data!")
   }
 
-  # additional ols model information
+  # additional OLS model information
   fitted_y <- x_input %*% lm
   residuals <- y - fitted_y
   RSS <- sum(residuals^2)
@@ -212,9 +212,9 @@ f_ols_reg <- function(x, y) {
   se_intercept <- sqrt(sigma_squared_hat * (S_x / (length(x) * SS_x)))
   se_slope <- sqrt(sigma_squared_hat / SS_x)
   r_squared <- 1 - RSS / SS_y
-  r_squared_adjusted <- r_squared - (1 - r_squared)*
-    (1 / (length(x)-2))
-  f_statistic <- (r_squared / (1- r_squared)) * ((length(x)-2))
+  r_squared_adjusted <- r_squared - (1 - r_squared) *
+    (1 / (length(x) - 2))
+  f_statistic <- (r_squared / (1 - r_squared)) * ((length(x) - 2))
 
   # matrix for coefficients and their se
   coef <- matrix(c(intercept, slope, se_intercept,
@@ -271,16 +271,16 @@ f_cubic_root <- function(x, y, weights_x, weights_y, r_xy, slope_ols, se_slope_o
     (3 * sum(xW_w))
   beta_cubic <- (sum(yW_w) - sum(Weight * x_centered^2)) /
     (3 * sum(xW_w))
-  gamma_cubic <- - sum(xy * Weight) / (sum(x_centered^2 *
+  gamma_cubic <- -sum(xy * Weight) / (sum(x_centered^2 *
                                              Weight^2 / weights_x))
 
   # determine phi and solve cubic equation
-  phi <- acos((alpha_cubic^3 - 3 /2 * alpha_cubic * beta_cubic + 0.5 *
+  phi <- acos((alpha_cubic^3 - 3 / 2 * alpha_cubic * beta_cubic + 0.5 *
                  gamma_cubic) /
                 (alpha_cubic^2 - beta_cubic)^(3 / 2))
 
   sol_cubic <- alpha_cubic + 2 * (alpha_cubic^2 - beta_cubic)^0.5 *
-    cos( 1 / 3 *(phi + 2 * pi * c(0:2)))
+    cos( 1 / 3 * (phi + 2 * pi * c(0:2)))
 
   # pick the root that is closest to ols
   ols_range <- c(slope_ols - 4 * se_slope_ols,
