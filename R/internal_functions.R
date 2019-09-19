@@ -16,7 +16,7 @@
 #'  f_var_row calculates the variance of the respective rows of a data frame
 #'  and f_corr_row the correlations of the respective rows of a data frame.
 #'
-#'  f_ols_reg returns the fit of a linear model. The ols slope coefficient
+#'  f_ols_reg returns the fit of a linear model. The OLS slope coefficient
 #'  is then used in the first iteration of the york algorithm.
 #'
 #'  f_cubic_root avoids the iterative determination of the slope coefficient.
