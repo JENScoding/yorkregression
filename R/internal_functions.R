@@ -1,3 +1,12 @@
+#' @title Internal Functions I
+#'
+#' @description Functions used in york function. For Internal Functions I
+#' the output is used for proceeding calculations or displaying. All the
+#' Internal Functions I functions begin with f_ and then the name of the
+#' function is given.
+#'
+#' @keywords internal
+#'
 
 # Make data suitable for Algorithm
 f_rewrite <- function(x, y, weights_x = NULL, weights_y = NULL,

@@ -1,3 +1,11 @@
+#' @title Internal Functions II
+#'
+#' @description Functions used in york function. Internal Functions II
+#' compromise all possible error messages.
+#'
+#' @keywords internal
+#'
+
 ### expected errors with only one sample each (simple) (mult.sample = FALSE)
 exp_error_simple <- function(x, y, weights_x = NULL, weights_y = NULL,
                                sd_x = NULL, sd_y = NULL, r_xy_errors = NULL) {

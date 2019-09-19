@@ -1,94 +1,86 @@
-### york in Least Squares Fitting Of A Straight Line With Correlated Errors ###
-
-#' @title Simple linear regression of X- and Y-variables with correlated errors.
+#'@title Fitting Linear Models with York's method.
 #'
-#' @description Implements the algorithm for the problem of the best-ﬁt straight
-#' line to independent points with errors in both x and y general York 1969
-#' solution according to the algorithm of Wehr & Saleska (2017)
-#' @details Given \eqn{n} pairs of \eqn{(X_i, Y_i), i = 1, \ldots, n}, their
-#' weights \eqn{(\omega(X_i), \omega(Y_i)), i = 1, \ldots, n} or their standard
-#' errors \eqn{SE(X_i)} and \eqn{SE(Y_i)}, the \code{york} function finds the
-#' best-fit straight line using the algorithm of York et al. (1966)/ York et al.
-#' (1969) as presented in Wehr & Saleska (2017). In addition, the function
-#' provides numerous statistics, parameters and goodness of fit criteria. If the
-#' data contains NA values then the share of \code{NA} values in the total
-#' values is calculated and the rows with \code{NA} values will be deleted.
-#' @param x A 1 times n numeric row vector or a dataframe of the \code{X}-variable
-#' @param y A 1 times n numeric row vector or a dataframe of the \code{Y}-variable
-#' @param tolerance The tolerance for convergence of the slope coefficent.
-#' It is set a priori to \code{1e-5}
+#'@description The york function implements the algorithm for the problem of the
+#'  best-ﬁt straight line to independent points with errors in both x and y
+#'  variables. General York (1969) solution according to the algorithm of Wehr & Saleska
+#'  (2017). Returned is an object of class "york".
+#'
+#'@details Given \eqn{n} pairs of \eqn{(x_i, y_i), i = 1, \ldots, n}, their
+#'  weights \eqn{(\omega(x_i), \omega(y_i)), i = 1, \ldots, n} or their standard
+#'  errors \eqn{sd(x_i)} and \eqn{sd(y_i)}, the \code{york} function finds the
+#'  best-fit straight line using the algorithm of York et al. (1966)/ York et
+#'  al. (1969) as presented in Wehr & Saleska (2017). In addition, the function
+#'  provides numerous statistics, parameters and goodness of fit criteria. If
+#'  the data contains NA values they will be omitted.
+#'@param x A 1 times n numeric row vector or a dataframe of the
+#'  \code{X}-variable
+#'@param y A 1 times n numeric row vector or a dataframe of the
+#'  \code{Y}-variable
+#'@param tolerance The tolerance for convergence of the slope coefficent. It is
+#'  set a priori to \code{1e-5}
 #'@param max_iterations The maximum number of iterations for convergence.
-#'   Default is \code{50}.
-#' @param weights_x The prespecified 1 times n weights vector for
-#'   \code{X}-values
-#' @param weights_y The prespecified 1 times n weights vector for
-#'   \code{Y}-values
-#' @param sd_x The standard error of the \code{X}-values
-#' @param sd_y The standard error of the \code{Y}-values
-#' @param r_xy_errors The prespecified correlation coefficient between the errors in
-#'   \code{X} and \code{Y}
-#' @param mult_samples An indicator if the multiple samples option is turned on
-#' or not. The standard value is \code{FALSE}
-#' @param approx_solution An indicator if the approximate solution option is turned on
-#' or not. The standard value is \code{FALSE}
-#' @return York Returns an object of class "york" the York regression for the
-#'   \code{x} and \code{y} data for either specified weights \code{weights_x}
-#'   and \code{weights_y} or specified standard errors \code{sd_x} and
-#'   \code{sd_y} An object of class "york" containing the following components:
+#'  Default is \code{50}.
+#'@param weights_x The prespecified 1 times n weights vector for \code{X}-values
+#'@param weights_y The prespecified 1 times n weights vector for \code{Y}-values
+#'@param sd_x The standard error of the \code{X}-values
+#'@param sd_y The standard error of the \code{Y}-values
+#'@param r_xy_errors The prespecified correlation coefficient between the errors
+#'  in \code{X} and \code{Y}
+#'@param mult_samples An indicator if the multiple samples option is turned on
+#'  or not. The standard value is \code{FALSE}
+#'@param approx_solution An indicator if the approximate solution option is
+#'  turned on or not. The standard value is \code{FALSE}
+#'@return York Returns an object of class "york" the York regression for the
+#'  \code{x} and \code{y} data for either specified weights \code{weights_x} and
+#'  \code{weights_y} or specified standard errors \code{sd_x} and \code{sd_y} An
+#'  object of class "york" containing the following components:
 #'
-#'   \describe{
+#'  \describe{
 #'
-#'   \item{coefficients}{a matrix which contains the York estimates for
-#'   intercept and slope of the best-fit straight line with the respective
-#'   standard errors}
-#'   \item{coefficients.orthogonal}{a matrix which contains the
-#'   orthogonal estimates for intercept and slope with the respective standard
-#'   errors}
-#'   \item{coefficients.ols}{a matrix which contains the OLS estimates
-#'   for the intercept and slope with the respective standard errors}
-#'   \item{weights}{a matrix representation of the prespecified or calculated
-#'   weights for the X- and Y-observations}
-#'   \item{x_residuals}{a vector of the
-#'   York X-residuals}
-#'   \item{y_residuals}{a vector of the York Y-residuals}
-#'   \item{fitted_y}{a vector of the fitted York Y-values}
-#'   \item{df_regression}{the number of degrees of freedom
-#'   (See \url{https://en.wikipedia.org/wiki/Degrees_of_freedom_(statistics)})
-#'   of York's regression}
-#'   \item{weighted_mean_x}{the weighted.mean of X}
-#'   \item{weighted_mean_y}{the weighted.mean of Y}
-#'   \item{reduced_chisq}{the reduced chi-squared statistic
-#'   (See \url{https://en.wikipedia.org/wiki/Reduced_chi-squared_statistic}),
-#'   i.e. the goodness of fit measure of York's regression}
-#'   \item{se_chisq}{the standard error of the chi-squared statistic}
-#'   \item{n_iterations}{the total number of iterations}
-#'   \item{slope_per_iteration}{the York slope after each iteration}
-#'   \item{fitted_y.ols}{the fitted values for OLS}
-#'   \item{residuals.ols}{the OLS residuals}
-#'   \item{residual.sum.of.squares}{the residual sum of squares (RSS) of OLS}
-#'   \item{total.sum.of.squares}{the total sum of squares of OLS}
-#'   \item{se.of.reg.ols}{the standard error of the regression (SER) for OLS}
-#'   \item{r.squared.ols}{the R squared of the OLS regression}
-#'   \item{r.squared.adjusted.ols}{the adjusted R squared of OLS}
-#'   \item{f.statistic.ols}{the F statistic of OLS}
-#'   \item{fitted_y.orthogonal}{the fitted values for orthogonal regression (See
-#'   \url{https://en.wikipedia.org/wiki/Deming_regression})}
-#'   \item{data}{a data matrix which contains as columns the observed points
-#'   X-, Y-, sd_x- and sd_y-values}}
+#'  \item{coefficients}{a matrix which contains the York estimates for intercept
+#'  and slope of the best-fit straight line with the respective standard errors}
+#'  \item{coefficients.orthogonal}{a matrix which contains the orthogonal
+#'  estimates for intercept and slope with the respective standard errors}
+#'  \item{coefficients.ols}{a matrix which contains the OLS estimates for the
+#'  intercept and slope with the respective standard errors} \item{weights}{a
+#'  matrix representation of the prespecified or calculated weights for the X-
+#'  and Y-observations} \item{x_residuals}{a vector of the York X-residuals}
+#'  \item{y_residuals}{a vector of the York Y-residuals} \item{fitted_y}{a
+#'  vector of the fitted York Y-values} \item{df_regression}{the number of
+#'  degrees of freedom (See
+#'  \url{https://en.wikipedia.org/wiki/Degrees_of_freedom_(statistics)}) of
+#'  York's regression} \item{weighted_mean_x}{the weighted.mean of X}
+#'  \item{weighted_mean_y}{the weighted.mean of Y} \item{reduced_chisq}{the
+#'  reduced chi-squared statistic (See
+#'  \url{https://en.wikipedia.org/wiki/Reduced_chi-squared_statistic}), i.e. the
+#'  goodness of fit measure of York's regression} \item{se_chisq}{the standard
+#'  error of the chi-squared statistic} \item{n_iterations}{the total number of
+#'  iterations} \item{slope_per_iteration}{the York slope after each iteration}
+#'  \item{fitted_y.ols}{the fitted values for OLS} \item{residuals.ols}{the OLS
+#'  residuals} \item{residual.sum.of.squares}{the residual sum of squares (RSS)
+#'  of OLS} \item{total.sum.of.squares}{the total sum of squares of OLS}
+#'  \item{se.of.reg.ols}{the standard error of the regression (SER) for OLS}
+#'  \item{r.squared.ols}{the R squared of the OLS regression}
+#'  \item{r.squared.adjusted.ols}{the adjusted R squared of OLS}
+#'  \item{f.statistic.ols}{the F statistic of OLS}
+#'  \item{fitted_y.orthogonal}{the fitted values for orthogonal regression (See
+#'  \url{https://en.wikipedia.org/wiki/Deming_regression})} \item{data}{a data
+#'  matrix which contains as columns the observed points X-, Y-, sd_x- and
+#'  sd_y-values}}
 #'
-#' @references Wehr, Richard, and Scott R. Saleska. "The long-solved problem of
-#' the best-fit straight line: Application to isotopic mixing lines."
-#' Biogeosciences 14.1 (2017). pp. 17-29.
+#'@references Wehr, Richard, and Scott R. Saleska. "The long-solved problem of
+#'  the best-fit straight line: Application to isotopic mixing lines."
+#'  Biogeosciences 14.1 (2017). pp. 17-29.
 #'
-#' York, Derek. "Least squares fitting of a straight line with correlated
-#' errors." Earth and planetary science letters 5 (1968), pp. 320-324.
+#'  York, Derek. "Least squares fitting of a straight line with correlated
+#'  errors." Earth and planetary science letters 5 (1968), pp. 320-324.
 #'
-#' York, Derek. "Least-squares fitting of a straight line.", Canadian Journal of
-#' Physics 44.5 (1966), pp. 1079-1086.
+#'  York, Derek. "Least-squares fitting of a straight line.", Canadian Journal
+#'  of Physics 44.5 (1966), pp. 1079-1086.
 #'
-#' York, Derek, et al. "Unified equations for the slope, intercept, and standard
-#' errors of the best straight line." American Journal of Physics 72.3 (2004),
-#' pp. 367-375.
+#'  York, Derek, et al. "Unified equations for the slope, intercept, and
+#'  standard errors of the best straight line." American Journal of Physics 72.3
+#'  (2004), pp. 367-375.
 #'
 #' @examples
 #' # Example: York's regression with weight data taken from Pearson (1901):
@@ -119,10 +111,10 @@
 #' y = c(5.9, 5.4, 4.4, 4.6, 3.5, 3.7, 2.8, 2.8, 2.4, 1.5),
 #' weights_x = weights_x, weights_y = weights_y,  r_xy_errors = 0)
 #' }
-#' @name york
-#' @export
-#' @importFrom stats pchisq
-#' @importFrom utils stack
+#'@name york
+#'@export
+#'@importFrom stats pchisq
+#'@importFrom utils stack
 york <- function(x, y, weights_x = NULL, weights_y = NULL, tolerance = 1e-5,
                  max_iterations = 50, sd_x = NULL, sd_y = NULL, r_xy_errors = NULL,
                  mult_samples = FALSE, approx_solution = FALSE) {
