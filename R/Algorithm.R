@@ -173,7 +173,6 @@ york <- function(x, y, weights_x = NULL, weights_y = NULL, r_xy_errors = NULL,
     exp_error_multiple(x, y, weights_x, weights_y,
                        sd_x, sd_y, r_xy_errors, approx_solution)
 
-    # omit rows with NA values
     # rewrite input and delete rows with NA values
     re_input <- f_rewrite_mult(x, y)
     x <- re_input$x
