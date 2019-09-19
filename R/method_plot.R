@@ -1,39 +1,57 @@
-#' @title Plots for York's regression
+#' @title
+#'  Plot an york object
 #'
-#' @description Gives several diagnostic plots for York's regression.
-#' @details Given an object of class "york" this function gives several
-#' dianostic plots. The first plot shows York's best-fit straight line only. The
-#' second plot shows ork' best fit straight line compared to OLS and orthogonal
-#' regression. Additionally, the different "center of gravity" are shown. The
-#' third plot is a "y-residuals vs. x-residuals plot". The fourth is a
-#' "x-residuals vs. fitted-y plot". The fith plot is a "y-residuals vs.
-#' fitted y" plot and the last plot is a "trace plot" which shows the slope after
-#' each interation, i.e. how the slope coefficient converges.
-#' @param x An object of class "york"
-#' @param ... Arguments to be passed to methods.
+#' @description
+#'  Plots for york model fit are obtained. The plot function returns
+#'  6 different plots.
+#'  A plot for the fitted line, diagnostic plots and a trace plot
+#'  (if the slope coefficient was determined approximately,
+#'  no trace plot will be shown).
 #'
-#' @return The plot function returns 7 different plots.
+#' @param x
+#'  an object of class "york"
+#' @param ...
+#'  arguments to be passed to methods.
+#'
+#' @details
+#'  Given an object of class "york" this function gives several york plots.
+#'  The first plot shows York's best-fit straight line only. The
+#'  second plot shows York's best fit straight line compared to OLS and orthogonal
+#'  regression. Additionally, the different "center of gravity" are shown. The
+#'  third plot is a "y-residuals vs. x-residuals plot". The fourth is a
+#'  "x-residuals vs. fitted-y plot". The fith plot is a "y-residuals vs.
+#'  fitted y" plot and the last plot is a "trace plot" which shows the slope after
+#'  each interation, i.e. how the slope coefficient converges.
 #'
 #' @examples
-#' # Example: York's regression with weight data taken from Pearson (1901):
-#' x <- c(0.0, 0.9, 1.8, 2.6, 3.3, 4.4, 5.2, 6.1, 6.5, 7.4)
-#' y <- c(5.9, 5.4, 4.4, 4.6, 3.5, 3.7, 2.8, 2.8, 2.4, 1.5)
-#' weights_x <- c(1e+3, 1e+3, 5e+2, 8e+2, 2e+2, 8e+1, 6e+1, 2e+1, 1.8, 1)
-#' weights_y <- c(1, 1.8, 4, 8, 20, 20, 70, 70, 1e+2, 5e+2)
-#' r_xy_errors <- 0
-#' york_fit <- york(x = x, y = y, weights_x = weights_x, weights_y = weights_y,
-#'                     r_xy_errors = 0)
-#' plot(york_fit)
+#'  # Example: York's regression with weight data taken from Pearson (1901):
+#'  x <- c(0.0, 0.9, 1.8, 2.6, 3.3, 4.4, 5.2, 6.1, 6.5, 7.4)
+#'  y <- c(5.9, 5.4, 4.4, 4.6, 3.5, 3.7, 2.8, 2.8, 2.4, 1.5)
+#'  weights_x <- c(1e+3, 1e+3, 5e+2, 8e+2, 2e+2, 8e+1, 6e+1, 2e+1, 1.8, 1)
+#'  weights_y <- c(1, 1.8, 4, 8, 20, 20, 70, 70, 1e+2, 5e+2)
+#'  r_xy_errors <- 0
+#'
+#'  # fit york model
+#'  york_fit <- york(x, y, weights_x, weights_y, r_xy_errors = 0)
+#'
+#'  # Obtain plots
+#'  plot(york_fit)
 #'
 #' @name plot.york
 #'
-#' @importFrom ggplot2 ggplot aes geom_abline geom_point labs theme element_text
-#' draw_key_rect scale_colour_manual geom_vline geom_hline geom_smooth geom_line
-#' @importFrom utils stack
-#' @importFrom stats pnorm
+#' @importFrom
+#'  ggplot2 ggplot aes geom_abline geom_point labs theme element_text
+#'  draw_key_rect scale_colour_manual geom_vline geom_hline geom_smooth geom_line
+#' @importFrom
+#'  utils stack
+#' @importFrom
+#'  stats pnorm
 #'
-#' @method plot york
-#' @S3method plot york
+#' @method
+#'  plot york
+#' @S3method
+#'  plot york
+#'
 
 plot.york <- function(x, ...) {
   if (class(x) != "york") {

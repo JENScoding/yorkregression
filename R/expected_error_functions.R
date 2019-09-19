@@ -1,12 +1,26 @@
-#' @title Internal Functions II
+#' @title
+#'  Internal Functions II
 #'
-#' @description Functions used in york function. Internal Functions II
-#' compromise all possible error messages.
+#' @description
+#'  Functions used in york function. Internal Functions II
+#'  compromise all possible error messages.
 #'
-#' @keywords internal
+#'  The exp_error_simple function returns all possible error messages if the input
+#'  is a simple regression with only one sample of x and y.
 #'
-
-### expected errors with only one sample each (simple) (mult.sample = FALSE)
+#'  The exp_error_multiple function returns all possible error messages if
+#'  mult.sample = TRUE is specified
+#'
+#'  The exp_error_convergence function returns an error message if the slope
+#'  coefficient does not converge. It will also print the value if the last
+#'  determined slope coefficients.
+#'
+#' @name internal_functions_II
+#'
+#' @keywords
+#'  internal
+#'
+# function to print error message if input is wrong for mult.samples = FALSE
 exp_error_simple <- function(x, y, weights_x = NULL, weights_y = NULL,
                                sd_x = NULL, sd_y = NULL, r_xy_errors = NULL) {
 
@@ -32,7 +46,14 @@ exp_error_simple <- function(x, y, weights_x = NULL, weights_y = NULL,
   }
 }
 
-### expected errors when input has multiple samples (mult.sample = TRUE)
+
+#' @title Internal Functions II
+#'
+#' @name internal_functions_II
+#'
+#' @keywords internal
+#'
+# error function for multiple sample case
 exp_error_multiple <- function(x, y, weights_x = NULL, weights_y = NULL,
                                sd_x = NULL, sd_y = NULL, r_xy_errors = NULL,
                                approx_solution = FALSE) {
@@ -68,7 +89,14 @@ exp_error_multiple <- function(x, y, weights_x = NULL, weights_y = NULL,
   }
 }
 
-# expected error when slope does not converge
+
+#' @title Internal Functions II
+#'
+#' @name internal_functions_II
+#'
+#' @keywords internal
+#'
+# error function for no convergence
 exp_error_convergence <- function(count, max_iterations, slope_per_iteration) {
 
   if (count <= 3) {

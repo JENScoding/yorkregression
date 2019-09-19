@@ -1,14 +1,45 @@
-#' @title Internal Functions I
+#' @title
+#'  Internal Functions I
 #'
-#' @description Functions used in york function. For Internal Functions I
-#' the output is used for proceeding calculations or displaying. All the
-#' Internal Functions I functions begin with f_ and then the name of the
-#' function is given.
+#' @description
+#'  Function used in york function. For Internal Functions I
+#'  the output is used for proceeding calculations or displaying in the
+#'  york function. All the Internal Functions I functions begin with f_ and
+#'  then the name of the function is given.
 #'
-#' @keywords internal
+#'  f_rewrite rewrites the input data to make it suitable for the algorithm.
+#'  If there are missing values in the input data, they will be omitted.
+#'  If only one value of the weights or sd for x and y respectively, or
+#'  only one value for the error correlation is given, this value is
+#'  repeated as many times as the length of the x and y vector.
+#'
+#'  f_var_row calculates the variance of the respective rows of a data frame
+#'  and f_corr_row the correlations of the respective rows of a data frame.
+#'
+#'  f_ols_reg returns the fit of a linear model. The ols slope coefficient
+#'  is then used in the first iteration of the york algorithm.
+#'
+#'  f_cubic_root avoids the iterative determination of the slope coefficient.
+#'  It solves the cubic equation for the slope coefficient.
+#'  It is just an approximation, for more accurate results the slope has to be
+#'  determined iteratively. Only possible when the error correlation
+#'  is equal to 0. For further detail see references.
+#'
+#'  f_define_output returns a list that is used for the york function
+#'  output. It mainly restructures the information given in the york
+#'  function.
+#'
+#' @references
+#'  York, Derek. "Least-squares fitting of a straight line.", Canadian Journal
+#'  of Physics 44.5 (1966), pp. 1079-1086.
+#'
+#' @name internal_functions_I
+#'
+#' @keywords
+#'  internal
 #'
 
-# Make data suitable for Algorithm
+# function to rewrite input and omit na values:
 f_rewrite <- function(x, y, weights_x = NULL, weights_y = NULL,
                     sd_x = NULL, sd_y = NULL, r_xy_errors = NULL) {
 
@@ -73,16 +104,49 @@ f_rewrite <- function(x, y, weights_x = NULL, weights_y = NULL,
   return(input)
 }
 
-# functions for the variance and correlation of the row
+
+#' @title Internal Functions I
+#'
+#' @name internal_functions_I
+#'
+#' @keywords internal
+#'
+# function to calculate the variance of the rows:
 f_var_row <- function(x) {
-  sum((x - apply(x, 1, mean))^2) / (length(x) - 1)
-}
-f_corr_row <- function(x, y) {
-  sum((x - apply(x, 1, mean)) * (y - apply(y, 1, mean))) /
-    (sqrt(f_var_row(x) * f_var_row(y)) * (length(x) - 1))
+  var <- NULL
+  for (i in 1:nrow(x)) {
+    var[i] <- sum((x[i, ] - apply(x[i, ], 1, mean))^2) / (ncol(x) - 1)
+  }
+  return(var)
 }
 
-# simple linear regression to get ols
+
+#' @title Internal Functions I
+#'
+#' @name internal_functions_I
+#'
+#' @keywords internal
+#'
+## function to calculate the correlation of the rows:
+f_corr_row <- function(x, y) {
+  corr <- NULL
+  for (i in 1:nrow(x)) {
+  corr[i] <- sum((x[i, ] - apply(x[i, ], 1, mean)) *
+                   (y[i, ] - apply(y[i, ], 1, mean))) /
+                   (sqrt(f_var_row(x[i, ]) * f_var_row(y[i, ])) *
+                      (ncol(x) - 1))
+  }
+  return(corr)
+}
+
+
+#' @title Internal Functions I
+#'
+#' @name internal_functions_I
+#'
+#' @keywords internal
+#'
+# function to calculate ols fit:
 f_ols_reg <- function(x, y) {
 
   # find ols slope
@@ -138,7 +202,14 @@ f_ols_reg <- function(x, y) {
   return(ols_output)
 }
 
-# Solve cubic root problem (approximate solution for slope from York (1966)
+
+#' @title Internal Functions I
+#'
+#' @name internal_functions_I
+#'
+#' @keywords internal
+#'
+# function to solve cubic equation for the slope coefficient:
 f_cubic_root <- function(x, y, weights_x, weights_y, r_xy, slope_ols, se_slope_ols) {
 
   if (any(r_xy != 0)) {
@@ -200,6 +271,13 @@ f_cubic_root <- function(x, y, weights_x, weights_y, r_xy, slope_ols, se_slope_o
 }
 
 
+#' @title Internal Functions I
+#'
+#' @name internal_functions_I
+#'
+#' @keywords internal
+#'
+# function to rewrite output:
 f_define_output <- function(intercept, slope, sigma_intercept, sigma_slope,
                             weights_x, weights_y, mult_samples, x, y, sd_x,
                             sd_y, r_xy_errors, x_original, y_original,
@@ -224,10 +302,10 @@ f_define_output <- function(intercept, slope, sigma_intercept, sigma_slope,
 
   if (mult_samples == FALSE) {
     data <- matrix(c(x, y, sd_x, sd_y, r_xy_errors), ncol = 5)
-    colnames(data) <- c("x", "y", "sd_x", "sd_y", "r_xy_errors")
+    colnames(data) <- c("x", "y", "sd_x", "sd_y", "error_correlation")
   } else {
     data <- list("x" = x_original, "y" = y_original, "sd_x" = sd_x,
-                 "sd_y" = sd_y, "r_xy_errors" = r_xy_errors, "x_errors" = x_errors,
+                 "sd_y" = sd_y, "error_correlation" = r_xy_errors, "x_errors" = x_errors,
                  "y_errors" = y_errors, "mean_x_i" = mean_x_i,
                  "mean_y_i" = mean_y_i)
   }
