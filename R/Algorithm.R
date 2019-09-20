@@ -271,16 +271,17 @@ york <- function(x, y, weights_x = NULL, weights_y = NULL, r_xy_errors = NULL,
   sigma_chisq <- sqrt(2 / chisq_df)
   p_value <- 1 - pchisq(S, df = chisq_df)
   test_result <- if (p_value > 0.1 ) {
-    "The assumption of a good fit cannot be rejected."
+    paste("The assumption of a good fit cannot be rejected ",
+          "at a significance level of 10%.")
   } else if (p_value < 0.01) {
-    paste("The assumption of a good fit can be rejected",
-          "at a significance level of 1%.", sep = " ")
+    paste("The assumption of a good fit can be rejected ",
+          "at a significance level of 1%.")
   } else if (p_value < 0.05) {
-    paste("The assumption of a good fit can be rejected",
-          "at a significance level of 5%.", sep = " ")
+    paste("The assumption of a good fit can be rejected ",
+          "at a significance level of 5%.")
   } else {
-    paste("The assumption of a good fit can be rejected",
-          "at a significance level of 10%.", sep = " ")
+    paste("The assumption of a good fit can be rejected ",
+          "at a significance level of 10%.")
   }
 
   # fitted values
