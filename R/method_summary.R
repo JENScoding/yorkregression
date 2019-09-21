@@ -46,8 +46,15 @@ summary.york <- function(object, ...) {
   if (class(object) != "york") {
     stop("Input must be of class york (Output of york function)")
   }
-  x_residuals_summary <- round(summary(object$x_residuals), 3)
-  y_residuals_summary <- round(summary(object$y_residuals), 3)
+  if (object$york_arguments$mult_samples == FALSE) {
+    x_resid <- object$x_residuals
+    y_resid <- object$y_residuals
+  } else {
+    x_resid <- as.vector(object$x_residuals)
+    y_resid <- as.vector(object$y_residuals)
+  }
+  x_residuals_summary <- round(summary(x_resid), 3)
+  y_residuals_summary <- round(summary(y_resid), 3)
   p_value <- round(object$goodness_of_fit$p_value, 5)
   df <- object$goodness_of_fit$chisq_df
   test_statistic <- round(object$goodness_of_fit$chisq_statistic, 3)
@@ -62,7 +69,6 @@ summary.york <- function(object, ...) {
                  "y_Residuals" = y_residuals_summary,
                  "Coefficients" = round(object$coefficients, 5),
                  "Regression_Test" = regression_test)
-  attr(output, "class") <- "summary.york"
 
   return(output)
 }

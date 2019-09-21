@@ -52,10 +52,24 @@ f_p_influential <- function(x_data, y_data, mult_samples,
     detect_influential <- which(p_value <= 0.01)
 
     # write all influential observations with x and y coordinate in a data frame
+    # and define output
     influential <- data.frame("x" = x_data[detect_influential],
                           "y" = y_data[detect_influential],
                           "which_row" = factor(detect_influential))
-    leg_title = "Influential observation at observation point:"
+
+    # define titles for plot
+    if (length(detect_influential) != 0) {
+      legend_title = "Influential observation at observation point:"
+      plot_title = paste("York's best-fit straight line with encircled ",
+                         "potential influential points")
+      plot_subtitle = "t-test with significance level alpha = 0.01"
+    } else {
+      legend_title = "."
+      plot_title = paste("York's best-fit straight line with encircled ",
+                         "potential influential points")
+      plot_subtitle = paste("No influential points were detected for ",
+                            "t-test with significance level alpha = 0.01")
+    }
   } else { # mult.samples = TRUE
 
     # run york regression and omit one row of observations
@@ -92,6 +106,8 @@ f_p_influential <- function(x_data, y_data, mult_samples,
                               "which_row" = factor(rep(detect_influential,
                                                        each =
                                                          ncol(x_mult))))
+
+
     if (length(detect_influential) != 0) {
       colnames(influential) <- c("x", "y", "which_row")
       legend_title = "Influential observation(s) in row(s):"
