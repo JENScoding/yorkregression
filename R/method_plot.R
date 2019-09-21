@@ -207,30 +207,26 @@ plot.york <- function(x, ...) {
                                  york_fit$york_arguments$max_iterations,
                                  x_mult, y_mult)
 
-  if (length(influential) == 0) {
-    plot_6 <- NULL
-  } else {
-    ddf6 <- data.frame(x = x_data, y = y_data)
-    ddf_influential <- data.frame(influential$detect_influential)
 
-    # plot fitted line and observations with encircled influential points
-    plot_6 <- ggplot(data = ddf6, aes(x = x,
+  ddf6 <- data.frame(x = x_data, y = y_data)
+  ddf_influential <- data.frame(influential$detect_influential)
+
+  # plot fitted line and observations with encircled influential points
+  plot_6 <- ggplot(data = ddf6, aes(x = x,
                                       y = y)) +
-      geom_point() +
-      geom_abline(aes(slope = york_fit$coefficients[2, 1],
-                      intercept = york_fit$coefficients[1, 1]), col = "red") +
-      geom_point(aes(x = ddf_influential$x,
-                     y = ddf_influential$y,
-                     col = ddf_influential$which_row),
-                 size = 15, shape = 1,
-                 data = ddf_influential) +
-      labs(title=paste("York's best-fit straight line with encircled ",
-                       "potential influential points"),
-           subtitle = "significance level alpha = 0.01",
-           x ="x data", y = "y data", col = influential$leg_title) +
-      theme(plot.title =element_text(hjust = 0.5)) +
-      theme(plot.subtitle =element_text(hjust = 0.5))
-  }
+    geom_point() +
+    geom_abline(aes(slope = york_fit$coefficients[2, 1],
+                    intercept = york_fit$coefficients[1, 1]), col = "red") +
+    geom_point(aes(x = ddf_influential$x,
+                   y = ddf_influential$y,
+                   col = ddf_influential$which_row),
+               size = 15, shape = 1,
+               data = ddf_influential) +
+    labs(title = influential$pl_title,
+         subtitle = influential$pl_subtitle,
+         x ="x data", y = "y data", col = influential$leg_title) +
+    theme(plot.title =element_text(hjust = 0.5)) +
+    theme(plot.subtitle =element_text(hjust = 0.5))
 
 
   ### Chi^2 test graph and test results
