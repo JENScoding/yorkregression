@@ -78,18 +78,39 @@ f_p_influential <- function(x_data, y_data, mult_samples,
     x_mult_t <- data.frame(t(x_mult[detect_influential,]))
     y_mult_t <- data.frame(t(y_mult[detect_influential,]))
 
+    if (length(detect_influential) == 0) {
+      x_mult_st <- NULL
+      y_mult_st <- NULL
+    } else {
+      x_mult_st <- stack(x_mult_t)[, 1]
+      y_mult_st <- stack(y_mult_t)[, 1]
+    }
+
     # write all influentials with x and y coordinate in a data frame
-    influential <- data.frame("x" = stack(x_mult_t)[1],
-                              "y" = stack(y_mult_t)[1],
+    influential <- data.frame("x" = x_mult_st,
+                              "y" = y_mult_st,
                               "which_row" = factor(rep(detect_influential,
                                                        each =
                                                          ncol(x_mult))))
-    colnames(influential) <- c("x", "y", "which_row")
-    leg_title = "Influential observation(s) in row(s):"
+    if (length(detect_influential) != 0) {
+      colnames(influential) <- c("x", "y", "which_row")
+      legend_title = "Influential observation(s) in row(s):"
+      plot_title = paste("York's best-fit straight line with encircled ",
+                       "potential influential points")
+      plot_subtitle = "t-test with significance level alpha = 0.01"
+    } else {
+      legend_title = "."
+      plot_title = paste("York's best-fit straight line with encircled ",
+                         "potential influential points")
+      plot_subtitle = paste("No influential points were detected for ",
+                            "t-test with significance level alpha = 0.01")
+    }
   }
 
   output <- list("detect_influential" = influential,
-                 "leg_title" = leg_title)
+                 "leg_title" = legend_title,
+                 "pl_title" = plot_title,
+                 "pl_subtitle" = plot_subtitle)
 
   return(output)
 }
