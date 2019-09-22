@@ -2,7 +2,7 @@
 #'  Predict method for York Model Fits
 #'
 #' @description
-#'  Predictions from a model fitted by \code{\link{york}}.
+#'  Predictions from a model fitted by \code{york}.
 #'
 #' @param object
 #'  a fitted object of class inheriting from "york".
