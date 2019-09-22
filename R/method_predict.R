@@ -58,6 +58,7 @@ predict.york <- function(object, newdata = NULL, ...) {
   if (is.null(newdata)) {
     predict_y <- data.frame("x" = x_data, "predict_y" =
                               object$fitted_y)
+    colnames(predict_y) <- c("x", "predict_y")
   } else {
     predict_y <- data.frame("x" = newdata, "predict_y" =
                               object$coefficients[1, 1] +
