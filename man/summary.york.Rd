@@ -23,7 +23,7 @@ The function summary.york computes and returns a list, of summary
     intercept and slope of the best-fit straight line with their respective
     standard errors.}
   \item{Regression_Test}{a vector of strings with the information of
-    the value of the test-statistic the degrees of freedom and the p-value
+    the value of the test statistic the degrees of freedom and the p-value
    as first element and the test result whether \eqn{H0} can be rejected
    or not as second element.}
 }

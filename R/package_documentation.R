@@ -1,6 +1,6 @@
-#' York: A package to fit a linear York's model.
+#' yorkregression: A package to fit a linear York's model.
 #'
-#' The York package provides one main function named york and three methods
+#' The yorkregression package provides one main function named york and three methods
 #' summary.york, plot.york and predict.york.
 #'
 #' @section
@@ -21,5 +21,5 @@
 #'
 #' @docType package
 #'
-#' @name York
+#' @name yorkregression
 NULL

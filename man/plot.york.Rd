@@ -21,12 +21,12 @@ Plots for york model fit are obtained. The plot function returns
 \details{
 Given an object of class "york" this function gives several york plots.
  The first plot shows York's best-fit straight line only. The
- second plot shows York's best fit straight line compared to OLS and orthogonal
- regression. Additionally, the different "center of gravity" are shown. The
- third plot is a "y-residuals vs. x-residuals plot". The fourth is a
- "x-residuals vs. fitted-y plot". The fith plot is a "y-residuals vs.
- fitted y" plot and the last plot is a "trace plot" which shows the slope after
- each interation, i.e. how the slope coefficient converges.
+ second plot shows York's best fit straight line compared to OLS and
+ orthogonal regression. Additionally, the different "center of gravity" are
+ shown. The third plot is a "y-residuals vs. x-residuals plot". The fourth is
+  a "x-residuals vs. fitted-y plot". The fith plot is a "y-residuals vs.
+ fitted y" plot and the last plot is a "trace plot" which shows the slope
+ after each interation, i.e. how the slope coefficient converges.
 }
 \examples{
  # Example: York's regression with weight data taken from Pearson (1901):

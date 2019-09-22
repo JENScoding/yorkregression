@@ -78,7 +78,7 @@ York Returns an object of class "york". An
  }
 }
 \description{
-\code{york} is used to fit a model when both X and Y variables are
+The function york is used to fit a model when both X and Y variables are
  subject to measurement errors. The york function returns an object of class
  "york", which is a fit of a York's regression. The model can also take into
  account correlations between x and y errors.

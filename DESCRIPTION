@@ -1,4 +1,4 @@
-Package: York
+Package: yorkregression
 Title: York's regression of X and Y-variables with correlated errors
 Version: 0.0.0.9000
 Authors@R: c(

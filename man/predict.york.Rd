@@ -9,9 +9,9 @@
 \arguments{
 \item{object}{a fitted object of class inheriting from "york".}
 
-\item{newdata}{a vector or a dataframe to be used for prediction.
-If not specified the original x values with their respective
-fitted y values will be returned.}
+\item{newdata}{a vector or a dataframe to be used for the prediction.
+If not specified the original x-values with their respective
+fitted y-values will be returned.}
 
 \item{...}{additional arguments affecting the predictions produced.}
 }
