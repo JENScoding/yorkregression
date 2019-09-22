@@ -20,7 +20,7 @@ the first column represents the first sample, of the \code{y}-variable(s).}
 \item{weights_y}{the prespecified 1 times n weighting vector for \code{y}-values.}
 
 \item{r_xy_errors}{the prespecified correlation coefficient between the errors
-in \code{x} and \code{y}. Either a 1 times n vector or a single value.}
+in \code{X} and \code{Y}. Either a 1 times n vector or a single value.}
 
 \item{tolerance}{the tolerance for convergence of the slope coefficent. The default
 is \code{1e-5}.}
@@ -78,13 +78,13 @@ York Returns an object of class "york". An
  }
 }
 \description{
-The york function is used to fit a model when both x and y variables are subject
- to measurement errors. The york function returnes an object of class "york", which is a fit of a
- York's regression. The model can also take into account correlations between
- x and y errors.
+\code{york} is used to fit a model when both X and Y variables are
+ subject to measurement errors. The york function returns an object of class
+ "york", which is a fit of a York's regression. The model can also take into
+ account correlations between x and y errors.
 }
 \details{
-The york function implements the algorithm for the problem of the
+\code{york} implements the algorithm for the problem of the
  best-ﬁt straight line to independent points with errors in both x and y
  variables. General York (1969) solution according to the algorithm of Wehr & Saleska
  (2017).
