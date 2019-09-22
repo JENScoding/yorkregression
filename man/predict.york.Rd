@@ -26,7 +26,7 @@ Returns a list, containing a dataframe with predicted values.
 }
 }
 \description{
-Predictions from a model fitted by \code{\link{york}}.
+Predictions from a model fitted by \code{york}.
 }
 \examples{
  # Example: York's regression with weight data taken from Pearson (1901):
