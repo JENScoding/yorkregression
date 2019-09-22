@@ -187,6 +187,8 @@ york <- function(x, y, weights_x = NULL, weights_y = NULL, r_xy_errors = NULL,
                            y_errors)
     var_x <- f_var_row(x)
     var_y <- f_var_row(y)
+    sd_x <- sqrt(var_x)
+    sd_y <- sqrt(var_y)
     weights_x <- 1 / var_x
     weights_y <- 1 / var_y
 
