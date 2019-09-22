@@ -156,7 +156,7 @@ york <- function(x, y, weights_x = NULL, weights_y = NULL, r_xy_errors = NULL,
     sd_y <- re_input$sd_y
     r_xy_errors <- re_input$r_xy_errors
     x_data <- NULL
-    y_original <- NULL
+    y_data <- NULL
     x_errors <- NULL
     y_errors <- NULL
     mean_x_i <- NULL
@@ -185,15 +185,15 @@ york <- function(x, y, weights_x = NULL, weights_y = NULL, r_xy_errors = NULL,
     y_errors <- y - mean_y_i
     r_xy_errors <- f_corr_row(x_errors,
                            y_errors)
-    sd_x <- f_var_row(x)
-    sd_y <- f_var_row(y)
-    weights_x <- 1 / sd_x
-    weights_y <- 1 / sd_y
+    var_x <- f_var_row(x)
+    var_y <- f_var_row(y)
+    weights_x <- 1 / var_x
+    weights_y <- 1 / var_y
 
     x_data <- x
-    y_original <- y
+    y_data <- y
     x <- as.matrix(stack(data.frame(t(x_data)))[1])
-    y <- as.matrix(stack(data.frame(t(y_original)))[1])
+    y <- as.matrix(stack(data.frame(t(y_data)))[1])
   }
 
   # initial value of the slope is olse slope
@@ -298,7 +298,7 @@ york <- function(x, y, weights_x = NULL, weights_y = NULL, r_xy_errors = NULL,
   # define output
   def_output <- f_define_output(intercept, slope, sigma_intercept, sigma_slope,
                                 weights_x, weights_y, mult_samples, x, y, sd_x,
-                                sd_y, r_xy_errors, x_data, y_original,
+                                sd_y, r_xy_errors, x_data, y_data,
                                 x_errors, y_errors, mean_x_i, mean_y_i,
                                 slope_per_iteration, tolerance, max_iterations,
                                 approx_solution, S, chisq_df, p_value,
