@@ -7,9 +7,9 @@
 #' @param object
 #'  a fitted object of class inheriting from "york".
 #' @param newdata
-#'  a vector or a dataframe to be used for prediction.
-#'  If not specified the original x values with their respective
-#'  fitted y values will be returned.
+#'  a vector or a dataframe to be used for the prediction.
+#'  If not specified the original x-values with their respective
+#'  fitted y-values will be returned.
 #' @param ...
 #'  additional arguments affecting the predictions produced.
 #'
@@ -70,9 +70,3 @@ predict.york <- function(object, newdata = NULL, ...) {
 
   return(output)
 }
-
-
-
-
-
-

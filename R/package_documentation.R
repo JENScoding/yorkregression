@@ -16,7 +16,8 @@
 #'
 #'  The plot.york method returns plots for the fitted york model.
 #'
-#'  The predict.york method returns predicted values for y for a fitted york model.
+#'  The predict.york method returns predicted values for y for a fitted york
+#'  model.
 #'
 #' @docType package
 #'

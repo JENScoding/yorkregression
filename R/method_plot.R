@@ -16,12 +16,12 @@
 #' @details
 #'  Given an object of class "york" this function gives several york plots.
 #'  The first plot shows York's best-fit straight line only. The
-#'  second plot shows York's best fit straight line compared to OLS and orthogonal
-#'  regression. Additionally, the different "center of gravity" are shown. The
-#'  third plot is a "y-residuals vs. x-residuals plot". The fourth is a
-#'  "x-residuals vs. fitted-y plot". The fith plot is a "y-residuals vs.
-#'  fitted y" plot and the last plot is a "trace plot" which shows the slope after
-#'  each interation, i.e. how the slope coefficient converges.
+#'  second plot shows York's best fit straight line compared to OLS and
+#'  orthogonal regression. Additionally, the different "center of gravity" are
+#'  shown. The third plot is a "y-residuals vs. x-residuals plot". The fourth is
+#'   a "x-residuals vs. fitted-y plot". The fith plot is a "y-residuals vs.
+#'  fitted y" plot and the last plot is a "trace plot" which shows the slope
+#'  after each interation, i.e. how the slope coefficient converges.
 #'
 #' @examples
 #'  # Example: York's regression with weight data taken from Pearson (1901):
@@ -41,8 +41,8 @@
 #'
 #' @importFrom
 #'  ggplot2 ggplot aes geom_abline geom_point labs theme element_text
-#'  draw_key_rect scale_colour_manual geom_vline geom_hline geom_smooth geom_line
-#'  stat_function geom_segment annotate
+#'  draw_key_rect scale_colour_manual geom_vline geom_hline geom_smooth
+#'  geom_line stat_function geom_segment annotate
 #' @importFrom
 #'  utils stack
 #' @importFrom
@@ -270,13 +270,16 @@ plot.york <- function(x, ...) {
                  size = (15 - log(chisq_test$df) * 2.5),
                  data = ddf_reject_region) +
     scale_colour_manual("", values = c("red4", "red3", "red", "lightgreen")) +
-    annotate("text", label = paste("test statistic = ", chisq_test$test_statistic),
+    annotate("text", label = paste("test statistic = ",
+                                   chisq_test$test_statistic),
              x =  Inf, y = Inf,
              vjust = 7.5, hjust = chisq_test$adj, size = 6) +
-    annotate("text", label = paste("p-value", chisq_test$math, chisq_test$p_value ),
+    annotate("text", label = paste("p-value", chisq_test$math,
+                                   chisq_test$p_value ),
               x =  Inf, y = Inf,
              vjust = 10, hjust = 1.3, size = 6) +
-    labs(title = paste("Chi-squared test: ", york_fit$goodness_of_fit$test_result),
+    labs(title = paste("Chi-squared test: ",
+                       york_fit$goodness_of_fit$test_result),
          x = "x", y = "Density") +
     theme(plot.title = element_text(hjust = 0.5))
 
@@ -295,7 +298,7 @@ plot.york <- function(x, ...) {
       labs(title = "Trace plot",
            x = "Number of iterations", y = "slope coefficient") +
       theme(plot.title = element_text(hjust = 0.5))
-  } else { # approx_solution = TRUE
+  } else {# approx_solution = TRUE
     plot_8 <- NULL
   }
   return(list(plot_1, plot_2, plot_3, plot_4, plot_5, plot_6, plot_7, plot_8))

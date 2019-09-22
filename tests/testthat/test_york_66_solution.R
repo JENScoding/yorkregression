@@ -7,7 +7,8 @@ test_that("Test implementation of exact solution", {
   weights_x = c(1e+3, 1e+3, 5e+2, 8e+2, 2e+2, 8e+1, 6e+1, 2e+1, 1.8, 1)
 
   ## Test
-  expect_error(york(x, y, weights_x = weights_x, weights_y = weights_y, r_xy_errors = 0, approx_solution = TRUE), NA)
+  expect_error(york(x, y, weights_x = weights_x, weights_y = weights_y,
+                    r_xy_errors = 0, approx_solution = TRUE), NA)
 
   # if weights for x and y are 1 we have orthogonal regression
   first <- york(x, y, weights_x = 1, weights_y = 1, r_xy_errors = 0)
@@ -20,9 +21,11 @@ test_that("Test implementation of exact solution", {
                round(second$ols_summary$coefficients_ols[2,1], 3))
 
   # compare approx value with the one in York (1966)
-  third <- york(x, y, weights_x = weights_x, weights_y = weights_y, r_xy_errors = 0, approx_solution = TRUE)
+  third <- york(x, y, weights_x = weights_x, weights_y = weights_y,
+                r_xy_errors = 0, approx_solution = TRUE)
   expect_type(third$coefficients[2, 1], "double")
-  expect_true(third$coefficients[2, 1] < -0.477 && third$coefficients[2, 1] > -0.478)
+  expect_true(third$coefficients[2, 1] < -0.477 && third$coefficients[2, 1] >
+                -0.478)
 })
 
 
