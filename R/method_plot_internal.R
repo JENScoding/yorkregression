@@ -51,8 +51,8 @@ f_p_influential <- function(x_data, y_data, mult_samples,
     p_value <- 2 * (1 - pnorm(abs(t_statistic)))
     detect_influential <- which(p_value <= 0.01)
 
-    # write all influential observations with x and y coordinate in a data frame
-    # and define output
+    # write all influential observations with x and y coordinate in
+    # a data frame and define output
     influential <- data.frame("x" = x_data[detect_influential],
                           "y" = y_data[detect_influential],
                           "which_row" = factor(detect_influential))

@@ -18,8 +18,8 @@
 #'  The first plot shows York's best-fit straight line only. The
 #'  second plot shows York's best fit straight line compared to OLS and
 #'  orthogonal regression. Additionally, the different "center of gravity" are
-#'  shown. The third plot is a "y-residuals vs. x-residuals plot". The fourth is
-#'   a "x-residuals vs. fitted-y plot". The fith plot is a "y-residuals vs.
+#'  shown. The third plot is a "y-residuals vs. x-residuals plot". The fourth
+#'  is a "x-residuals vs. fitted-y plot". The fith plot is a "y-residuals vs.
 #'  fitted y" plot and the last plot is a "trace plot" which shows the slope
 #'  after each interation, i.e. how the slope coefficient converges.
 #'
@@ -77,7 +77,8 @@ plot.york <- function(x, ...) {
                                    y = y)) +
       geom_point() +
       geom_abline(aes(slope = york_fit$coefficients[2, 1],
-                      intercept = york_fit$coefficients[1, 1]), col = "red") +
+                      intercept = york_fit$coefficients[1, 1]),
+                  col = "red") +
       labs(title="York's best-fit straight line",
            x ="x data", y = "y data") +
       theme(plot.title =element_text(hjust = 0.5))
@@ -94,7 +95,8 @@ plot.york <- function(x, ...) {
                                      y = y)) +
       geom_point() +
       geom_abline(aes(slope = york_fit$coefficients[2, 1],
-                      intercept = york_fit$coefficients[1, 1]), col = "red") +
+                      intercept = york_fit$coefficients[1, 1]),
+                  col = "red") +
       labs(title="York's best-fit straight line",
            x ="x data", y = "y data") +
       theme(plot.title = element_text(hjust = 0.5))
@@ -216,7 +218,8 @@ plot.york <- function(x, ...) {
                                       y = y)) +
     geom_point() +
     geom_abline(aes(slope = york_fit$coefficients[2, 1],
-                    intercept = york_fit$coefficients[1, 1]), col = "red") +
+                    intercept = york_fit$coefficients[1, 1]),
+                col = "red") +
     geom_point(aes(x = ddf_influential$x,
                    y = ddf_influential$y,
                    col = ddf_influential$which_row),
@@ -237,10 +240,14 @@ plot.york <- function(x, ...) {
 
   # plot chisq graph and test results
   plot_7 <- ggplot(data = data.frame(x = c(0, chisq_test$x_limit)), aes(x)) +
+
+    # build chi-squared distribution
     stat_function(fun = dchisq, n = 1e+3, args = list(df = chisq_test$df),
                   size = 1.1) +
     geom_hline(yintercept = 0, col = "black") +
     geom_vline(xintercept = 0, col = "black") +
+
+    # add results from test and critical values
     geom_segment(aes(x = chisq_test$x_p_value,
                      y = 0,
                      xend = chisq_test$x_p_value,

@@ -5,8 +5,8 @@
 #'  Functions used in york function. Internal Functions II
 #'  compromise all possible error messages.
 #'
-#'  The exp_error_simple function returns all possible error messages if the input
-#'  is a simple regression with only one sample of x and y.
+#'  The exp_error_simple function returns all possible error messages
+#'  if the input is a simple regression with only one sample of x and y.
 #'
 #'  The exp_error_multiple function returns all possible error messages if
 #'  mult.sample = TRUE is specified

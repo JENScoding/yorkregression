@@ -55,11 +55,15 @@ predict.york <- function(object, newdata = NULL, ...) {
     x_data <- stack(x_t)[, 1]
     y_data <- stack(y_t)[, 1]
   }
+
+  # show fitted y's if now newdata is given
   if (is.null(newdata)) {
     predict_y <- data.frame("x" = x_data, "predict_y" =
                               object$fitted_y)
     colnames(predict_y) <- c("x", "predict_y")
   } else {
+
+    # show fitted y for given newdata
     predict_y <- data.frame("x" = newdata, "predict_y" =
                               object$coefficients[1, 1] +
                               object$coefficients[2, 1] * newdata)
