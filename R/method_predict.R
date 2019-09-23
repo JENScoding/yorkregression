@@ -49,7 +49,7 @@ predict.york <- function(object, newdata = NULL, ...) {
   if (object$york_arguments$mult_samples == FALSE) {
     x_data <- object$data[, 1]
     y_data <- object$data[, 2]
-  } else { # mult_sample = TRUE
+  } else {# mult_sample = TRUE
     x_t <- data.frame(t(object$data$x))
     y_t <- data.frame(t(object$data$y))
     x_data <- stack(x_t)[, 1]
@@ -74,3 +74,4 @@ predict.york <- function(object, newdata = NULL, ...) {
 
   return(output)
 }
+

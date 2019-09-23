@@ -49,7 +49,7 @@ summary.york <- function(object, ...) {
   if (object$york_arguments$mult_samples == FALSE) {
     x_resid <- object$x_residuals
     y_resid <- object$y_residuals
-  } else { # mult_samples = TRUE
+  } else {# mult_samples = TRUE
     x_resid <- as.vector(object$x_residuals)
     y_resid <- as.vector(object$y_residuals)
   }
@@ -75,7 +75,4 @@ summary.york <- function(object, ...) {
 
   return(output)
 }
-
-
-
 

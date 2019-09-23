@@ -28,7 +28,7 @@ exp_error_simple <- function(x, y, weights_x = NULL, weights_y = NULL,
   if (is.null(c(sd_x, sd_y, weights_x, weights_y))) {
     stop("Specify either standard errors or weights")
   }
-  if(length(x) != length(y)) {
+  if (length(x) != length(y)) {
     stop("x and y must have the same length!")
   }
   if (length(r_xy_errors) != length(x)) {
@@ -109,8 +109,9 @@ exp_error_convergence <- function(count, max_iterations, slope_per_iteration) {
          count, paste(" iterations. \nHint: You may reduce the tolerance level",
                       "or increase the maximum number of iterations.", sep = " "),
          cat("Slope coefficient for the last", last + 1, "iterations:"),
-         for (i in last:0){
+         for (i in last:0) {
            cat("\n\t", count - i, "\t", slope_per_iteration[count - i])},
          cat("\n"))
   }
 }
+

@@ -332,6 +332,3 @@ york <- function(x, y, weights_x = NULL, weights_y = NULL, r_xy_errors = NULL,
 
   return(output)
 }
-
-
-

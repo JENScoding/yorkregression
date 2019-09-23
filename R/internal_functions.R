@@ -358,5 +358,3 @@ f_define_output <- function(intercept, slope, sigma_intercept, sigma_slope,
 
   return(output)
 }
-
-

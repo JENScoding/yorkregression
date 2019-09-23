@@ -70,7 +70,7 @@ f_p_influential <- function(x_data, y_data, mult_samples,
       plot_subtitle = paste("No influential points were detected for ",
                             "t-test with significance level alpha = 0.01")
     }
-  } else { # mult.samples = TRUE
+  } else {# mult.samples = TRUE
 
     # run york regression and omit one row of observations
     slope_influential <- NULL
@@ -78,7 +78,7 @@ f_p_influential <- function(x_data, y_data, mult_samples,
       slope_influential[i] <- suppressWarnings(
         york(x_mult[-i,], y_mult[-i,],
              tolerance = tolerance,
-             max_iterations =max_iterations,
+             max_iterations = max_iterations,
              mult_samples = mult_samples)[[1]][2, 1])
     }
 
@@ -165,7 +165,7 @@ f_p_chisq_test <- function(chisq_df, p_value, chisq_statistic) {
                               "y" = rep(0, length(critical_value) - 3),
                               "yend" = y_critical[4:32])
   test_statistic <- round(chisq_statistic, 3)
-  if (test_statistic >= 100){
+  if (test_statistic >= 100) {
     adj <- 1.09
   } else {
     adj <- 1.17
@@ -187,3 +187,4 @@ f_p_chisq_test <- function(chisq_df, p_value, chisq_statistic) {
 
   return(output)
 }
+
