@@ -49,15 +49,18 @@ summary.york <- function(object, ...) {
   if (object$york_arguments$mult_samples == FALSE) {
     x_resid <- object$x_residuals
     y_resid <- object$y_residuals
-  } else {
+  } else { # mult_samples = TRUE
     x_resid <- as.vector(object$x_residuals)
     y_resid <- as.vector(object$y_residuals)
   }
+
+  # to be shown in console
   x_residuals_summary <- round(summary(x_resid), 3)
   y_residuals_summary <- round(summary(y_resid), 3)
   p_value <- round(object$goodness_of_fit$p_value, 5)
   df <- object$goodness_of_fit$chisq_df
   test_statistic <- round(object$goodness_of_fit$chisq_statistic, 3)
+
   phrase <- object$goodness_of_fit$test_result
   regression_test = c(paste("Chisq-statistic:", test_statistic,
                             "on", df, "degrees of freedom, ",

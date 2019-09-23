@@ -41,7 +41,7 @@
 
 # function to rewrite input and omit na values:
 f_rewrite <- function(x, y, weights_x = NULL, weights_y = NULL,
-                    sd_x = NULL, sd_y = NULL, r_xy_errors = NULL) {
+                      sd_x = NULL, sd_y = NULL, r_xy_errors = NULL) {
 
   # if input was only 1 value repeat it to adjust to sample size
   if (length(weights_x) == 1) {
@@ -209,12 +209,14 @@ f_ols_reg <- function(x, y) {
   SS_y <- sum(centered_y^2)
   S_x <- sum(x^2)
   SS_xy <- sum((centered_x) * (centered_y))
-  se_intercept <- sqrt(sigma_squared_hat * (S_x / (length(x) * SS_x)))
+  se_intercept <- sqrt(sigma_squared_hat *
+                         (S_x / (length(x) * SS_x)))
   se_slope <- sqrt(sigma_squared_hat / SS_x)
   r_squared <- 1 - RSS / SS_y
   r_squared_adjusted <- r_squared - (1 - r_squared) *
-    (1 / (length(x) - 2))
-  f_statistic <- (r_squared / (1 - r_squared)) * ((length(x) - 2))
+                                       (1 / (length(x) - 2))
+  f_statistic <- (r_squared / (1 - r_squared)) *
+                    ((length(x) - 2))
 
   # matrix for coefficients and their se
   coef <- matrix(c(intercept, slope, se_intercept,

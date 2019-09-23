@@ -3,9 +3,9 @@
 #'
 #' @description
 #'  The function york is used to fit a model when both X and Y variables are
-#'  subject to measurement errors. The york function returns an object of class
-#'  "york", which is a fit of a York's regression. The model can also take into
-#'  account correlations between x and y errors.
+#'  subject to measurement errors. The york function returns an object of
+#'  class "york", which is a fit of a York's regression. The model can also
+#'  take into account correlations between x and y errors.
 #'
 #' @param x
 #'  a 1 times n vector or in case of multiple samples a dataframe, where
@@ -24,7 +24,8 @@
 #'  the tolerance for convergence of the slope coefficent. The default
 #'  is \code{1e-5}.
 #' @param max_iterations
-#'  the maximum number of iterations for convergence. The default is \code{50}.
+#'  the maximum number of iterations for convergence.
+#'  The default is \code{50}.
 #' @param sd_x
 #'  the standard error of the \code{x}-values. If the true errors
 #'  in x are known.
@@ -37,22 +38,22 @@
 #' @param approx_solution
 #'  \code{logical}. Default is \code{FALSE}. Change to TRUE, if you want an
 #'  approximate solution of the slope coefficients. No iteration is needed.
-#'  TRUE is not recommended when the accuracy for the slope coefficient shall be
-#'  more than one decimal point.
+#'  TRUE is not recommended when the accuracy for the slope coefficient
+#'  shall be more than one decimal point.
 #'
 #' @details
 #'  \code{york} implements the algorithm for the problem of the
 #'  best-ﬁt straight line to independent points with errors in both x and y
-#'  variables. General York (1969) solution according to the algorithm of Wehr & Saleska
-#'  (2017).
+#'  variables. General York (1969) solution according to the algorithm of Wehr
+#'  & Saleska (2017).
 #'
 #'  Given \eqn{n} pairs of \eqn{(x_i, y_i), i = 1, \ldots, n}, their
-#'  weights \eqn{(\omega(x_i), \omega(y_i)), i = 1, \ldots, n} or their standard
-#'  errors \eqn{sd(x_i)} and \eqn{sd(y_i)}, the \code{york} function finds the
-#'  best-fit straight line using the algorithm of York et al. (1966)/ York et
-#'  al. (1969) as presented in Wehr & Saleska (2017). In addition, the function
-#'  provides numerous statistics, parameters and goodness of fit criteria. If
-#'  the data contains NA values they will be omitted.
+#'  weights \eqn{(\omega(x_i), \omega(y_i)), i = 1, \ldots, n} or their
+#'  standard errors \eqn{sd(x_i)} and \eqn{sd(y_i)}, the \code{york} function
+#'  finds the best-fit straight line using the algorithm of York et al. (1966)/
+#'  York et al. (1969) as presented in Wehr & Saleska (2017). In addition, the
+#'  function provides numerous statistics, parameters and goodness of fit
+#'  criteria. If the data contains NA values they will be omitted.
 #'
 #' @return
 #'  York Returns an object of class "york". An
@@ -60,8 +61,9 @@
 #'
 #'  \describe{
 #'
-#'  \item{coefficients}{a matrix which contains the York estimates for intercept
-#'    and slope of the best-fit straight line with their respective standard errors.}
+#'  \item{coefficients}{a matrix which contains the York estimates
+#'    for intercept and slope of the best-fit straight line with their
+#'    respective  standard errors.}
 #'  \item{x_residuals}{a vector of the York x-residuals.}
 #'  \item{y_residuals}{a vector of the York y-residuals.}
 #'  \item{fitted_y}{a vector of the fitted York y-values.}
@@ -69,19 +71,20 @@
 #'    weights for the x- and y-observations.}
 #'  \item{data}{a data matrix which contains as columns the observed points x-,
 #'    y-values, the errors sd_x- and sd_y and the correlation of the errors
-#'    (error_correlation). If the input are multiple samples the data element will be
-#'    a list containing the observed points x-, y-values, the errors sd_x- and sd_y
-#'    and the correlation of the errors (error_correlation), the errors in x and y
-#'    (x_errors// y_errors) and the mean of each obersvation i for variable x
-#'    and y, respectively (mean_x_i// mean).}
+#'    (error_correlation). If the input are multiple samples the data element
+#'    will be a list containing the observed points x-, y-values, the errors
+#'    sd_x- and sd_y and the correlation of the errors (error_correlation),
+#'    the errors in x and y (x_errors// y_errors) and the mean of each
+#'    obersvation i for variable x and y, respectively (mean_x_i// mean).}
 #'  \item{reduced_chisq}{the reduced chi-squared statistic
-#'    (See \url{https://en.wikipedia.org/wiki/Reduced_chi-squared_statistic}), i.e.
-#'    the goodness of fit measure of York's regression.}
+#'    (See \url{https://en.wikipedia.org/wiki/Reduced_chi-squared_statistic}),
+#'    i.e. the goodness of fit measure of York's regression.}
 #'  \item{se_chisq}{the standard error of the chi-squared statistic.}
-#'  \item{goodness_of_fit}{a list with the test results of a \eqn{\chi^2}--test,
-#'    containing the test-statistic, the degrees of freedom, the p-value and
-#'    a string saying whether \eqn{H0} (the assumption of a good fit) can be
-#'    rejected or not for \eqn{\alpha = 0.01}.}
+#'  \item{goodness_of_fit}{a list with the test results of a
+#'    chi-squared-test, containing the test-statistic, the degrees of
+#'    freedom, the p-value and a string saying whether \eqn{H0}
+#'    (the assumption of a good fit) can be rejected or not for
+#'    \eqn{\alpha = 0.01}.}
 #'  \item{n_iterations}{the total number of iterations.}
 #'  \item{slope_per_iteration}{the York slope after each iteration.}
 #'  \item{weighted_mean_x}{the weighted.mean of x.}
@@ -102,8 +105,8 @@
 #'  of Physics 44.5 (1966), pp. 1079-1086.
 #'
 #'  York, Derek, et al. "Unified equations for the slope, intercept, and
-#'  standard errors of the best straight line." American Journal of Physics 72.3
-#'  (2004), pp. 367-375.
+#'  standard errors of the best straight line." American Journal of
+#'  Physics 72.3 (2004), pp. 367-375.
 #'
 #' @examples
 #'  # Example: York's regression with weight data taken from Pearson (1901):
@@ -140,8 +143,8 @@
 #' @export
 #'
 york <- function(x, y, weights_x = NULL, weights_y = NULL, r_xy_errors = NULL,
-                 tolerance = 1e-5, max_iterations = 50, sd_x = NULL, sd_y = NULL,
-                 mult_samples = FALSE, approx_solution = FALSE) {
+                 tolerance = 1e-5, max_iterations = 50, sd_x = NULL,
+                 sd_y = NULL, mult_samples = FALSE, approx_solution = FALSE) {
 
   if (mult_samples == FALSE) {
 
@@ -205,11 +208,13 @@ york <- function(x, y, weights_x = NULL, weights_y = NULL, r_xy_errors = NULL,
 
   if (approx_solution == FALSE) {
 
-    # algorithm to find york slope
+    # algorithm to find york slope. first set variables
     slope_diff <- 10
     count <- 0
     slope_per_iteration <- NULL
     alpha <- sqrt(weights_x * weights_y)
+
+    # run loop
     while (slope_diff > tolerance) {
       slope_old <- slope
       Weight <- alpha^2 / (slope^2 * weights_y + weights_x -
@@ -222,9 +227,10 @@ york <- function(x, y, weights_x = NULL, weights_y = NULL, r_xy_errors = NULL,
       y_bar <- sum(Weight * y) / Weight_sum
       x_centered <- x - x_bar
       y_centered <- y - y_bar
-      beta <- Weight * ((x_centered / weights_y) + (slope * y_centered /
-                                                      weights_x) -
-                          (slope * x_centered + y_centered) * r_xy_errors / alpha)
+      beta <- Weight * ((x_centered / weights_y) +
+                          (slope * y_centered / weights_x) -
+                          (slope * x_centered + y_centered) *
+                          r_xy_errors / alpha)
       Q1 <- sum(Weight * beta * y_centered)
       Q2 <- sum(Weight * beta * x_centered)
 
@@ -244,7 +250,7 @@ york <- function(x, y, weights_x = NULL, weights_y = NULL, r_xy_errors = NULL,
 
     # solve cubic problem and use estimates as approximation
     approx <- f_cubic_root(x, y, weights_x, weights_y,
-                                           r_xy_errors, slope, ols_reg$se_slope)
+                           r_xy_errors, slope, ols_reg$se_slope)
     slope <- approx$slope
     Weight <- approx$Weight
     Weight_sum <- approx$Weight_sum
@@ -264,7 +270,8 @@ york <- function(x, y, weights_x = NULL, weights_y = NULL, r_xy_errors = NULL,
   x_mean <- sum(Weight * beta) / (Weight_sum * (length(x) - 2))
   u <- x_adj - x_mean
   sigma_slope <- sqrt(1 / sum(Weight * u^2))
-  sigma_intercept <- sqrt(x_mean^2 * sigma_slope^2 + 1 / Weight_sum)
+  sigma_intercept <- sqrt(x_mean^2 * sigma_slope^2 +
+                            1 / Weight_sum)
 
   # Goodness of fit + Test (H0: S <= chisq_df)
   S <- sum(Weight * (y - slope * x - intercept)^2)
