@@ -1,8 +1,4 @@
----
-title: 'yorkregression'
-author: "Jonas Cedro Delgado and Jens Lichter"
-output: html_document
----
+# yorkregression
 
 > *Copyright 2019 Jonas Cedro Delgado, Jens Lichter. Licensed under the MIT license.*
 
@@ -53,11 +49,10 @@ plot.york(fit)
 
 ```
 
-![Plot 1](inst/Rplot0.png "fig:"){width=30% } ![Plot 2](inst/Rplot1.png "fig:"){
-width=50% }
-![Plot 3](inst/Rplot3.png "fig:"){width=30% } ![Plot 4](inst/Rplot4.png "fig:"){width=30% }
-![Plot 5](inst/Rplot5.png "fig:"){width=30% } ![Plot 6](inst/Rplot6.png "fig:"){width=50% }
-![Plot 7](inst/Rplot7.png "fig:"){width=45% } ![Plot 8](inst/Rplot8.png "fig:"){
+![Plot 1](inst/Rplot0.png "fig:") ![Plot 2](inst/Rplot1.png "fig:")
+![Plot 3](inst/Rplot3.png "fig:") ![Plot 4](inst/Rplot4.png "fig:")
+![Plot 5](inst/Rplot5.png "fig:")![Plot 6](inst/Rplot6.png "fig:")
+![Plot 7](inst/Rplot7.png "fig:") ![Plot 8](inst/Rplot8.png "fig:")
 width=30%}
 
 
