@@ -4,18 +4,24 @@ author: "Jonas Cedro Delgado and Jens Lichter"
 output: html_document
 ---
 
-## Installation
+> *Copyright 2019 Jonas Cedro Delgado, Jens Lichter. Licensed under the MIT license.*
 
-You can install the development version from github
+`yorkregression` is a R package for running a York's regression using ggplot2, stats and utils.
+
+This software was developed by **Jonas Cedro Delgado** and **Jens Lichter** and is available freely.
+
+## Installation
+`yorkregression` is available through GitHub:
+
+To install the latest development version from GitHub:
 
 ```{r}
 # install.packages("devtools")
 devtools::install_github("JENScoding/yorkregression")
 ```
 
-## Usage
-
-#### Example 1 (x, y, weights of x and y as input)
+## Examples
+###Example 1 (x, y, weights as input)
 ```{r}
 # data
 x <- c(0.0, 0.9, 1.8, 2.6, 3.3, 4.4, 5.2, 6.1, 6.5, 7.4)
@@ -43,7 +49,16 @@ $Regression_Test
 [1] "Chisq-statistic: 11.866 on 8 degrees of freedom,  p-value: 0.15727"              
 [2] "The assumption of a good fit cannot be rejected  at a significance level of 10%."
 
+plot.york(fit)
+
 ```
+
+![Plot 1](inst/Rplot0.png "fig:"){width=30% } ![Plot 2](inst/Rplot1.png "fig:"){
+width=50% }
+![Plot 3](inst/Rplot3.png "fig:"){width=30% } ![Plot 4](inst/Rplot4.png "fig:"){width=30% }
+![Plot 5](inst/Rplot5.png "fig:"){width=30% } ![Plot 6](inst/Rplot6.png "fig:"){width=50% }
+![Plot 7](inst/Rplot7.png "fig:"){width=45% } ![Plot 8](inst/Rplot8.png "fig:"){
+width=30%}
 
 
 Prediction
