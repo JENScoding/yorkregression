@@ -5,8 +5,8 @@
 \title{Fitting Linear Models With York's Method.}
 \usage{
 york(x, y, weights_x = NULL, weights_y = NULL, r_xy_errors = NULL,
-  tolerance = 0.00001, max_iterations = 50, sd_x = NULL,
-  sd_y = NULL, mult_samples = FALSE, approx_solution = FALSE)
+  tolerance = 1e-05, max_iterations = 50, sd_x = NULL, sd_y = NULL,
+  mult_samples = FALSE, approx_solution = FALSE)
 }
 \arguments{
 \item{x}{a 1 times n vector or in case of multiple samples a dataframe, where
